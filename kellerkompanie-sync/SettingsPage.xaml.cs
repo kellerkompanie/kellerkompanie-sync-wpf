@@ -77,6 +77,8 @@ namespace kellerkompanie_sync_wpf
 
                     Settings.Instance.AddAddonSearchDirectory(addonSearchDirectory.Directory);
                     Settings.Instance.SaveSettings();
+
+                    FileIndexer.Instance.UpdateLocalIndex();
                 }
             }
         }
