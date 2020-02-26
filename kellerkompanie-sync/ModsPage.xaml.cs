@@ -40,7 +40,7 @@ namespace kellerkompanie_sync_wpf
         public string ButtonText { get; set; }
         public bool ButtonIsEnabled { get; set; }
         public string ButtonVisibility { get; set; }
-        public bool CheckBoxIsEnabled { get; set; }
+        public string CheckBoxVisibility { get; set; }
         public bool CheckBoxIsSelected { get; set; }
 
 
@@ -83,7 +83,7 @@ namespace kellerkompanie_sync_wpf
                     IconTooltip = "Unknown";
                     IconColor = "Red";
 
-                    CheckBoxIsEnabled = false;
+                    CheckBoxVisibility = "Hidden";
 
                     ButtonVisibility = "Hidden";
                     ButtonText = "";
@@ -94,7 +94,7 @@ namespace kellerkompanie_sync_wpf
                     IconTooltip = "All mods missing";
                     IconColor = "Red";
 
-                    CheckBoxIsEnabled = false;
+                    CheckBoxVisibility = "Hidden";
 
                     ButtonVisibility = "Visible";
                     ButtonText = "Subscribe";
@@ -105,7 +105,7 @@ namespace kellerkompanie_sync_wpf
                     IconTooltip = "All mods downloaded, but not subscribed";
                     IconColor = "Green";
 
-                    CheckBoxIsEnabled = false;
+                    CheckBoxVisibility = "Hidden";
 
                     ButtonVisibility = "Visible";
                     ButtonText = "Subscribe";
@@ -116,7 +116,7 @@ namespace kellerkompanie_sync_wpf
                     IconTooltip = "Some mods already downloaded";
                     IconColor = "Yellow";
 
-                    CheckBoxIsEnabled = false;
+                    CheckBoxVisibility = "Hidden";
 
                     ButtonVisibility = "Visible";
                     ButtonText = "Subscribe";
@@ -127,7 +127,7 @@ namespace kellerkompanie_sync_wpf
                     IconTooltip = "Needs update";
                     IconColor = "Yellow";
 
-                    CheckBoxIsEnabled = false;
+                    CheckBoxVisibility = "Hidden";
 
                     ButtonVisibility = "Visible";
                     ButtonText = "Update";
@@ -138,7 +138,7 @@ namespace kellerkompanie_sync_wpf
                     IconTooltip = "Ready";
                     IconColor = "Green";
 
-                    CheckBoxIsEnabled = true;
+                    CheckBoxVisibility = "Visible";
 
                     ButtonVisibility = "Hidden";
                     ButtonText = "";

@@ -10,8 +10,66 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
 
-    <StackPanel>
+    <Page.Resources>
+        <Style x:Key="{x:Type CheckBox}" TargetType="{x:Type CheckBox}">
+            <Setter Property="SnapsToDevicePixels" Value="true" />
+            <Setter Property="OverridesDefaultStyle" Value="true" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <BulletDecorator Background="Transparent">
+                            <BulletDecorator.Bullet>
+                                <Border
+                                    x:Name="Border"
+                                    Width="14"
+                                    Height="14"
+                                    Background="Transparent"
+                                    BorderBrush="#f2f5f4"
+                                    BorderThickness="1"
+                                    CornerRadius="0">
+                                    <Path
+                                        x:Name="CheckMark"
+                                        Width="8"
+                                        Height="8"
+                                        Data="M 0 0 L 8 8 M 0 8 L 8 0"
+                                        SnapsToDevicePixels="False"
+                                        Stroke="#f2f5f4"
+                                        StrokeThickness="2" />
+                                </Border>
+                            </BulletDecorator.Bullet>
+                            <ContentPresenter
+                                Margin="4,0,0,0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                RecognizesAccessKey="True" />
+                        </BulletDecorator>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="false">
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Collapsed" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="{x:Null}">
+                                <Setter TargetName="CheckMark" Property="Data" Value="M 0 7 L 7 0" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="Border" Property="Background" Value="#808080" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter TargetName="Border" Property="Background" Value="#E0E0E0" />
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#606060" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter TargetName="Border" Property="Background" Value="#EEEEEE" />
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#AAAAAA" />
+                                <Setter Property="Foreground" Value="#888888" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
 
+    <StackPanel>
         <DockPanel
             Name="SettingsExecutableLocationContainer"
             Margin="8,8,8,8"
@@ -25,13 +83,17 @@
             <Button
                 Name="SettingsExecutableLocationPicker"
                 Width="24"
+                Background="#ee4d2e"
+                BorderThickness="0"
                 Click="SettingsExecutableLocationPicker_Click"
                 Content="..."
-                DockPanel.Dock="Right" />
+                DockPanel.Dock="Right"
+                Foreground="#f2f5f4" />
             <TextBox
                 Name="TextBoxExecutableLocation"
                 Margin="8,0,0,0"
                 Background="#212121"
+                BorderBrush="#f2f5f4"
                 Foreground="#f2f5f4"
                 IsReadOnly="True" />
         </DockPanel>
@@ -41,36 +103,42 @@
             <CheckBox
                 Name="CheckBoxShowScriptErrors"
                 Margin="0,8,0,0"
+                Background="#212121"
                 Click="CheckBoxShowScriptErrors_Click"
                 Content="show script errors"
                 Foreground="#f2f5f4" />
             <CheckBox
                 Name="CheckBoxNoPause"
                 Margin="0,8,0,0"
+                Background="#212121"
                 Click="CheckBoxNoPause_Click"
                 Content="no pause"
                 Foreground="#f2f5f4" />
             <CheckBox
                 Name="CheckBoxWindowMode"
                 Margin="0,8,0,0"
+                Background="#212121"
                 Click="CheckBoxWindowMode_Click"
                 Content="window mode"
                 Foreground="#f2f5f4" />
             <CheckBox
                 Name="CheckBoxNoSplashScreen"
                 Margin="0,8,0,0"
+                Background="#212121"
                 Click="CheckBoxNoSplashScreen_Click"
                 Content="no splash screen"
                 Foreground="#f2f5f4" />
             <CheckBox
                 Name="CheckBoxDefaultWorldEmpty"
                 Margin="0,8,0,0"
+                Background="#212121"
                 Click="CheckBoxDefaultWorldEmpty_Click"
                 Content="default world empty"
                 Foreground="#f2f5f4" />
             <CheckBox
                 Name="CheckBoxNoLogs"
                 Margin="0,8,0,0"
+                Background="#212121"
                 Click="CheckBoxNoLogs_Click"
                 Content="no logs"
                 Foreground="#f2f5f4" />
@@ -83,6 +151,7 @@
                 Height="60"
                 AcceptsReturn="True"
                 Background="#212121"
+                BorderBrush="#f2f5f4"
                 Foreground="#f2f5f4"
                 TextChanged="TextBoxAdditionalParameters_TextChanged"
                 TextWrapping="Wrap" />
@@ -99,6 +168,7 @@
                 Margin="0,6,0,0"
                 HorizontalAlignment="Stretch"
                 Background="#161618"
+                BorderBrush="#f2f5f4"
                 BorderThickness="1">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
@@ -118,16 +188,22 @@
                                     Height="28"
                                     Margin="8,0,0,0"
                                     VerticalAlignment="Center"
+                                    Background="#ee4d2e"
+                                    BorderThickness="0"
                                     Click="ButtonOpen_Click"
-                                    Content="Open" />
+                                    Content="Open"
+                                    Foreground="#f2f5f4" />
                                 <Button
                                     Name="ButtonRemove"
                                     Width="64"
                                     Height="28"
                                     Margin="8,0,0,0"
                                     VerticalAlignment="Center"
+                                    Background="#ee4d2e"
+                                    BorderThickness="0"
                                     Click="ButtonRemove_Click"
-                                    Content="Remove" />
+                                    Content="Remove"
+                                    Foreground="#f2f5f4" />
                             </StackPanel>
 
                             <TextBlock
@@ -146,8 +222,11 @@
                 Width="100"
                 Height="28"
                 HorizontalAlignment="Left"
+                Background="#ee4d2e"
+                BorderThickness="0"
                 Click="ButtonAddAddonSearchDirectory_Click"
-                Content="Add Directory" />
+                Content="Add Directory"
+                Foreground="#f2f5f4" />
         </StackPanel>
 
     </StackPanel>

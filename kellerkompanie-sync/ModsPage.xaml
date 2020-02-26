@@ -10,8 +10,66 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
 
-    <Grid>
+    <Page.Resources>
+        <Style x:Key="{x:Type CheckBox}" TargetType="{x:Type CheckBox}">
+            <Setter Property="SnapsToDevicePixels" Value="true" />
+            <Setter Property="OverridesDefaultStyle" Value="true" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <BulletDecorator Background="Transparent">
+                            <BulletDecorator.Bullet>
+                                <Border
+                                    x:Name="Border"
+                                    Width="14"
+                                    Height="14"
+                                    Background="Transparent"
+                                    BorderBrush="#f2f5f4"
+                                    BorderThickness="1"
+                                    CornerRadius="0">
+                                    <Path
+                                        x:Name="CheckMark"
+                                        Width="8"
+                                        Height="8"
+                                        Data="M 0 0 L 8 8 M 0 8 L 8 0"
+                                        SnapsToDevicePixels="False"
+                                        Stroke="#f2f5f4"
+                                        StrokeThickness="2" />
+                                </Border>
+                            </BulletDecorator.Bullet>
+                            <ContentPresenter
+                                Margin="4,0,0,0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                RecognizesAccessKey="True" />
+                        </BulletDecorator>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="false">
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Collapsed" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="{x:Null}">
+                                <Setter TargetName="CheckMark" Property="Data" Value="M 0 7 L 7 0" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="Border" Property="Background" Value="#808080" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter TargetName="Border" Property="Background" Value="#E0E0E0" />
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#606060" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter TargetName="Border" Property="Background" Value="#EEEEEE" />
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#AAAAAA" />
+                                <Setter Property="Foreground" Value="#888888" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
 
+    <Grid>
         <ListView
             Name="ListViewAddonGroups"
             Margin="0,6,0,0"
@@ -35,7 +93,7 @@
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 Click="CheckBox_Click"
-                                IsEnabled="{Binding CheckBoxIsEnabled}" />
+                                Visibility="{Binding CheckBoxVisibility}" />
                             <Rectangle
                                 Width="24"
                                 Height="24"
@@ -52,11 +110,15 @@
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                             <Button
                                 Name="ButtonDownloadOrUpdate"
+                                Width="80"
                                 Height="28"
                                 Margin="8,0,0,0"
                                 VerticalAlignment="Center"
+                                Background="#ee4d2e"
+                                BorderThickness="0"
                                 Click="ButtonDownload_Click"
                                 Content="{Binding ButtonText}"
+                                Foreground="#f2f5f4"
                                 IsEnabled="{Binding ButtonIsEnabled}"
                                 Visibility="{Binding ButtonVisibility}" />
                         </StackPanel>

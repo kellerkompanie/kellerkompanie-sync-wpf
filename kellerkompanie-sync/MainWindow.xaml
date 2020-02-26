@@ -14,6 +14,9 @@
     LocationChanged="MainWindow_LocationChanged"
     SizeChanged="MainWindow_SizeChanged"
     mc:Ignorable="d">
+    
+
+
     <DockPanel>
         <DockPanel
             Name="NavigationPanel"
@@ -103,7 +106,7 @@
                         BorderThickness="0"
                         Click="ButtonTeamspeak_Click">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="/Images/headset.png" />
+                            <Image Margin="6,0,0,0" Source="/Images/headset.png" />
                             <TextBlock
                                 Margin="8,0,8,0"
                                 VerticalAlignment="Center"
@@ -119,7 +122,7 @@
                         BorderThickness="0"
                         Click="ButtonForum_Click">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="/Images/forum.png" />
+                            <Image Margin="6,0,0,0" Source="/Images/forum.png" />
                             <TextBlock
                                 Margin="8,0,8,0"
                                 VerticalAlignment="Center"
@@ -135,7 +138,7 @@
                         BorderThickness="0"
                         Click="ButtonServer_Click">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="/Images/server.png" />
+                            <Image Margin="6,0,0,0" Source="/Images/server.png" />
                             <TextBlock
                                 Margin="8,0,8,0"
                                 VerticalAlignment="Center"
@@ -151,7 +154,7 @@
                         BorderThickness="0"
                         Click="ButtonWiki_Click">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="/Images/wiki.png" />
+                            <Image Margin="6,0,0,0" Source="/Images/wiki.png" />
                             <TextBlock
                                 Margin="8,0,8,0"
                                 VerticalAlignment="Center"
