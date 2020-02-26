@@ -148,10 +148,6 @@
                 HorizontalAlignment="Left"
                 Click="ButtonAddAddonSearchDirectory_Click"
                 Content="Add Directory" />
-            <Button
-                Name="ButtonIndex"
-                Click="ButtonIndex_Click"
-                Content="Index" />
         </StackPanel>
 
     </StackPanel>

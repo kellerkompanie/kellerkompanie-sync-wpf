@@ -166,13 +166,6 @@ namespace kellerkompanie_sync_wpf
             string directory = addonSearchDirectory.Directory;
             Settings.Instance.AddonSearchDirectories.Remove(directory);
             Settings.Instance.SaveSettings();
-        }
-
-        private void ButtonIndex_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow wnd = (MainWindow)Window.GetWindow(this);
-            wnd.ProgressBar.Value = 0;
-            FileIndexer.Instance.UpdateLocalIndex();
-        }        
+        }       
     }
 }
