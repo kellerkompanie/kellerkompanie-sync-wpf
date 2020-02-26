@@ -1,0 +1,158 @@
+﻿<Page
+    x:Class="kellerkompanie_sync_wpf.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:kellerkompanie_sync_wpf"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Settings"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+
+    <StackPanel>
+
+        <DockPanel
+            Name="SettingsExecutableLocationContainer"
+            Margin="8,8,8,8"
+            LastChildFill="True">
+            <TextBlock
+                Name="SettingsExecutableLocationTitle"
+                VerticalAlignment="Center"
+                DockPanel.Dock="Left"
+                Foreground="#f2f5f4"
+                Text="Arma 3 executable location:" />
+            <Button
+                Name="SettingsExecutableLocationPicker"
+                Width="24"
+                Click="SettingsExecutableLocationPicker_Click"
+                Content="..."
+                DockPanel.Dock="Right" />
+            <TextBox
+                Name="TextBoxExecutableLocation"
+                Margin="8,0,0,0"
+                Background="#212121"
+                Foreground="#f2f5f4"
+                IsReadOnly="True" />
+        </DockPanel>
+
+        <StackPanel Name="SettingsCheckboxParametersPanel" Margin="8,8,8,8">
+            <TextBlock Foreground="#f2f5f4" Text="Default Parameters" />
+            <CheckBox
+                Name="CheckBoxShowScriptErrors"
+                Margin="0,8,0,0"
+                Click="CheckBoxShowScriptErrors_Click"
+                Content="show script errors"
+                Foreground="#f2f5f4" />
+            <CheckBox
+                Name="CheckBoxNoPause"
+                Margin="0,8,0,0"
+                Click="CheckBoxNoPause_Click"
+                Content="no pause"
+                Foreground="#f2f5f4" />
+            <CheckBox
+                Name="CheckBoxWindowMode"
+                Margin="0,8,0,0"
+                Click="CheckBoxWindowMode_Click"
+                Content="window mode"
+                Foreground="#f2f5f4" />
+            <CheckBox
+                Name="CheckBoxNoSplashScreen"
+                Margin="0,8,0,0"
+                Click="CheckBoxNoSplashScreen_Click"
+                Content="no splash screen"
+                Foreground="#f2f5f4" />
+            <CheckBox
+                Name="CheckBoxDefaultWorldEmpty"
+                Margin="0,8,0,0"
+                Click="CheckBoxDefaultWorldEmpty_Click"
+                Content="default world empty"
+                Foreground="#f2f5f4" />
+            <CheckBox
+                Name="CheckBoxNoLogs"
+                Margin="0,8,0,0"
+                Click="CheckBoxNoLogs_Click"
+                Content="no logs"
+                Foreground="#f2f5f4" />
+        </StackPanel>
+
+        <StackPanel Name="SettingsAdditionalParametersPanel" Margin="8,8,8,8">
+            <TextBlock Foreground="#f2f5f4" Text="Additional Parameters" />
+            <TextBox
+                Name="TextBoxAdditionalParameters"
+                Height="60"
+                AcceptsReturn="True"
+                Background="#212121"
+                Foreground="#f2f5f4"
+                TextChanged="TextBoxAdditionalParameters_TextChanged"
+                TextWrapping="Wrap" />
+        </StackPanel>
+
+        <StackPanel Margin="8,8,8,8">
+            <TextBlock Foreground="#f2f5f4" Text="Addon Search Directories" />
+            <TextBlock
+                Foreground="#888888"
+                Text="A list of directories on your computer in which the tool will look for addons (folders starting with @). You can also select folders that already contain addons, in which case the tool will try to discover existing addons before downloading."
+                TextWrapping="Wrap" />
+            <ListView
+                Name="ListViewAddonSearchDirectories"
+                Margin="0,6,0,0"
+                HorizontalAlignment="Stretch"
+                Background="#161618"
+                BorderThickness="1">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="Margin" Value="0,1,0,1" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="BorderThickness" Value="0" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel Background="#212121" LastChildFill="True">
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                <Button
+                                    Name="ButtonOpen"
+                                    Width="64"
+                                    Height="28"
+                                    Margin="8,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Click="ButtonOpen_Click"
+                                    Content="Open" />
+                                <Button
+                                    Name="ButtonRemove"
+                                    Width="64"
+                                    Height="28"
+                                    Margin="8,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Click="ButtonRemove_Click"
+                                    Content="Remove" />
+                            </StackPanel>
+
+                            <TextBlock
+                                Name="TextBlockDirectory"
+                                Margin="8,0,0,0"
+                                HorizontalAlignment="Stretch"
+                                FontSize="18"
+                                Foreground="#ee4d2e"
+                                Text="{Binding Directory}" />
+                        </DockPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <Button
+                Name="ButtonAddAddonSearchDirectory"
+                Width="100"
+                Height="28"
+                HorizontalAlignment="Left"
+                Click="ButtonAddAddonSearchDirectory_Click"
+                Content="Add Directory" />
+            <Button
+                Name="ButtonIndex"
+                Click="ButtonIndex_Click"
+                Content="Index" />
+        </StackPanel>
+
+    </StackPanel>
+</Page>

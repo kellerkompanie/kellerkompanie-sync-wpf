@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>kellerkompanie_sync_wpf</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>appicon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>0.1.0-alpha</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Images\announcement.png" />
+    <None Remove="Images\appicon.png" />
+    <None Remove="Images\calendar.png" />
+    <None Remove="Images\checkmark.png" />
+    <None Remove="Images\download.png" />
+    <None Remove="Images\euro.png" />
+    <None Remove="Images\forum.png" />
+    <None Remove="Images\headset.png" />
+    <None Remove="Images\kk-logo-full.png" />
+    <None Remove="Images\kk-signet-small-color.png" />
+    <None Remove="Images\link.png" />
+    <None Remove="Images\open_location.png" />
+    <None Remove="Images\pause.png" />
+    <None Remove="Images\play.png" />
+    <None Remove="Images\questionmark.png" />
+    <None Remove="Images\server.png" />
+    <None Remove="Images\settings.png" />
+    <None Remove="Images\wiki.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\announcement.png" />
+    <Resource Include="Images\appicon.png" />
+    <Resource Include="Images\calendar.png" />
+    <Resource Include="Images\checkmark.png" />
+    <Resource Include="Images\download.png" />
+    <Resource Include="Images\euro.png" />
+    <Resource Include="Images\forum.png" />
+    <Resource Include="Images\headset.png" />
+    <Resource Include="Images\kk-logo-full.png" />
+    <Resource Include="Images\kk-signet-small-color.png" />
+    <Resource Include="Images\link.png" />
+    <Resource Include="Images\open_location.png" />
+    <Resource Include="Images\pause.png" />
+    <Resource Include="Images\play.png" />
+    <Resource Include="Images\questionmark.png" />
+    <Resource Include="Images\server.png" />
+    <Resource Include="Images\settings.png" />
+    <Resource Include="Images\wiki.png" />
+  </ItemGroup>
+
+</Project>
