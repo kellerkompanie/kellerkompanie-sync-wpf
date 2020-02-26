@@ -14,7 +14,7 @@
     LocationChanged="MainWindow_LocationChanged"
     SizeChanged="MainWindow_SizeChanged"
     mc:Ignorable="d">
-    
+
 
 
     <DockPanel>
@@ -192,7 +192,7 @@
             </Grid>
 
             <Frame
-                x:Name="MainFrame"
+                Name="MainFrame"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 Background="#161618"

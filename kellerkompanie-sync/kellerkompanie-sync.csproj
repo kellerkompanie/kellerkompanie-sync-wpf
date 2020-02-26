@@ -27,11 +27,13 @@
     <None Remove="Images\checkmark.png" />
     <None Remove="Images\download.png" />
     <None Remove="Images\euro.png" />
+    <None Remove="Images\event.png" />
     <None Remove="Images\forum.png" />
     <None Remove="Images\headset.png" />
     <None Remove="Images\kk-logo-full.png" />
     <None Remove="Images\kk-signet-small-color.png" />
     <None Remove="Images\link.png" />
+    <None Remove="Images\news.png" />
     <None Remove="Images\open_location.png" />
     <None Remove="Images\pause.png" />
     <None Remove="Images\play.png" />
@@ -48,15 +50,16 @@
   <ItemGroup>
     <Resource Include="Images\announcement.png" />
     <Resource Include="Images\appicon.png" />
-    <Resource Include="Images\calendar.png" />
     <Resource Include="Images\checkmark.png" />
     <Resource Include="Images\download.png" />
     <Resource Include="Images\euro.png" />
+    <Resource Include="Images\event.png" />
     <Resource Include="Images\forum.png" />
     <Resource Include="Images\headset.png" />
     <Resource Include="Images\kk-logo-full.png" />
     <Resource Include="Images\kk-signet-small-color.png" />
     <Resource Include="Images\link.png" />
+    <Resource Include="Images\news.png" />
     <Resource Include="Images\open_location.png" />
     <Resource Include="Images\pause.png" />
     <Resource Include="Images\play.png" />

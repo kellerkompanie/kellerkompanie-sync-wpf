@@ -1,5 +1,7 @@
-﻿using System;
+﻿using kellerkompanie_sync;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,40 +15,57 @@ using System.Windows.Shapes;
 
 namespace kellerkompanie_sync_wpf
 {
-    public enum NewsType
+    public class NewsItem
     {
-        News,
-        Mission,
-        Donation
-    }
-
-    public class News
-    {
-        public string uuid { get; set; }
-        public NewsType newsType { get; set; }
-        public string title { get; set; }
-        public string content { get; set; }
-        public string weblink { get; set; }
-        public long timestamp { get; set; }
+        public string Title { get; set; }
+        public string Content { get; set; }
+        public long Timestamp { get; set; }
+        public string Weblink { get; set; }
+        public string Icon { get; set; }
     }
 
     public partial class NewsPage : Page
     {
-        private readonly List<News> news = new List<News>();
-        private const string LoremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-
+        private readonly List<NewsItem> news = new List<NewsItem>();
+       
         public NewsPage()
         {
             InitializeComponent();
 
-            news.Add(new News { uuid = "xxx", newsType = NewsType.News, title = "News Title", content = LoremIpsum, weblink = "http://kellerkompanie.com", timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds() });
-            news.Add(new News { uuid = "xxx", newsType = NewsType.News, title = "News Title", content = LoremIpsum, weblink = "http://kellerkompanie.com", timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds() });
-            news.Add(new News { uuid = "xxx", newsType = NewsType.News, title = "News Title", content = LoremIpsum, weblink = "http://kellerkompanie.com", timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds() });
-            news.Add(new News { uuid = "xxx", newsType = NewsType.News, title = "News Title", content = LoremIpsum, weblink = "http://kellerkompanie.com", timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds() });
-            news.Add(new News { uuid = "xxx", newsType = NewsType.News, title = "News Title", content = LoremIpsum, weblink = "http://kellerkompanie.com", timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds() });
-            news.Add(new News { uuid = "xxx", newsType = NewsType.News, title = "News Title", content = LoremIpsum, weblink = "http://kellerkompanie.com", timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds() });
+            foreach (WebNews webNews in WebAPI.GetNews()) {
+                NewsItem newsItem = new NewsItem();
+                newsItem.Title = webNews.Title;
+                newsItem.Content = webNews.Content;
+                newsItem.Timestamp = webNews.Timestamp;
+                newsItem.Weblink = webNews.Weblink;
+                newsItem.Icon = "/Images/news.png";
+                news.Add(newsItem);
+            }
+
+            foreach (WebEvent webEvent in WebAPI.GetEvents())
+            {
+                NewsItem newsItem = new NewsItem();
+                newsItem.Title = webEvent.Title;
+                newsItem.Content = webEvent.ExtractContent();
+                newsItem.Timestamp = webEvent.Timestamp;
+                newsItem.Weblink = webEvent.ExtractWeblink();
+                newsItem.Icon = "/Images/event.png";
+                news.Add(newsItem);
+            }
+
+            news.Sort(delegate (NewsItem n1, NewsItem n2) { return n2.Timestamp.CompareTo(n1.Timestamp); });
 
             NewsListView.ItemsSource = news;
+        }
+        
+        private void ListViewItem_Selected(object sender, RoutedEventArgs e)
+        {
+            var item = sender as ListViewItem;
+            if (item != null && item.IsSelected)
+            {
+                NewsItem newsItem = (NewsItem)item.DataContext;
+                MainWindow.LaunchUri(newsItem.Weblink);
+            }
         }
     }
 }
