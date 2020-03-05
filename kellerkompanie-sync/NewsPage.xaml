@@ -9,56 +9,53 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
 
-    <Grid>
-        <ListView
-            Name="NewsListView"
-            HorizontalAlignment="Stretch"
-            VerticalAlignment="Stretch"
-            Background="#161618"
-            BorderThickness="0">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="Padding" Value="0" />
-                    <Setter Property="Margin" Value="0,1,0,1" />
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    <EventSetter Event="Selected" Handler="ListViewItem_Selected" />
-                </Style>
-            </ListView.ItemContainerStyle>
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <DockPanel Background="#212121" LastChildFill="True">
-                        <Image
-                            Name="NewsItemImage"
-                            Width="36"
-                            Height="36"
-                            Margin="16,8,16,8"
-                            VerticalAlignment="Center"
-                            DockPanel.Dock="Left"
-                            Source="{Binding Icon}" />
-                        <StackPanel HorizontalAlignment="Stretch">
-                            <TextBlock
-                                Name="NewsItemTitle"
-                                Margin="0,16,0,0"
-                                HorizontalAlignment="Stretch"
-                                FontSize="20"
-                                FontWeight="SemiBold"
-                                Foreground="#ee4d2e"
-                                Text="{Binding Title}"
-                                TextTrimming="CharacterEllipsis"
-                                TextWrapping="Wrap" />
-                            <TextBlock
-                                Name="NewsItemContent"
-                                Margin="0,0,0,16"
-                                HorizontalAlignment="Stretch"
-                                FontSize="16"
-                                Foreground="DarkGray"
-                                Text="{Binding Content}"
-                                TextTrimming="CharacterEllipsis"
-                                TextWrapping="Wrap" />
-                        </StackPanel>
-                    </DockPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-    </Grid>
+    <ListView
+        Name="NewsListView"
+        Background="#161618"
+        BorderThickness="0">
+        <ListView.ItemContainerStyle>
+            <Style TargetType="ListViewItem">
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Margin" Value="0,1,0,1" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <EventSetter Event="Selected" Handler="ListViewItem_Selected" />
+            </Style>
+        </ListView.ItemContainerStyle>
+        <ListView.ItemTemplate>
+            <DataTemplate>
+                <StackPanel
+                    Width="{Binding ActualWidth, ElementName=NewsListView}"
+                    Margin="0,0,-24,0"
+                    Background="#212121"
+                    Orientation="Horizontal">
+                    <Image
+                        Name="NewsItemImage"
+                        Width="36"
+                        Height="36"
+                        Margin="16,8,16,8"
+                        VerticalAlignment="Center"
+                        Source="{Binding Icon}" />
+                    <StackPanel>
+                        <TextBlock
+                            Name="NewsItemTitle"
+                            Margin="0,16,0,0"
+                            FontSize="20"
+                            FontWeight="SemiBold"
+                            Foreground="#ee4d2e"
+                            Text="{Binding Title}"
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Name="NewsItemContent"
+                            Margin="0,0,0,16"
+                            FontSize="16"
+                            Foreground="DarkGray"
+                            Text="{Binding Content}"
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="Wrap" />
+                    </StackPanel>
+                </StackPanel>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+    </ListView>
 </Page>

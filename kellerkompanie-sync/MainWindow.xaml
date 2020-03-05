@@ -89,7 +89,10 @@
 
         </DockPanel>
 
-        <DockPanel Name="ContentPanel" DockPanel.Dock="Right">
+        <DockPanel
+            Name="ContentPanel"
+            DockPanel.Dock="Right"
+            LastChildFill="True">
             <StackPanel
                 x:Name="QuickBarPanel"
                 Background="#161618"
@@ -193,8 +196,6 @@
 
             <Frame
                 Name="MainFrame"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
                 Background="#161618"
                 NavigationUIVisibility="Hidden" />
         </DockPanel>
