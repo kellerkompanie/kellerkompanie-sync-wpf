@@ -157,6 +157,34 @@
                 TextWrapping="Wrap" />
         </StackPanel>
 
+        <StackPanel Name="SettingsDownloadParametersPanel" Margin="8,8,8,8">
+            <TextBlock
+                Margin="0,0,0,8"
+                Foreground="#f2f5f4"
+                Text="Download Settings" />
+            <DockPanel>
+                <TextBlock Foreground="#f2f5f4" Text="Number of simultaneous downloads:" />
+                <TextBox
+                    Width="40"
+                    Background="#212121"
+                    BorderBrush="#f2f5f4"
+                    DockPanel.Dock="Right"
+                    Foreground="#f2f5f4"
+                    Text="{Binding ElementName=SliderDownloads, Path=Value, UpdateSourceTrigger=PropertyChanged}"
+                    TextAlignment="Right" />
+                <Slider
+                    Name="SliderDownloads"
+                    Margin="16,0,8,0"
+                    IsSnapToTickEnabled="True"
+                    Maximum="10"
+                    Minimum="1"
+                    TickFrequency="1"
+                    TickPlacement="BottomRight"
+                    ValueChanged="SliderDownloads_ValueChanged"
+                    Value="10" />
+            </DockPanel>
+        </StackPanel>
+
         <StackPanel Margin="8,8,8,8">
             <TextBlock Foreground="#f2f5f4" Text="Addon Search Directories" />
             <TextBlock

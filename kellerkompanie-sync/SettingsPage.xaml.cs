@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -20,8 +16,7 @@ namespace kellerkompanie_sync_wpf
 
         public override bool Equals(Object obj)
         {
-            //Check for null and compare run-time types.
-            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+            if ((obj == null) || !GetType().Equals(obj.GetType()))
             {
                 return false;
             }
@@ -34,7 +29,7 @@ namespace kellerkompanie_sync_wpf
 
         public override int GetHashCode()
         {
-            return this.Directory.GetHashCode();
+            return Directory.GetHashCode();
         }
     }
 
@@ -55,6 +50,8 @@ namespace kellerkompanie_sync_wpf
 
             TextBoxExecutableLocation.Text = settings.ExecutableLocation;
             TextBoxAdditionalParameters.Text = settings.ParamAdditional;
+
+            SliderDownloads.Value = settings.SimultaneousDownloads;
 
             ListViewAddonSearchDirectories.ItemsSource = AddonSearchDirectories;
             foreach (string addonSearchDirectory in settings.AddonSearchDirectories)
@@ -168,6 +165,12 @@ namespace kellerkompanie_sync_wpf
             string directory = addonSearchDirectory.Directory;
             Settings.Instance.AddonSearchDirectories.Remove(directory);
             Settings.Instance.SaveSettings();
-        }       
+        }
+
+        private void SliderDownloads_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Settings.Instance.SimultaneousDownloads = (int)Math.Floor(e.NewValue);
+            Settings.Instance.SaveSettings();
+        }
     }
 }

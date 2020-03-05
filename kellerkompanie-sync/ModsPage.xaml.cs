@@ -176,29 +176,7 @@ namespace kellerkompanie_sync_wpf
             worker.RunWorkerCompleted += DownloadWorker_RunWorkerCompleted;
             worker.RunWorkerAsync(addonGroup);
         }
-        
-        private void DownloadFile(string sourceUrl, string destinationFile, long filesize)
-        {
-            Debug.WriteLine($"downloading: {sourceUrl} --> {destinationFile}");
-            var directory = Path.GetDirectoryName(destinationFile);
-            Directory.CreateDirectory(directory);
-
-            using var client = new WebClient();
-            client.DownloadFile(sourceUrl, destinationFile);
-            long destinationFilesize = new FileInfo(destinationFile).Length;
-            if (filesize != destinationFilesize)
-            {
-                throw new InvalidDataException($"downloaded file has different size than expected, expected {filesize} bytes but got {destinationFilesize} bytes");
-            }
-        }
-
-        void wc_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-        {
-            MainWindow wnd = (MainWindow)Window.GetWindow(this);
-            wnd.ProgressBar.Value = e.ProgressPercentage;
-            Debug.WriteLine(e.ProgressPercentage);
-        }
-
+                
         void DownloadWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             AddonGroup addonGroup = (AddonGroup)e.Argument;
@@ -295,32 +273,62 @@ namespace kellerkompanie_sync_wpf
                 }
             }
 
-            // update existing information, i.e., versions, hashes etc.
-            double i = 0;
+            DownloadManager downloadManager = new DownloadManager(addonGroup);
+            downloadManager.eDownloadsFinished += DownloadManager_Finished;
+            downloadManager.eProgressChanged += DownloadManager_ProgressChanged;
+            downloadManager.eSpeedChanged += DownloadManager_SpeedChanged;
+                        
             foreach ((string url, string destinationFile, long filesize) in downloads)
             {
-                DownloadFile(url, destinationFile, filesize);
-
-                i += 1;
-                int percentage = (int)Math.Floor(i / downloads.Count * 100);
-                (sender as BackgroundWorker).ReportProgress(percentage);
+                downloadManager.AddDownload(url, destinationFile);
             }
 
-            Application.Current.Dispatcher.Invoke(new Action(() => { FileIndexer.Instance.SetAddonGroupState(addonGroup, AddonGroupState.Ready); }));            
+            downloadManager.StartDownloads();
         }
+
+        void DownloadManager_Finished(object sender, bool status)
+        {
+            DownloadManager downloadManager = sender as DownloadManager;
+            Application.Current.Dispatcher.Invoke(new Action(() => {
+                MainWindow wnd = (MainWindow)Window.GetWindow(this);
+                wnd.ProgressBar.Value = 0;
+                wnd.ProgressBarText.Text = "Everything up-to-date";
+
+                FileIndexer.Instance.SetAddonGroupState(downloadManager.AddonGroup, AddonGroupState.Ready);             
+            }));            
+        }
+
+        void DownloadManager_SpeedChanged(object sender, double speed)
+        {
+            Speed = speed;
+            UpdateProgressUI();
+        }
+
+        void DownloadManager_ProgressChanged(object sender, double progress)
+        {
+            Progress = progress;
+            UpdateProgressUI();
+        }
+
+        private double Progress = 0.0;
+        private double Speed = 0.0;
+        private void UpdateProgressUI()
+        {
+            Application.Current.Dispatcher.Invoke(new Action(() => {
+                MainWindow wnd = (MainWindow)Window.GetWindow(this);
+                wnd.ProgressBar.Value = Progress;
+                wnd.ProgressBarText.Text = "Downloading mods... (" + (int)Progress + "% @ " + string.Format("{0:n1} Kb/s", Speed) + ")";
+            }));
+        }            
 
         void DownloadWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            MainWindow wnd = (MainWindow)Window.GetWindow(this);
-            wnd.ProgressBar.Value = e.ProgressPercentage;
-            wnd.ProgressBarText.Text = "Downloading mods... (" + e.ProgressPercentage + "%)";
+            
         }
 
         void DownloadWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            MainWindow wnd = (MainWindow)Window.GetWindow(this);
-            wnd.ProgressBar.Value = 0;
-            wnd.ProgressBarText.Text = "Everything up-to-date";
-        }        
+            // TODO update existing information, i.e., versions, hashes etc.
+        }
     }
 }
