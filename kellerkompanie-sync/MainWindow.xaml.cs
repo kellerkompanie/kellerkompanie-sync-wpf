@@ -127,8 +127,23 @@ namespace kellerkompanie_sync_wpf
             MainFrame.Navigate(new Uri(destination, UriKind.Relative));
         }
 
+        private bool IsSteamRunning()
+        {
+            Process[] pname = Process.GetProcessesByName("Steam");
+            if (pname.Length == 0)
+                return false;
+            else
+                return true;
+        }
+
         private void PlayUpdateButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!IsSteamRunning())
+            {
+                MessageBox.Show("Steam is not running, please start Steam first!", "kellerkompanie-sync");
+                return;
+            }
+
             StringBuilder sb = new StringBuilder();
 
             if (Settings.Instance.ParamDefaultWorldEmpty)
