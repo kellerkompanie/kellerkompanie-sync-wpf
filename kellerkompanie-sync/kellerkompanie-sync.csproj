@@ -40,6 +40,7 @@
     <None Remove="Images\questionmark.png" />
     <None Remove="Images\server.png" />
     <None Remove="Images\settings.png" />
+    <None Remove="Images\tfar.png" />
     <None Remove="Images\wiki.png" />
   </ItemGroup>
 
@@ -66,6 +67,7 @@
     <Resource Include="Images\questionmark.png" />
     <Resource Include="Images\server.png" />
     <Resource Include="Images\settings.png" />
+    <Resource Include="Images\tfar.png" />
     <Resource Include="Images\wiki.png" />
   </ItemGroup>
 

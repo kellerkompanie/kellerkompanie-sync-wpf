@@ -165,6 +165,22 @@
                                 Text="Wiki" />
                         </StackPanel>
                     </Button>
+                    <Button
+                        Name="buttonTFAR"
+                        Height="42"
+                        Margin="24,0,0,0"
+                        Background="#212121"
+                        BorderThickness="0"
+                        Click="buttonTFAR_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Margin="6,0,0,0" Source="/Images/tfar.png" />
+                            <TextBlock
+                                Margin="8,0,8,0"
+                                VerticalAlignment="Center"
+                                Foreground="White"
+                                Text="TFAR" />
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
 
             </StackPanel>

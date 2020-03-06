@@ -64,6 +64,26 @@ namespace kellerkompanie_sync_wpf
             LaunchUri("https://wiki.kellerkompanie.com");
         }
 
+        private bool IsTeamspeakRunning()
+        {
+            Process[] pname = Process.GetProcessesByName("ts3client_win64");
+            if (pname.Length == 0)
+                return false;
+            else
+                return true;
+        }
+
+        private void buttonTFAR_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsTeamspeakRunning())
+            {
+                MessageBox.Show("Teamspeak is running, please close Teamspeak before installing the TFAR plugin!", "kellerkompanie-sync");
+                return;
+            }
+
+            LaunchUri("http://server.kellerkompanie.com/repository/task_force_radio.ts3_plugin");
+        }
+
         public static void LaunchUri(string uri)
         {
             try
@@ -225,6 +245,6 @@ namespace kellerkompanie_sync_wpf
         private void MainWindow_Closed(object sender, EventArgs e)
         {
             Settings.Instance.SaveSettings();
-        }
+        }        
     }
 }
