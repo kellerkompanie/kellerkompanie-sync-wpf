@@ -1,5 +1,4 @@
-﻿using kellerkompanie_sync;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
@@ -13,7 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace kellerkompanie_sync_wpf
+namespace kellerkompanie_sync
 {
     public class NewsItem
     {

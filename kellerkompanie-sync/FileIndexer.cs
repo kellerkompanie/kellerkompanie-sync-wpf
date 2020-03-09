@@ -1,5 +1,4 @@
-﻿using kellerkompanie_sync;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,7 +10,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace kellerkompanie_sync_wpf
+namespace kellerkompanie_sync
 {
     public class LocalAddon
     {

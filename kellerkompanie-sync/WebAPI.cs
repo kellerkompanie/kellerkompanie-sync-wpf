@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using kellerkompanie_sync_wpf;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -80,14 +80,14 @@ namespace kellerkompanie_sync
         [JsonProperty("event_timestamp")]
         public long Timestamp { get; set; }
 
-        internal string ExtractContent()
+        public string ExtractContent()
         {
             Regex regex = new Regex(@"(.*) - <a.*>(.*)<\/a>");
             Match match = regex.Match(Description);
             return match.Groups[1].ToString();
         }
 
-        internal string ExtractWeblink()
+        public string ExtractWeblink()
         {
             Regex regex = new Regex(@".*<a.*>(.*)<\/a>");
             Match match = regex.Match(Description);

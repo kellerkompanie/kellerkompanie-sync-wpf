@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace kellerkompanie_sync_wpf
+namespace kellerkompanie_sync
 {
     public sealed class Settings
     {

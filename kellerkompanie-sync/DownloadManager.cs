@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 
-namespace kellerkompanie_sync_wpf
+namespace kellerkompanie_sync
 {
     public class DownloadManager
     {

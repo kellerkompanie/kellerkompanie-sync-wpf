@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace kellerkompanie_sync_wpf
+namespace kellerkompanie_sync
 {
     public enum DownloadState
     {

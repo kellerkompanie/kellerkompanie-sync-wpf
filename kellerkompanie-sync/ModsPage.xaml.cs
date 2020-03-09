@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Path = System.IO.Path;
 
-namespace kellerkompanie_sync_wpf
+namespace kellerkompanie_sync
 {
     public enum AddonGroupState
     {
@@ -185,7 +185,7 @@ namespace kellerkompanie_sync_wpf
                 if (!FileIndexer.Instance.addonUuidToLocalAddonMap.ContainsKey(webAddonUuid))
                     continue;
 
-                RemoteAddon remAddon = remoteIndex.map[webAddon.Foldername];
+                RemoteAddon remAddon = remoteIndex.Map[webAddon.Foldername];
 
                 List<LocalAddon> localAddons = FileIndexer.Instance.addonUuidToLocalAddonMap[webAddonUuid];
                 foreach (LocalAddon localAddon in localAddons)
@@ -194,7 +194,7 @@ namespace kellerkompanie_sync_wpf
                     foreach (LocalFileIndex fileIndex in localAddon.Files.Values)
                     {
                         string relativeFilepath = fileIndex.Relative_filepath;
-                        if (!remAddon.addon_files.ContainsKey(relativeFilepath.Replace("\\", "/")))
+                        if (!remAddon.AddonFiles.ContainsKey(relativeFilepath.Replace("\\", "/")))
                         {
                             string filePath = fileIndex.Absolute_filepath;
                             Debug.WriteLine("deleting " + filePath);
@@ -213,13 +213,13 @@ namespace kellerkompanie_sync_wpf
             List<(string, string, long)> downloads = new List<(string, string, long)>();
             foreach (WebAddon webAddon in webAddonGroup.Addons)
             {
-                RemoteAddon remoteAddon = remoteIndex.map[webAddon.Foldername];
+                RemoteAddon remoteAddon = remoteIndex.Map[webAddon.Foldername];
                 string uuid = webAddon.Uuid;
                 string name = webAddon.Name;
 
-                if (!remoteAddon.addon_uuid.Equals(uuid))
+                if (!remoteAddon.AddonUuid.Equals(uuid))
                 {
-                    throw new InvalidOperationException("uuid " + uuid + " of local addon " + name + " does not match remote uuid " + remoteAddon.addon_uuid + " of addon " + remoteAddon.addon_name);
+                    throw new InvalidOperationException("uuid " + uuid + " of local addon " + name + " does not match remote uuid " + remoteAddon.AddonUuid + " of addon " + remoteAddon.AddonName);
                 }
 
                 // TODO select proper destination folder on disk, maybe ask user
@@ -233,20 +233,20 @@ namespace kellerkompanie_sync_wpf
                 if (!FileIndexer.Instance.addonUuidToLocalAddonMap.ContainsKey(uuid))
                 {
                     // download all
-                    foreach (RemoteAddonFile remoteAddonFile in remoteAddon.addon_files.Values)
+                    foreach (RemoteAddonFile remoteAddonFile in remoteAddon.AddonFiles.Values)
                     {
-                        string remoteFilePath = remoteAddonFile.file_path;
+                        string remoteFilePath = remoteAddonFile.FilePath;
                         string destinationFilePath = Path.Combine(destinationFolder, remoteFilePath.Replace("/", "\\"));
-                        downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath, destinationFilePath, remoteAddonFile.file_size));
+                        downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath, destinationFilePath, remoteAddonFile.FileSize));
                     }
                 }
                 else
                 {
                     List<LocalAddon> localAddons = FileIndexer.Instance.addonUuidToLocalAddonMap[uuid];
-                    foreach (RemoteAddonFile remoteAddonFile in remoteAddon.addon_files.Values)
+                    foreach (RemoteAddonFile remoteAddonFile in remoteAddon.AddonFiles.Values)
                     {
-                        string remoteFilePath = remoteAddonFile.file_path;
-                        string remoteHash = remoteAddonFile.file_hash;
+                        string remoteFilePath = remoteAddonFile.FilePath;
+                        string remoteHash = remoteAddonFile.FileHash;
 
                         foreach (LocalAddon localAddon in localAddons)
                         {
@@ -257,7 +257,7 @@ namespace kellerkompanie_sync_wpf
                                     if (!fileIndex.Hash.Equals(remoteHash))
                                     {
                                         string destinationFilepath = Path.Combine(destinationFolder, remoteFilePath.Replace("/", "\\"));
-                                        downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath, destinationFilepath, remoteAddonFile.file_size));
+                                        downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath, destinationFilepath, remoteAddonFile.FileSize));
                                     }
                                     break;
                                 }

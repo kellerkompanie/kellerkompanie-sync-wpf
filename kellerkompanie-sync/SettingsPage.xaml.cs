@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace kellerkompanie_sync_wpf
+namespace kellerkompanie_sync
 {
     public class AddonSearchDirectory
     {

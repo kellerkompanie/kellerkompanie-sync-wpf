@@ -1,12 +1,11 @@
-﻿using kellerkompanie_sync;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
 
-namespace kellerkompanie_sync_wpf
+namespace kellerkompanie_sync
 {
     public partial class MainWindow : Window
     {
