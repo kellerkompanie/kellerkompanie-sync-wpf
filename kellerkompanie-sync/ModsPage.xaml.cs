@@ -1,21 +1,11 @@
 ﻿using kellerkompanie_sync;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Net;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Path = System.IO.Path;
 
 namespace kellerkompanie_sync_wpf
@@ -47,13 +37,13 @@ namespace kellerkompanie_sync_wpf
         private AddonGroupState state;
         public AddonGroupState State
         {
-            get { return this.state; }
+            get { return state; }
             set
             {
-                if (this.state != value)
+                if (state != value)
                 {
-                    this.state = value;
-                    this.NotifyPropertyChanged("State");
+                    state = value;
+                    NotifyPropertyChanged("State");
                 }
             }
         }
@@ -62,8 +52,7 @@ namespace kellerkompanie_sync_wpf
 
         public void NotifyPropertyChanged(string propName)
         {
-            if (this.PropertyChanged != null)
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
 
         public AddonGroup(WebAddonGroupBase WebAddonGroupBase)
@@ -89,6 +78,7 @@ namespace kellerkompanie_sync_wpf
                     ButtonText = "";
                     ButtonIsEnabled = false;
                     break;
+
                 case AddonGroupState.NonExistent:
                     Icon = "/Images/link.png";
                     IconTooltip = "All mods missing";
@@ -100,6 +90,7 @@ namespace kellerkompanie_sync_wpf
                     ButtonText = "Subscribe";
                     ButtonIsEnabled = true;
                     break;
+
                 case AddonGroupState.CompleteButNotSubscribed:
                     Icon = "/Images/link.png";
                     IconTooltip = "All mods downloaded, but not subscribed";
@@ -111,6 +102,7 @@ namespace kellerkompanie_sync_wpf
                     ButtonText = "Subscribe";
                     ButtonIsEnabled = true;
                     break;
+
                 case AddonGroupState.Partial:
                     Icon = "/Images/link.png";
                     IconTooltip = "Some mods already downloaded";
@@ -122,6 +114,7 @@ namespace kellerkompanie_sync_wpf
                     ButtonText = "Subscribe";
                     ButtonIsEnabled = true;
                     break;
+
                 case AddonGroupState.NeedsUpdate:
                     Icon = "/Images/download.png";
                     IconTooltip = "Needs update";
@@ -133,6 +126,7 @@ namespace kellerkompanie_sync_wpf
                     ButtonText = "Update";
                     ButtonIsEnabled = true;
                     break;
+
                 case AddonGroupState.Ready:
                     Icon = "/Images/checkmark.png";
                     IconTooltip = "Ready";
@@ -274,19 +268,17 @@ namespace kellerkompanie_sync_wpf
             }
 
             DownloadManager downloadManager = new DownloadManager(addonGroup);
-            downloadManager.eDownloadsFinished += DownloadManager_Finished;
-            downloadManager.eProgressChanged += DownloadManager_ProgressChanged;
-            downloadManager.eSpeedChanged += DownloadManager_SpeedChanged;
+            downloadManager.DownloadsFinished += DownloadManager_DownloadsFinished;
+            downloadManager.ProgressChanged += DownloadManager_ProgressChanged;
+            downloadManager.SpeedChanged += DownloadManager_SpeedChanged;
                         
             foreach ((string url, string destinationFile, long filesize) in downloads)
-            {
                 downloadManager.AddDownload(url, destinationFile);
-            }
 
             downloadManager.StartDownloads();
         }
 
-        void DownloadManager_Finished(object sender, bool status)
+        void DownloadManager_DownloadsFinished(object sender, bool status)
         {
             DownloadManager downloadManager = sender as DownloadManager;
             Application.Current.Dispatcher.Invoke(new Action(() => {
