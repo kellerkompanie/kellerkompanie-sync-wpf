@@ -86,16 +86,7 @@ namespace kellerkompanie_sync_wpf
 
         public static void LaunchUri(string uri)
         {
-            try
-            {
-                Process.Start(uri);
-            }
-            catch
-            {
-                // hack because of this: https://github.com/dotnet/corefx/issues/10361                
-                uri = uri.Replace("&", "^&");
-                Process.Start(new ProcessStartInfo("cmd", $"/c start {uri}") { CreateNoWindow = true });
-            }
+            Process.Start(new ProcessStartInfo(uri) { CreateNoWindow = true, UseShellExecute = true });
         }
 
         private void ButtonNews_Click(object sender, RoutedEventArgs e)
