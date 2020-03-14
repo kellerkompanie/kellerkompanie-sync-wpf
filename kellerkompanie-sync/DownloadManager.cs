@@ -5,6 +5,16 @@ using System.Threading;
 
 namespace kellerkompanie_sync
 {
+    public class DownloadProgress
+    {
+        public double DownloadSpeed { get; set; }
+        public double CurrentDownloadSize { get; set; }
+        public double TotalDownloadSize { get; set; }
+        public double RemainingTime { get; set; }
+        public double ActiveDownloads { get; set; }
+        public double Progress { get; set; }
+    }
+
     public class DownloadManager
     {
         private bool isDownloading = false;
@@ -15,10 +25,14 @@ namespace kellerkompanie_sync
         private static readonly ReaderWriterLock ReaderWriterLock = new ReaderWriterLock();
         private const int TIMEOUT = 100;
 
+        private long totalDownloadSize = 0;
+
         public EventHandler<bool> DownloadsFinished;
-        public EventHandler<double> ProgressChanged;
-        public EventHandler<double> SpeedChanged;
+        public EventHandler<DownloadProgress> ProgressChanged;
         public AddonGroup AddonGroup { get; }
+
+        /// a timer used to update downloading information every x millisecond
+        private readonly System.Timers.Timer timer = new System.Timers.Timer(500);
 
         public DownloadManager(AddonGroup addonGroup)
         {
@@ -28,6 +42,9 @@ namespace kellerkompanie_sync
         public void StartDownloads()
         {
             isDownloading = true;
+            timer.Elapsed += Timer_Elapsed;
+            timer.Start();
+
             int n = Math.Min(Settings.Instance.SimultaneousDownloads, queuedDownloads.Count);
             for (int i = 0; i < n; i++)
             {
@@ -38,15 +55,15 @@ namespace kellerkompanie_sync
         private void DownloadNext()
         {
             Download download = queuedDownloads[0];
-            queuedDownloads.RemoveAt(0);
             download.StateChanged += Download_StateChanged;
-            download.SpeedChanged += Download_SpeedChanged;
+            queuedDownloads.RemoveAt(0);
             download.StartDownload();
         }
 
         public void PauseDownloads()
         {
             isDownloading = false;
+            timer.Stop();
 
             ReaderWriterLock.AcquireWriterLock(TIMEOUT);
             try
@@ -62,53 +79,55 @@ namespace kellerkompanie_sync
             }
         }
 
-        public void AddDownload(string sourceUrl, string filepath)
+        public void AddDownload(string sourceUrl, string filepath, long expectedFileSize)
         {
             if (isDownloading)
                 throw new InvalidOperationException("can only add new downloads while downloader is not running");
 
-            ReaderWriterLock.AcquireWriterLock(TIMEOUT);
-            try
-            {
-                Download download = new Download(sourceUrl, filepath);
-                queuedDownloads.Add(download);
-            }
-            finally
-            {
-                ReaderWriterLock.ReleaseWriterLock();
-            }
+            Download download = new Download(sourceUrl, filepath);
+            totalDownloadSize += expectedFileSize;
+            queuedDownloads.Add(download);
         }
 
-        private double GetProgressUI()
+        private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
+            double downloadSpeed = 0.0;
+            int numTotalDownloads = 0;
+            int numActiveDownloads = 0;
+            int numFinishedDownloads = 0;
+            long currentDownloadSize = 0;
+
             ReaderWriterLock.AcquireReaderLock(TIMEOUT);
             try
             {
-                double total = queuedDownloads.Count + runningDownloads.Count + finishedDownloads.Count;
-                double finished = finishedDownloads.Count;
-                return Math.Floor((finished / total) * 100);
-            }
-            finally
-            {
-                ReaderWriterLock.ReleaseReaderLock();
-            }
-        }
+                numTotalDownloads = queuedDownloads.Count + runningDownloads.Count + finishedDownloads.Count;
+                numActiveDownloads = runningDownloads.Count;
+                numFinishedDownloads = finishedDownloads.Count;
 
-        private void Download_SpeedChanged(object sender, double e)
-        {
-            double speed = 0.0;
-            ReaderWriterLock.AcquireReaderLock(TIMEOUT);
-            try
-            {
                 foreach (Download download in runningDownloads)
-                    speed += download.DownloadSpeed;
+                {
+                    downloadSpeed += download.DownloadSpeed;
+                    currentDownloadSize += download.DownloadedSize;
+                }                    
+
+                foreach (Download download in finishedDownloads)
+                {
+                    currentDownloadSize += download.FileSize;
+                }
             }
             finally
             {
                 ReaderWriterLock.ReleaseReaderLock();
             }
 
-            SpeedChanged?.Invoke(this, speed);
+            DownloadProgress progress = new DownloadProgress();
+            progress.DownloadSpeed = downloadSpeed;
+            progress.ActiveDownloads = numActiveDownloads;
+            progress.CurrentDownloadSize = currentDownloadSize;
+            progress.TotalDownloadSize = totalDownloadSize;
+            progress.RemainingTime = (totalDownloadSize - currentDownloadSize) / 1024 / downloadSpeed;
+            progress.Progress = Math.Floor(((double) numFinishedDownloads / (double) numTotalDownloads) * 100.0);
+            ProgressChanged.Invoke(this, progress);
         }
 
         private void Download_StateChanged(object sender, DownloadState e)
@@ -124,9 +143,7 @@ namespace kellerkompanie_sync
                     {
                         runningDownloads.Remove(download);
                         finishedDownloads.Add(download);
-
-                        ProgressChanged?.Invoke(this, GetProgressUI());
-
+                        
                         if (queuedDownloads.Count > 0)
                         {
                             DownloadNext();
@@ -134,6 +151,7 @@ namespace kellerkompanie_sync
                         else if (queuedDownloads.Count == 0 && runningDownloads.Count == 0)
                         {
                             isDownloading = false;
+                            timer.Stop();
                             DownloadsFinished?.Invoke(this, true);
                         }
                     }
@@ -148,7 +166,6 @@ namespace kellerkompanie_sync
                     try
                     {
                         runningDownloads.Add(download);
-                        ProgressChanged?.Invoke(this, GetProgressUI());
                         Debug.WriteLine("running downloads: " + runningDownloads.Count);
                     }
                     finally

@@ -270,10 +270,9 @@ namespace kellerkompanie_sync
             DownloadManager downloadManager = new DownloadManager(addonGroup);
             downloadManager.DownloadsFinished += DownloadManager_DownloadsFinished;
             downloadManager.ProgressChanged += DownloadManager_ProgressChanged;
-            downloadManager.SpeedChanged += DownloadManager_SpeedChanged;
                         
             foreach ((string url, string destinationFile, long filesize) in downloads)
-                downloadManager.AddDownload(url, destinationFile);
+                downloadManager.AddDownload(url, destinationFile, filesize);
 
             downloadManager.StartDownloads();
         }
@@ -289,29 +288,35 @@ namespace kellerkompanie_sync
                 FileIndexer.Instance.SetAddonGroupState(downloadManager.AddonGroup, AddonGroupState.Ready);             
             }));            
         }
-
-        void DownloadManager_SpeedChanged(object sender, double speed)
+        
+        void DownloadManager_ProgressChanged(object sender, DownloadProgress downloadProgress)
         {
-            Speed = speed;
-            UpdateProgressUI();
-        }
+            Debug.WriteLine("progress: {0}", downloadProgress.Progress);
 
-        void DownloadManager_ProgressChanged(object sender, double progress)
-        {
-            Progress = progress;
-            UpdateProgressUI();
-        }
-
-        private double Progress = 0.0;
-        private double Speed = 0.0;
-        private void UpdateProgressUI()
-        {
             Application.Current.Dispatcher.Invoke(new Action(() => {
                 MainWindow wnd = (MainWindow)Window.GetWindow(this);
-                wnd.ProgressBar.Value = Progress;
-                wnd.ProgressBarText.Text = "Downloading mods... (" + (int)Progress + "% @ " + string.Format("{0:n1} Kb/s", Speed) + ")";
+                wnd.ProgressBar.Value = downloadProgress.Progress;
+                                
+                string downloadSize = string.Format("{0:n1}/{1:n1} MB", downloadProgress.CurrentDownloadSize / 1024 / 1024, downloadProgress.TotalDownloadSize / 1024 / 1024);
+                string downloadSpeed = string.Format("{0:n1} MB/s", downloadProgress.DownloadSpeed / 1024);
+                TimeSpan t = TimeSpan.FromSeconds(downloadProgress.RemainingTime);
+                string remainingTime;
+                if (t.Hours > 0)
+                {
+                    remainingTime = string.Format("{0}h:{1}m:{2}s left", t.Hours, t.Minutes, t.Seconds);
+                }
+                else if(t.Hours == 0 && t.Minutes > 0)
+                {
+                    remainingTime = string.Format("{0}m:{1}s left", t.Minutes, t.Seconds);
+                }
+                else
+                {
+                    remainingTime = string.Format("{0}s left", t.Seconds);
+                }
+                
+                wnd.ProgressBarText.Text = string.Format("Downloading mods... ({0} @ {1}, {2})", downloadSize, downloadSpeed, remainingTime);
             }));
-        }            
+        }          
 
         void DownloadWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {

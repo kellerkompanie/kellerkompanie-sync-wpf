@@ -36,10 +36,7 @@ namespace kellerkompanie_sync
         /// Represent the downloaded length of the requested file, from the point of started.
         private long CurrentSize = 0;
 
-        public double DownloadSpeed { get; set; } = 0; 
-
-        /// a timer used to update downloading information every x millisecond
-        private readonly System.Timers.Timer timer = new System.Timers.Timer(1000);
+        public double DownloadSpeed { get; private set; } = 0;  
 
         private readonly string filePath;
 
@@ -47,7 +44,6 @@ namespace kellerkompanie_sync
 
         public EventHandler<long> eSize;
         public EventHandler<long> SizeChanged;
-        public EventHandler<double> SpeedChanged;
         public EventHandler<DownloadState> StateChanged;
 
         public Download(string url, string filePath)
@@ -66,9 +62,7 @@ namespace kellerkompanie_sync
             fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
 
             DownloadedSize = fileStream.Length;   // if file not exists fileStream.Length will return 0
-            timer.Elapsed += OnTimerElapsed;     // assign method to dlTimer
-            timer.Start();
-            
+                        
             request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(uri);
             // check if downloaded-length != 0, which equals to download resume
             if (DownloadedSize > 0)
@@ -91,34 +85,27 @@ namespace kellerkompanie_sync
 
                         while (DownloadState == DownloadState.Downloading && ((bufferBytesRead = stream.Read(buffer, 0, buffer.Length)) > 0))
                         {
-                            fileStream.Write(buffer, 0, bufferBytesRead); // write byte to the file on harddisk.
-                            DownloadedSize += bufferBytesRead; // update downloaded-length value.
-                            CurrentSize += bufferBytesRead; // update current-downloaded-length value.
+                            fileStream.Write(buffer, 0, bufferBytesRead);
+                            DownloadedSize += bufferBytesRead; 
+                            CurrentSize += bufferBytesRead; 
+                            DownloadSpeed = (CurrentSize / 1024) / ((DateTime.Now - downloadStart).TotalSeconds);
                         }
                     });
                 }
             }
-
-            timer.Stop();
+            
             fileStream.Dispose();
                         
             if (DownloadedSize == FileSize)
             {
                 DownloadState = DownloadState.Completed;
             }
-                
-            StateChanged?.Invoke(this, DownloadState);
-            SpeedChanged?.Invoke(this, 0.0);
+
+            DownloadSpeed = 0;
+            StateChanged?.Invoke(this, DownloadState);            
             SizeChanged?.Invoke(this, DownloadedSize);
         }
-
-        private void OnTimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            SizeChanged?.Invoke(this, DownloadedSize);
-
-            DownloadSpeed = (CurrentSize / 1024) / ((DateTime.Now - downloadStart).TotalSeconds);
-            SpeedChanged?.Invoke(this, DownloadSpeed);
-        }
+        
 
         public void PauseDownload()
         {
