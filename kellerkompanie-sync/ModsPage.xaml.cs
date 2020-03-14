@@ -19,7 +19,7 @@ namespace kellerkompanie_sync
         NeedsUpdate,
         Ready
     }
-
+    
     public class AddonGroup : INotifyPropertyChanged
     {
         // public AddonGroupState State { get; set; }
@@ -61,7 +61,11 @@ namespace kellerkompanie_sync
             this.WebAddonGroupBase = WebAddonGroupBase;
             SetState(AddonGroupState.Unknown);
         }
-                
+
+        private const string Green = "#5cb85c";
+        private const string Red = "#d9534f";
+        private const string Yellow = "#f7c516";
+
         public void SetState(AddonGroupState newState)
         {
             Debug.WriteLine("setting " + WebAddonGroupBase.Name + " to " + newState);
@@ -71,7 +75,7 @@ namespace kellerkompanie_sync
                 case AddonGroupState.Unknown:
                     Icon = "/Images/questionmark.png";
                     IconTooltip = "Unknown";
-                    IconColor = "#d9534f";
+                    IconColor = Red;
 
                     CheckBoxVisibility = Visibility.Hidden;
 
@@ -83,7 +87,7 @@ namespace kellerkompanie_sync
                 case AddonGroupState.NonExistent:
                     Icon = "/Images/link.png";
                     IconTooltip = "All mods missing";
-                    IconColor = "#d9534f";
+                    IconColor = Red;
 
                     CheckBoxVisibility = Visibility.Hidden;
 
@@ -95,7 +99,7 @@ namespace kellerkompanie_sync
                 case AddonGroupState.CompleteButNotSubscribed:
                     Icon = "/Images/link.png";
                     IconTooltip = "All mods downloaded, but not subscribed";
-                    IconColor = "#5cb85c";
+                    IconColor = Green;
 
                     CheckBoxVisibility = Visibility.Hidden;
 
@@ -107,7 +111,7 @@ namespace kellerkompanie_sync
                 case AddonGroupState.Partial:
                     Icon = "/Images/link.png";
                     IconTooltip = "Some mods already downloaded";
-                    IconColor = "#f7c516";
+                    IconColor = Yellow;
 
                     CheckBoxVisibility = Visibility.Hidden;
 
@@ -119,7 +123,7 @@ namespace kellerkompanie_sync
                 case AddonGroupState.NeedsUpdate:
                     Icon = "/Images/download.png";
                     IconTooltip = "Needs update";
-                    IconColor = "#f7c516";
+                    IconColor = Yellow;
 
                     CheckBoxVisibility = Visibility.Hidden;
 
@@ -131,7 +135,7 @@ namespace kellerkompanie_sync
                 case AddonGroupState.Ready:
                     Icon = "/Images/checkmark.png";
                     IconTooltip = "Ready";
-                    IconColor = "#5cb85c";
+                    IconColor = Green;
 
                     CheckBoxVisibility = Visibility.Visible;
 
