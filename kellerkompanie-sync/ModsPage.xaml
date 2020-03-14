@@ -130,6 +130,13 @@
                             FontSize="18"
                             Foreground="#ee4d2e"
                             Text="{Binding WebAddonGroupBase.Name}" />
+                        <TextBlock
+                            Name="TextBlockDownloading"
+                            Margin="8,0,0,0"
+                            FontSize="18"
+                            Foreground="#f2f5f4"
+                            Text="{Binding StatusText}"
+                            Visibility="{Binding StatusVisibility}" />
                     </DockPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
