@@ -154,6 +154,17 @@ namespace kellerkompanie_sync
                 return true;
         }
 
+        private bool IsArmaRunning()
+        {            
+            Process[] pname = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(Settings.Instance.ExecutableLocation));
+            if (pname.Length == 0)
+                return false;
+            else
+                return true;
+        }
+
+        private readonly System.Timers.Timer timer = new System.Timers.Timer(5000);
+
         private void PlayUpdateButton_Click(object sender, RoutedEventArgs e)
         {
             if (!IsSteamRunning())
@@ -219,7 +230,21 @@ namespace kellerkompanie_sync
 
             string args = sb.ToString();
             Log.Information(string.Format("PlayUpdateButton_Click: starting arma from executable: {0}\nwith args:\n{1}", Settings.Instance.ExecutableLocation, args));
-            Process.Start(new ProcessStartInfo(Settings.Instance.ExecutableLocation, args) { CreateNoWindow = true });
+            PlayUpdateButton.IsEnabled = false;
+            Process.Start(new ProcessStartInfo(Settings.Instance.ExecutableLocation, args) { CreateNoWindow = true });            
+            timer.Elapsed += Timer_Elapsed;
+            timer.Start();
+        }
+
+        private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (!IsArmaRunning())
+            {
+                timer.Stop();
+                Application.Current.Dispatcher.Invoke(new Action(() => {
+                    PlayUpdateButton.IsEnabled = true;
+                }));
+            }
         }
 
         private void RestoreWindowPositionAndSize()
