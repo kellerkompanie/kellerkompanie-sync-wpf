@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -242,7 +243,7 @@ namespace kellerkompanie_sync
                         if (!remAddon.AddonFiles.ContainsKey(relativeFilepath.Replace("\\", "/")))
                         {
                             string filePath = fileIndex.Absolute_filepath;
-                            Debug.WriteLine("deleting " + filePath);
+                            Log.Debug("deleting " + filePath);
                             removals.Add(filePath);
                             File.Delete(@filePath);
                         }
