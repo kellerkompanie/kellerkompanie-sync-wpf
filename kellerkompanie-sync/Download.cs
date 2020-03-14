@@ -25,7 +25,7 @@ namespace kellerkompanie_sync
         /// Start time of download.
         private DateTime downloadStart;
 
-        private readonly byte[] buffer = new byte[1024];
+        private readonly byte[] buffer = new byte[4096];
         private int bufferBytesRead = 0;
 
         /// Represent the total length of the requested file.
