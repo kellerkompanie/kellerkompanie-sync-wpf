@@ -8,14 +8,12 @@
     Title="kellerkompanie-sync (0.1.0-alpha)"
     Width="800"
     Height="600"
-    MinWidth="700"
-    MinHeight="500"
+    MinWidth="800"
+    MinHeight="600"
     Closed="MainWindow_Closed"
     LocationChanged="MainWindow_LocationChanged"
     SizeChanged="MainWindow_SizeChanged"
     mc:Ignorable="d">
-
-
 
     <DockPanel>
         <DockPanel

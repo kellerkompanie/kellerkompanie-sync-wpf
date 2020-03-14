@@ -1,5 +1,4 @@
-﻿using kellerkompanie_sync;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -163,22 +162,68 @@ namespace kellerkompanie_sync
             var button = (Button)sender;
             AddonGroup addonGroup = (AddonGroup)button.DataContext;
 
+            string downloadDirectory = null;
+            if (addonGroup.State == AddonGroupState.CompleteButNotSubscribed)
+            {
+                // all addons are already downloaded, directly proceed with validation
+                ValidateAddonGroup(addonGroup);
+            }
+            else { 
+                // decide where to download missing addons to
+                switch (Settings.Instance.AddonSearchDirectories.Count)
+                {
+                    case 0:
+                        MessageBox.Show("Please first add a addon search directory under settings.", "kellerkompanie-sync");
+                        return;
+
+                    case 1:
+                        foreach (string addonSearchDirectory in Settings.Instance.AddonSearchDirectories)
+                        {
+                            downloadDirectory = addonSearchDirectory;
+                            break;
+                        }
+                        break;
+
+                    default:
+                        ChooseDirectoryWindow inputDialog = new ChooseDirectoryWindow();
+                        if (inputDialog.ShowDialog() == true)
+                            downloadDirectory = inputDialog.ChosenDirectory;
+                        else
+                            return;
+                        break;
+                }
+
+                DownloadToDirectory(addonGroup, downloadDirectory);
+            }
+        }
+
+        class DownloadArguments
+        {
+            public AddonGroup AddonGroup { get; set; }
+            public string DownloadDirectory { get; set; }
+        }
+
+        private void DownloadToDirectory(AddonGroup addonGroup, string downloadDirectory)
+        {
             BackgroundWorker worker = new BackgroundWorker();
             worker.WorkerReportsProgress = true;
             worker.DoWork += DownloadWorker_DoWork;
             worker.ProgressChanged += DownloadWorker_ProgressChanged;
             worker.RunWorkerCompleted += DownloadWorker_RunWorkerCompleted;
-            worker.RunWorkerAsync(addonGroup);
+            DownloadArguments args = new DownloadArguments();
+            args.AddonGroup = addonGroup;
+            args.DownloadDirectory = downloadDirectory;
+            worker.RunWorkerAsync(args);
         }
-                
+                       
         void DownloadWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            AddonGroup addonGroup = (AddonGroup)e.Argument;
+            DownloadArguments args = (DownloadArguments)e.Argument;
 
             RemoteIndex remoteIndex = WebAPI.GetRemoteIndex();            
 
             // determine files to delete            
-            WebAddonGroup webAddonGroup = WebAPI.GetAddonGroup(addonGroup.WebAddonGroupBase);
+            WebAddonGroup webAddonGroup = WebAPI.GetAddonGroup(args.AddonGroup.WebAddonGroupBase);
             foreach (WebAddon webAddon in webAddonGroup.Addons)
             {
                 string webAddonUuid = webAddon.Uuid;
@@ -222,8 +267,7 @@ namespace kellerkompanie_sync
                     throw new InvalidOperationException("uuid " + uuid + " of local addon " + name + " does not match remote uuid " + remoteAddon.AddonUuid + " of addon " + remoteAddon.AddonName);
                 }
 
-                // TODO select proper destination folder on disk, maybe ask user
-                string destinationFolder = "";
+                string destinationFolder = args.DownloadDirectory;
                 foreach (string addonSearchDirectory in Settings.Instance.AddonSearchDirectories)
                 {
                     destinationFolder = addonSearchDirectory;
@@ -267,7 +311,7 @@ namespace kellerkompanie_sync
                 }
             }
 
-            DownloadManager downloadManager = new DownloadManager(addonGroup);
+            DownloadManager downloadManager = new DownloadManager(args.AddonGroup);
             downloadManager.DownloadsFinished += DownloadManager_DownloadsFinished;
             downloadManager.ProgressChanged += DownloadManager_ProgressChanged;
                         
@@ -280,12 +324,13 @@ namespace kellerkompanie_sync
         void DownloadManager_DownloadsFinished(object sender, bool status)
         {
             DownloadManager downloadManager = sender as DownloadManager;
+
+            ValidateAddonGroup(downloadManager.AddonGroup);
+            
             Application.Current.Dispatcher.Invoke(new Action(() => {
                 MainWindow wnd = (MainWindow)Window.GetWindow(this);
                 wnd.ProgressBar.Value = 0;
-                wnd.ProgressBarText.Text = "Everything up-to-date";
-
-                FileIndexer.Instance.SetAddonGroupState(downloadManager.AddonGroup, AddonGroupState.Ready);             
+                wnd.ProgressBarText.Text = "Everything up-to-date";                                     
             }));            
         }
         
@@ -325,7 +370,13 @@ namespace kellerkompanie_sync
 
         void DownloadWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            
+        }
+
+        private void ValidateAddonGroup(AddonGroup addonGroup)
+        {
             // TODO update existing information, i.e., versions, hashes etc.
+            FileIndexer.Instance.SetAddonGroupState(addonGroup, AddonGroupState.Ready);
         }
     }
 }
