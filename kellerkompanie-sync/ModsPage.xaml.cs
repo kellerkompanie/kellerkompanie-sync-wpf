@@ -376,7 +376,10 @@ namespace kellerkompanie_sync
         private void ValidateAddonGroup(AddonGroup addonGroup)
         {
             // TODO update existing information, i.e., versions, hashes etc.
-            FileIndexer.Instance.SetAddonGroupState(addonGroup, AddonGroupState.Ready);
+
+            Application.Current.Dispatcher.Invoke(new Action(() => { 
+                FileIndexer.Instance.SetAddonGroupState(addonGroup, AddonGroupState.Ready); 
+            }));            
         }
     }
 }
