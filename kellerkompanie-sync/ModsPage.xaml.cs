@@ -29,8 +29,8 @@ namespace kellerkompanie_sync
         public string IconColor { get; set; }
         public string ButtonText { get; set; }
         public bool ButtonIsEnabled { get; set; }
-        public string ButtonVisibility { get; set; }
-        public string CheckBoxVisibility { get; set; }
+        public Visibility ButtonVisibility { get; set; }
+        public Visibility CheckBoxVisibility { get; set; }
         public bool CheckBoxIsSelected { get; set; }
         public string StatusText { get; set; }
         public Visibility StatusVisibility { get; set; }
@@ -73,9 +73,9 @@ namespace kellerkompanie_sync
                     IconTooltip = "Unknown";
                     IconColor = "#d9534f";
 
-                    CheckBoxVisibility = "Hidden";
+                    CheckBoxVisibility = Visibility.Hidden;
 
-                    ButtonVisibility = "Hidden";
+                    ButtonVisibility = Visibility.Hidden;
                     ButtonText = "";
                     ButtonIsEnabled = false;
                     break;
@@ -85,9 +85,9 @@ namespace kellerkompanie_sync
                     IconTooltip = "All mods missing";
                     IconColor = "#d9534f";
 
-                    CheckBoxVisibility = "Hidden";
+                    CheckBoxVisibility = Visibility.Hidden;
 
-                    ButtonVisibility = "Visible";
+                    ButtonVisibility = Visibility.Visible;
                     ButtonText = "Subscribe";
                     ButtonIsEnabled = true;
                     break;
@@ -97,9 +97,9 @@ namespace kellerkompanie_sync
                     IconTooltip = "All mods downloaded, but not subscribed";
                     IconColor = "#5cb85c";
 
-                    CheckBoxVisibility = "Hidden";
+                    CheckBoxVisibility = Visibility.Hidden;
 
-                    ButtonVisibility = "Visible";
+                    ButtonVisibility = Visibility.Visible;
                     ButtonText = "Subscribe";
                     ButtonIsEnabled = true;
                     break;
@@ -109,9 +109,9 @@ namespace kellerkompanie_sync
                     IconTooltip = "Some mods already downloaded";
                     IconColor = "#f7c516";
 
-                    CheckBoxVisibility = "Hidden";
+                    CheckBoxVisibility = Visibility.Hidden;
 
-                    ButtonVisibility = "Visible";
+                    ButtonVisibility = Visibility.Visible;
                     ButtonText = "Subscribe";
                     ButtonIsEnabled = true;
                     break;
@@ -121,9 +121,9 @@ namespace kellerkompanie_sync
                     IconTooltip = "Needs update";
                     IconColor = "#f7c516";
 
-                    CheckBoxVisibility = "Hidden";
+                    CheckBoxVisibility = Visibility.Hidden;
 
-                    ButtonVisibility = "Visible";
+                    ButtonVisibility = Visibility.Visible;
                     ButtonText = "Update";
                     ButtonIsEnabled = true;
                     break;
@@ -133,9 +133,9 @@ namespace kellerkompanie_sync
                     IconTooltip = "Ready";
                     IconColor = "#5cb85c";
 
-                    CheckBoxVisibility = "Visible";
+                    CheckBoxVisibility = Visibility.Visible;
 
-                    ButtonVisibility = "Hidden";
+                    ButtonVisibility = Visibility.Hidden;
                     ButtonText = "";
                     ButtonIsEnabled = false;
                     break;
