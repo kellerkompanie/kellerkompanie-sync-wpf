@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -36,6 +37,7 @@ namespace kellerkompanie_sync
 
         public DownloadManager(AddonGroup addonGroup)
         {
+            Log.Debug(string.Format("DownloadManager: creating instance for AddonGroup: {0}", addonGroup));
             AddonGroup = addonGroup;
         }
 
@@ -46,6 +48,7 @@ namespace kellerkompanie_sync
             timer.Start();
 
             int n = Math.Min(Settings.Instance.SimultaneousDownloads, queuedDownloads.Count);
+            Log.Debug(string.Format("DownloadManager: starting with {0} simultaneous downloads", n));
             for (int i = 0; i < n; i++)
             {
                 DownloadNext();
@@ -152,6 +155,7 @@ namespace kellerkompanie_sync
                         {
                             isDownloading = false;
                             timer.Stop();
+                            Log.Debug("DownloadManager: all downloads finished");
                             DownloadsFinished?.Invoke(this, true);
                         }
                     }

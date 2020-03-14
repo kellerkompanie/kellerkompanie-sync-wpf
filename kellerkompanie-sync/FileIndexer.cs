@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -45,7 +46,10 @@ namespace kellerkompanie_sync
         public LocalFileIndex(string filePath)
         {
             if (!filePath.Contains("@"))
+            {
+                Log.Error("LocalFileIndex: Parameter must contain @ in path");
                 throw new ArgumentException("Parameter must contain @ in path");
+            }
 
             FileInfo fileInfo = new FileInfo(filePath);
             Created = fileInfo.CreationTime;
@@ -113,7 +117,10 @@ namespace kellerkompanie_sync
             get
             {
                 if (instance == null)
+                {
+                    Log.Error("FileIndexer: You need to initialize FileIndexer first");
                     throw new FieldAccessException("You need to initialize FileIndexer first");
+                }
                 return instance;
             }
         }
@@ -242,13 +249,13 @@ namespace kellerkompanie_sync
                 if (Index.ContainsKey(absoluteAddonPath))
                 {
                     // load addon from existing index
-                    Debug.WriteLine("loading existing addon: " + absoluteAddonPath);
+                    Log.Debug("loading existing addon: " + absoluteAddonPath);
                     localAddon = Index[absoluteAddonPath];
                 }
                 else
                 {
                     // create new addon
-                    Debug.WriteLine("creating new addon: " + absoluteAddonPath);
+                    Log.Debug("creating new addon: " + absoluteAddonPath);
                     string addonName = ExtractAddonName(file);
                     localAddon = new LocalAddon(addonName, absoluteAddonPath);
                     Index.Add(absoluteAddonPath, localAddon);
@@ -271,7 +278,7 @@ namespace kellerkompanie_sync
 
                     if (!existingIndex.Created.Equals(created) || existingIndex.Filesize != filesize)
                     {
-                        Debug.WriteLine("out of date file: " + file);
+                        Log.Debug("out of date file: " + file);
                         // file is not up to date, index it
                         LocalFileIndex fileIndex = new LocalFileIndex(file);
                         localAddon.Files.Add(fileIndex.Absolute_filepath, fileIndex);
@@ -280,7 +287,7 @@ namespace kellerkompanie_sync
                 else
                 {
                     // file is not indexed yet, index it
-                    Debug.WriteLine("file not indexed yet: " + file);
+                    Log.Debug("file not indexed yet: " + file);
                     LocalFileIndex fileIndex = new LocalFileIndex(file);
                     localAddon.Files.Add(fileIndex.Absolute_filepath, fileIndex);
                 }

@@ -64,7 +64,7 @@ namespace kellerkompanie_sync
         public void SetState(AddonGroupState newState)
         {
             Debug.WriteLine("setting " + WebAddonGroupBase.Name + " to " + newState);
-            this.State = newState;
+            State = newState;
             switch(newState)
             {
                 case AddonGroupState.Unknown:

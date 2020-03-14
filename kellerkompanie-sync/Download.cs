@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.IO;
 using System.Text;
 
@@ -57,6 +58,8 @@ namespace kellerkompanie_sync
 
         public async void StartDownload()
         {
+            Log.Debug("starting download: " + this);
+
             var directory = Path.GetDirectoryName(filePath);
             Directory.CreateDirectory(directory);                        
             fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
@@ -98,6 +101,7 @@ namespace kellerkompanie_sync
                         
             if (DownloadedSize == FileSize)
             {
+                Log.Debug("finished download: " + this);
                 DownloadState = DownloadState.Completed;
             }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -11,6 +12,13 @@ namespace kellerkompanie_sync
     {
         public MainWindow()
         {
+            Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.Console()
+            .WriteTo.File(Settings.LogFile, rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+            Log.Information("Logger initialized");
+
             InitializeComponent();
 
             ProgressBar.Value = 0;
@@ -150,6 +158,7 @@ namespace kellerkompanie_sync
         {
             if (!IsSteamRunning())
             {
+                Log.Information("PlayUpdateButton_Click: steam is not running");
                 MessageBox.Show("Steam is not running, please start Steam first!", "kellerkompanie-sync");
                 return;
             }
@@ -208,7 +217,8 @@ namespace kellerkompanie_sync
                 sb.Append(Settings.Instance.ParamAdditional);
             }
 
-            string args = sb.ToString();            
+            string args = sb.ToString();
+            Log.Information(string.Format("PlayUpdateButton_Click: starting arma from executable: {0}\nwith args:\n{1}", Settings.Instance.ExecutableLocation, args));
             Process.Start(new ProcessStartInfo(Settings.Instance.ExecutableLocation, args) { CreateNoWindow = true });
         }
 
