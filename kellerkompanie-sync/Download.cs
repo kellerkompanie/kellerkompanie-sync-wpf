@@ -127,11 +127,10 @@ namespace kellerkompanie_sync
 
         public void ResumeDownload()
         {
-            if (DownloadState == DownloadState.Paused)
-            {
-                StartDownload();
-            }
-            throw new InvalidOperationException("can only resume paused downloads");
+            if (DownloadState != DownloadState.Paused)
+                throw new InvalidOperationException("can only resume paused downloads");
+            
+            StartDownload();            
         }
 
         public override string ToString()
