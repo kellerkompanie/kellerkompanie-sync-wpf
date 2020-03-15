@@ -95,17 +95,13 @@ namespace kellerkompanie_sync
         private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             double downloadSpeed = 0.0;
-            int numTotalDownloads = 0;
             int numActiveDownloads = 0;
-            int numFinishedDownloads = 0;
             long currentDownloadSize = 0;
 
             ReaderWriterLock.AcquireReaderLock(TIMEOUT);
             try
             {
-                numTotalDownloads = queuedDownloads.Count + runningDownloads.Count + finishedDownloads.Count;
                 numActiveDownloads = runningDownloads.Count;
-                numFinishedDownloads = finishedDownloads.Count;
 
                 foreach (Download download in runningDownloads)
                 {
@@ -129,7 +125,7 @@ namespace kellerkompanie_sync
             progress.CurrentDownloadSize = currentDownloadSize;
             progress.TotalDownloadSize = totalDownloadSize;
             progress.RemainingTime = (totalDownloadSize - currentDownloadSize) / 1024 / downloadSpeed;
-            progress.Progress = Math.Floor(((double) numFinishedDownloads / (double) numTotalDownloads) * 100.0);
+            progress.Progress = Math.Floor(((double)currentDownloadSize / (double)totalDownloadSize) * 100.0);
             ProgressChanged.Invoke(this, progress);
         }
 
