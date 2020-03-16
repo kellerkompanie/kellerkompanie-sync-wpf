@@ -10,143 +10,6 @@ using Path = System.IO.Path;
 
 namespace kellerkompanie_sync
 {
-    public enum AddonGroupState
-    {
-        Unknown,
-        NonExistent,
-        Partial,
-        CompleteButNotSubscribed,
-        NeedsUpdate,
-        Ready
-    }
-    
-    public class AddonGroup : INotifyPropertyChanged
-    {
-        // public AddonGroupState State { get; set; }
-        public WebAddonGroupBase WebAddonGroupBase { get; set; }
-        public string Icon { get; set; }
-        public string IconTooltip { get; set; }
-        public string IconColor { get; set; }
-        public string ButtonText { get; set; }
-        public bool ButtonIsEnabled { get; set; }
-        public Visibility ButtonVisibility { get; set; }
-        public Visibility CheckBoxVisibility { get; set; }
-        public bool CheckBoxIsSelected { get; set; }
-        public string StatusText { get; set; }
-        public Visibility StatusVisibility { get; set; }
-        
-        private AddonGroupState state;
-        public AddonGroupState State
-        {
-            get { return state; }
-            set
-            {
-                if (state != value)
-                {
-                    state = value;
-                    NotifyPropertyChanged("State");
-                }
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public void NotifyPropertyChanged(string propName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
-        }
-
-        public AddonGroup(WebAddonGroupBase WebAddonGroupBase)
-        {
-            this.WebAddonGroupBase = WebAddonGroupBase;
-            SetState(AddonGroupState.Unknown);
-        }
-
-        private const string Green = "#5cb85c";
-        private const string Red = "#d9534f";
-        private const string Yellow = "#f7c516";
-
-        public void SetState(AddonGroupState newState)
-        {
-            Debug.WriteLine("setting " + WebAddonGroupBase.Name + " to " + newState);
-            State = newState;
-            switch(newState)
-            {
-                case AddonGroupState.Unknown:
-                    Icon = "/Images/questionmark.png";
-                    IconTooltip = "Unknown";
-                    IconColor = Red;
-
-                    CheckBoxVisibility = Visibility.Hidden;
-
-                    ButtonVisibility = Visibility.Hidden;
-                    ButtonText = "";
-                    ButtonIsEnabled = false;
-                    break;
-
-                case AddonGroupState.NonExistent:
-                    Icon = "/Images/link.png";
-                    IconTooltip = "All mods missing";
-                    IconColor = Red;
-
-                    CheckBoxVisibility = Visibility.Hidden;
-
-                    ButtonVisibility = Visibility.Visible;
-                    ButtonText = "Subscribe";
-                    ButtonIsEnabled = true;
-                    break;
-
-                case AddonGroupState.CompleteButNotSubscribed:
-                    Icon = "/Images/link.png";
-                    IconTooltip = "All mods downloaded, but not subscribed";
-                    IconColor = Green;
-
-                    CheckBoxVisibility = Visibility.Hidden;
-
-                    ButtonVisibility = Visibility.Visible;
-                    ButtonText = "Subscribe";
-                    ButtonIsEnabled = true;
-                    break;
-
-                case AddonGroupState.Partial:
-                    Icon = "/Images/link.png";
-                    IconTooltip = "Some mods already downloaded";
-                    IconColor = Yellow;
-
-                    CheckBoxVisibility = Visibility.Hidden;
-
-                    ButtonVisibility = Visibility.Visible;
-                    ButtonText = "Subscribe";
-                    ButtonIsEnabled = true;
-                    break;
-
-                case AddonGroupState.NeedsUpdate:
-                    Icon = "/Images/download.png";
-                    IconTooltip = "Needs update";
-                    IconColor = Yellow;
-
-                    CheckBoxVisibility = Visibility.Hidden;
-
-                    ButtonVisibility = Visibility.Visible;
-                    ButtonText = "Update";
-                    ButtonIsEnabled = true;
-                    break;
-
-                case AddonGroupState.Ready:
-                    Icon = "/Images/checkmark.png";
-                    IconTooltip = "Ready";
-                    IconColor = Green;
-
-                    CheckBoxVisibility = Visibility.Visible;
-
-                    ButtonVisibility = Visibility.Hidden;
-                    ButtonText = "";
-                    ButtonIsEnabled = false;
-                    break;
-            }
-        }
-    }
-
     public partial class ModsPage : Page
     {
         public ModsPage()
@@ -177,7 +40,8 @@ namespace kellerkompanie_sync
                 // all addons are already downloaded, directly proceed with validation
                 ValidateAddonGroup(addonGroup);
             }
-            else { 
+            else
+            {
                 // decide where to download missing addons to
                 switch (Settings.Instance.AddonSearchDirectories.Count)
                 {
@@ -224,12 +88,12 @@ namespace kellerkompanie_sync
             args.DownloadDirectory = downloadDirectory;
             worker.RunWorkerAsync(args);
         }
-                       
+
         void DownloadWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             DownloadArguments args = (DownloadArguments)e.Argument;
 
-            RemoteIndex remoteIndex = WebAPI.GetRemoteIndex();            
+            RemoteIndex remoteIndex = WebAPI.GetRemoteIndex();
 
             // determine files to delete            
             WebAddonGroup webAddonGroup = WebAPI.GetAddonGroup(args.AddonGroup.WebAddonGroupBase);
@@ -282,7 +146,7 @@ namespace kellerkompanie_sync
                     destinationFolder = addonSearchDirectory;
                     break;
                 }
-                               
+
                 if (!FileIndexer.Instance.addonUuidToLocalAddonMap.ContainsKey(uuid))
                 {
                     // download all
@@ -323,7 +187,7 @@ namespace kellerkompanie_sync
             DownloadManager downloadManager = new DownloadManager(args.AddonGroup);
             downloadManager.DownloadsFinished += DownloadManager_DownloadsFinished;
             downloadManager.ProgressChanged += DownloadManager_ProgressChanged;
-                        
+
             foreach ((string url, string destinationFile, long filesize) in downloads)
                 downloadManager.AddDownload(url, destinationFile, filesize);
 
@@ -335,22 +199,24 @@ namespace kellerkompanie_sync
             DownloadManager downloadManager = sender as DownloadManager;
 
             ValidateAddonGroup(downloadManager.AddonGroup);
-            
-            Application.Current.Dispatcher.Invoke(new Action(() => {
+
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
                 MainWindow wnd = (MainWindow)Window.GetWindow(this);
                 wnd.ProgressBar.Value = 0;
-                wnd.ProgressBarText.Text = "Everything up-to-date";                                     
-            }));            
+                wnd.ProgressBarText.Text = "Everything up-to-date";
+            }));
         }
-        
+
         void DownloadManager_ProgressChanged(object sender, DownloadProgress downloadProgress)
         {
             Debug.WriteLine("progress: {0}", downloadProgress.Progress);
 
-            Application.Current.Dispatcher.Invoke(new Action(() => {
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
                 MainWindow wnd = (MainWindow)Window.GetWindow(this);
                 wnd.ProgressBar.Value = downloadProgress.Progress;
-                                
+
                 string downloadSize = string.Format("{0:n1}/{1:n1} MB", downloadProgress.CurrentDownloadSize / 1024 / 1024, downloadProgress.TotalDownloadSize / 1024 / 1024);
                 string downloadSpeed = string.Format("{0:n1} MB/s", downloadProgress.DownloadSpeed / 1024);
                 TimeSpan t = TimeSpan.FromSeconds(downloadProgress.RemainingTime);
@@ -359,7 +225,7 @@ namespace kellerkompanie_sync
                 {
                     remainingTime = string.Format("{0}h:{1}m:{2}s left", t.Hours, t.Minutes, t.Seconds);
                 }
-                else if(t.Hours == 0 && t.Minutes > 0)
+                else if (t.Hours == 0 && t.Minutes > 0)
                 {
                     remainingTime = string.Format("{0}m:{1}s left", t.Minutes, t.Seconds);
                 }
@@ -367,30 +233,31 @@ namespace kellerkompanie_sync
                 {
                     remainingTime = string.Format("{0}s left", t.Seconds);
                 }
-                
+
                 wnd.ProgressBarText.Text = string.Format("Downloading mods... ({0} @ {1}, {2})", downloadSize, downloadSpeed, remainingTime);
             }));
-        }          
+        }
 
         void DownloadWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            
+
         }
 
         void DownloadWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            
+
         }
 
         private void ValidateAddonGroup(AddonGroup addonGroup)
         {
             // TODO update existing information, i.e., versions, hashes etc.
 
-            Application.Current.Dispatcher.Invoke(new Action(() => {
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
                 addonGroup.StatusText = "";
                 addonGroup.StatusVisibility = Visibility.Hidden;
-                FileIndexer.Instance.SetAddonGroupState(addonGroup, AddonGroupState.Ready); 
-            }));            
+                FileIndexer.Instance.SetAddonGroupState(addonGroup, AddonGroupState.Ready);
+            }));
         }
     }
 }
