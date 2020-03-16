@@ -6,33 +6,33 @@ namespace kellerkompanie_sync
     public class RemoteAddon
     {
         [JsonProperty("addon_name")]
-        public string AddonName { get; set; }
+        public string Name { get; set; }
 
         [JsonProperty("addon_uuid")]
-        public string AddonUuid { get; set; }
+        public string Uuid { get; set; }
 
         [JsonProperty("addon_version")]
-        public string AddonVersion { get; set; }
+        public string Version { get; set; }
 
         [JsonProperty("addon_files")]
-        public Dictionary<string, RemoteAddonFile> AddonFiles { get; set; }
+        public Dictionary<string, RemoteAddonFile> Files { get; set; }
     }
 
     public class RemoteAddonFile
     {
         [JsonProperty("file_path")]
-        public string FilePath { get; set; }
+        public string Path { get; set; }
 
         [JsonProperty("file_size")]
-        public int FileSize { get; set; }
+        public int Size { get; set; }
 
         [JsonProperty("file_hash")]
-        public string FileHash { get; set; }
+        public string Hash { get; set; }
     }
 
-    public class RemoteIndex
+    public class RemoteFileIndex
     {
-        public RemoteIndex(Dictionary<string, RemoteAddon> map)
+        public RemoteFileIndex(Dictionary<string, RemoteAddon> map)
         {
             Map = map;
         }

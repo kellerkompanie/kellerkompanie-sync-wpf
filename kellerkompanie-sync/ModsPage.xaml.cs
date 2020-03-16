@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using Path = System.IO.Path;
@@ -16,9 +17,47 @@ namespace kellerkompanie_sync
         {
             InitializeComponent();
 
+            foreach (AddonGroup addonGroup in FileIndexer.Instance.AddonGroups)
+            {
+                addonGroup.Parent = ListViewAddonGroups;
+            }
             ListViewAddonGroups.ItemsSource = FileIndexer.Instance.AddonGroups;
+
+            //BackgroundWorker worker = new BackgroundWorker();
+            //worker.DoWork += DebugNotifier_DoWork;
+            //worker.RunWorkerAsync();
         }
 
+        void DebugNotifier_DoWork(object sender, DoWorkEventArgs e)
+        {
+            List<AddonGroupState> addonGroupStates = new List<AddonGroupState>() 
+            { 
+                AddonGroupState.CompleteButNotSubscribed,
+                AddonGroupState.NeedsUpdate,
+                AddonGroupState.NonExistent,
+                AddonGroupState.Partial,
+                AddonGroupState.Ready,
+                AddonGroupState.Unknown
+            };
+            Random random = new Random();
+            while (true)
+            {
+                int n = FileIndexer.Instance.AddonGroups.Count;
+                AddonGroup randomAddonGroup = FileIndexer.Instance.AddonGroups[random.Next(n)];
+                var randomState = addonGroupStates[random.Next(addonGroupStates.Count)];
+                randomAddonGroup.State = randomState;
+                Debug.WriteLine(string.Format("setting group {0} to {1}", randomAddonGroup, randomState));
+                foreach (AddonGroup addonGroup in FileIndexer.Instance.AddonGroups)
+                {
+                    addonGroup.ButtonVisibility = random.Next(0, 2) == 0 ? Visibility.Visible : Visibility.Hidden;
+                    addonGroup.StatusVisibility = random.Next(0, 2) == 0 ? Visibility.Visible : Visibility.Hidden;
+                    addonGroup.CheckBoxVisibility = random.Next(0, 2) == 0 ? Visibility.Visible : Visibility.Hidden;
+                }               
+                
+                Thread.Sleep(1000);
+            }
+        }
+        
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
             CheckBox checkBox = (CheckBox)sender;
@@ -93,7 +132,7 @@ namespace kellerkompanie_sync
         {
             DownloadArguments args = (DownloadArguments)e.Argument;
 
-            RemoteIndex remoteIndex = WebAPI.GetRemoteIndex();
+            RemoteFileIndex remoteIndex = WebAPI.GetFileIndex();
 
             // determine files to delete            
             WebAddonGroup webAddonGroup = WebAPI.GetAddonGroup(args.AddonGroup.WebAddonGroupBase);
@@ -112,7 +151,7 @@ namespace kellerkompanie_sync
                     foreach (LocalFileIndex fileIndex in localAddon.Files.Values)
                     {
                         string relativeFilepath = fileIndex.Relative_filepath;
-                        if (!remAddon.AddonFiles.ContainsKey(relativeFilepath.Replace("\\", "/")))
+                        if (!remAddon.Files.ContainsKey(relativeFilepath.Replace("\\", "/")))
                         {
                             string filePath = fileIndex.Absolute_filepath;
                             Log.Debug("deleting " + filePath);
@@ -135,9 +174,9 @@ namespace kellerkompanie_sync
                 string uuid = webAddon.Uuid;
                 string name = webAddon.Name;
 
-                if (!remoteAddon.AddonUuid.Equals(uuid))
+                if (!remoteAddon.Uuid.Equals(uuid))
                 {
-                    throw new InvalidOperationException("uuid " + uuid + " of local addon " + name + " does not match remote uuid " + remoteAddon.AddonUuid + " of addon " + remoteAddon.AddonName);
+                    throw new InvalidOperationException("uuid " + uuid + " of local addon " + name + " does not match remote uuid " + remoteAddon.Uuid + " of addon " + remoteAddon.Name);
                 }
 
                 string destinationFolder = args.DownloadDirectory;
@@ -150,20 +189,20 @@ namespace kellerkompanie_sync
                 if (!FileIndexer.Instance.addonUuidToLocalAddonMap.ContainsKey(uuid))
                 {
                     // download all
-                    foreach (RemoteAddonFile remoteAddonFile in remoteAddon.AddonFiles.Values)
+                    foreach (RemoteAddonFile remoteAddonFile in remoteAddon.Files.Values)
                     {
-                        string remoteFilePath = remoteAddonFile.FilePath;
+                        string remoteFilePath = remoteAddonFile.Path;
                         string destinationFilePath = Path.Combine(destinationFolder, remoteFilePath.Replace("/", "\\"));
-                        downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath, destinationFilePath, remoteAddonFile.FileSize));
+                        downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath, destinationFilePath, remoteAddonFile.Size));
                     }
                 }
                 else
                 {
                     List<LocalAddon> localAddons = FileIndexer.Instance.addonUuidToLocalAddonMap[uuid];
-                    foreach (RemoteAddonFile remoteAddonFile in remoteAddon.AddonFiles.Values)
+                    foreach (RemoteAddonFile remoteAddonFile in remoteAddon.Files.Values)
                     {
-                        string remoteFilePath = remoteAddonFile.FilePath;
-                        string remoteHash = remoteAddonFile.FileHash;
+                        string remoteFilePath = remoteAddonFile.Path;
+                        string remoteHash = remoteAddonFile.Hash;
 
                         foreach (LocalAddon localAddon in localAddons)
                         {
@@ -174,7 +213,7 @@ namespace kellerkompanie_sync
                                     if (!fileIndex.Hash.Equals(remoteHash))
                                     {
                                         string destinationFilepath = Path.Combine(destinationFolder, remoteFilePath.Replace("/", "\\"));
-                                        downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath, destinationFilepath, remoteAddonFile.FileSize));
+                                        downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath, destinationFilepath, remoteAddonFile.Size));
                                     }
                                     break;
                                 }

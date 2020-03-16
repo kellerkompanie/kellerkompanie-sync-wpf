@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -25,11 +24,11 @@ namespace kellerkompanie_sync
 
         public LocalAddon(string addonName, string absoluteFilepath)
         {
-            this.Name = addonName;
-            this.Files = new Dictionary<string, LocalFileIndex>();
-            this.Version = DateTime.Now.ToString("yyyyMMdd-HHmmss");
-            this.AbsoluteFilepath = absoluteFilepath;
-            this.Uuid = WebAPI.LookUpAddonName(addonName);
+            Name = addonName;
+            Files = new Dictionary<string, LocalFileIndex>();
+            Version = DateTime.Now.ToString("yyyyMMdd-HHmmss");
+            AbsoluteFilepath = absoluteFilepath;
+            Uuid = WebAPI.LookUpAddonName(addonName);
         }
     }
 
@@ -103,7 +102,7 @@ namespace kellerkompanie_sync
         {
             int index = AddonGroups.IndexOf(addonGroup);
             AddonGroups.RemoveAt(index);
-            addonGroup.SetState(state);
+            addonGroup.State = state;
             AddonGroups.Insert(index, addonGroup);
         }
 
@@ -241,7 +240,7 @@ namespace kellerkompanie_sync
             }
             
 
-            double i = 0;
+            int i = 0;
             foreach (string file in files)
             {
                 string absoluteAddonPath = ExtractAbsoluteAddonPath(file);
@@ -292,9 +291,7 @@ namespace kellerkompanie_sync
                     localAddon.Files.Add(fileIndex.Absolute_filepath, fileIndex);
                 }
                 
-
-                i += 1;
-                int percentage = (int)Math.Floor(i / files.Count * 100);
+                int percentage = (int)Math.Floor((double) ++i / files.Count * 100);
                 (sender as BackgroundWorker).ReportProgress(percentage);
             }
 

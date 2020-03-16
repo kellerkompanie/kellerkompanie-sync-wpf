@@ -110,9 +110,9 @@ namespace kellerkompanie_sync
         {
             NavigateToPage(Page.Settings);
         }
-        
-        private readonly Brush orange = (SolidColorBrush) (new BrushConverter().ConvertFrom("#ee4d2e"));
-        private readonly Brush white = (SolidColorBrush) (new BrushConverter().ConvertFrom("#f2f5f4"));
+
+        private readonly Brush orange = (SolidColorBrush)(new BrushConverter().ConvertFrom("#ee4d2e"));
+        private readonly Brush white = (SolidColorBrush)(new BrushConverter().ConvertFrom("#f2f5f4"));
 
         private void NavigateToPage(Page page)
         {
@@ -155,7 +155,7 @@ namespace kellerkompanie_sync
         }
 
         private bool IsArmaRunning()
-        {            
+        {
             Process[] pname = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(Settings.Instance.ExecutableLocation));
             if (pname.Length == 0)
                 return false;
@@ -213,7 +213,7 @@ namespace kellerkompanie_sync
 
                 WebAddonGroup webAddonGroup = WebAPI.GetAddonGroup(addonGroup.WebAddonGroupBase);
                 foreach (WebAddon webAddon in webAddonGroup.Addons)
-                {                    
+                {
                     string uuid = webAddon.Uuid;
                     LocalAddon localAddon = FileIndexer.Instance.addonUuidToLocalAddonMap[uuid][0];
                     sb.Append(" -mod=");
@@ -231,7 +231,7 @@ namespace kellerkompanie_sync
             string args = sb.ToString();
             Log.Information(string.Format("PlayUpdateButton_Click: starting arma from executable: {0}\nwith args:\n{1}", Settings.Instance.ExecutableLocation, args));
             PlayUpdateButton.IsEnabled = false;
-            Process.Start(new ProcessStartInfo(Settings.Instance.ExecutableLocation, args) { CreateNoWindow = true });            
+            Process.Start(new ProcessStartInfo(Settings.Instance.ExecutableLocation, args) { CreateNoWindow = true });
             timer.Elapsed += Timer_Elapsed;
             timer.Start();
         }
@@ -241,7 +241,8 @@ namespace kellerkompanie_sync
             if (!IsArmaRunning())
             {
                 timer.Stop();
-                Application.Current.Dispatcher.Invoke(new Action(() => {
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
                     PlayUpdateButton.IsEnabled = true;
                 }));
             }
@@ -270,6 +271,6 @@ namespace kellerkompanie_sync
         private void MainWindow_Closed(object sender, EventArgs e)
         {
             Settings.Instance.SaveSettings();
-        }        
+        }
     }
 }

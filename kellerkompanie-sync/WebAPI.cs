@@ -1,5 +1,4 @@
-﻿using kellerkompanie_sync_wpf;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -76,7 +75,7 @@ namespace kellerkompanie_sync
 
         [JsonProperty("event_description")]
         public string Description { get; set; }
-        
+
         [JsonProperty("event_timestamp")]
         public long Timestamp { get; set; }
 
@@ -97,7 +96,7 @@ namespace kellerkompanie_sync
 
     class WebAPI
     {
-        private static readonly string IndexUrl = "http://server.kellerkompanie.com/repository/index.json";        
+        private static readonly string IndexUrl = "http://server.kellerkompanie.com/repository/index.json";
         public static readonly string RepoUrl = "http://server.kellerkompanie.com/repository/mods";
         private static readonly string APIUrl = "https://server.kellerkompanie.com:5000/";
         private static readonly string NewsUrl = "https://kellerkompanie.com/news_json.php";
@@ -136,23 +135,14 @@ namespace kellerkompanie_sync
             }
         }
 
-        public static RemoteIndex GetRemoteIndex()
+        public static RemoteFileIndex GetFileIndex()
         {
             using (WebClient wc = new WebClient())
             {
                 var json = wc.DownloadString(IndexUrl);
                 Dictionary<string, RemoteAddon> map = JsonConvert.DeserializeObject<Dictionary<string, RemoteAddon>>(json);
-                RemoteIndex index = new RemoteIndex(map);
+                RemoteFileIndex index = new RemoteFileIndex(map);
                 return index;
-            }
-        }
-
-        public static void Download() 
-        {
-            List<WebAddonGroupBase> addonGroupBases = GetAddonGroups();
-            foreach (WebAddonGroupBase addonGroupBase in addonGroupBases)
-            {
-                WebAddonGroup addonGroup = GetAddonGroup(addonGroupBase);
             }
         }
 
