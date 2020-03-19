@@ -129,6 +129,12 @@
   <data name="AddonSearchDirectoriesExplanation" xml:space="preserve">
     <value>Eine Liste von Ordnern auf deinem Computer, in dem das Tool nach Addons sucht (Ordner die mit @ starten). Du kannst auch Ordner auswählen die bereits Addons enthalten, dann wird das Tool versuchen existierende Addons zu entdecken bevor es welche runterlädt.</value>
   </data>
+  <data name="AllModsDownloadedButNotSubscribed" xml:space="preserve">
+    <value>Alle Addons runtergeladen, aber nicht abonniert</value>
+  </data>
+  <data name="AllModsMissing" xml:space="preserve">
+    <value>Alle Addons fehlen</value>
+  </data>
   <data name="ArmaExecutableLocation" xml:space="preserve">
     <value>Arma 3 Pfad zur ausführbaren Datei:</value>
   </data>
@@ -161,6 +167,9 @@
   </data>
   <data name="Mods" xml:space="preserve">
     <value>Mods</value>
+  </data>
+  <data name="NeedsUpdate" xml:space="preserve">
+    <value>Update benötigt</value>
   </data>
   <data name="News" xml:space="preserve">
     <value>Neuigkeiten</value>
@@ -198,6 +207,9 @@
   <data name="ProgressValidating" xml:space="preserve">
     <value>(validiere...)</value>
   </data>
+  <data name="Ready" xml:space="preserve">
+    <value>Bereit</value>
+  </data>
   <data name="Remove" xml:space="preserve">
     <value>Entfernen</value>
   </data>
@@ -210,8 +222,14 @@
   <data name="ShowScriptErrors" xml:space="preserve">
     <value>Scriptfehler anzeigen</value>
   </data>
+  <data name="SomeModsAlreadyDownloaded" xml:space="preserve">
+    <value>Einige Addons bereits runtergeladen</value>
+  </data>
   <data name="SteamNotRunningInfoMessage" xml:space="preserve">
     <value>Steam läuft nicht, bitte erst Steam starten!</value>
+  </data>
+  <data name="Subscribe" xml:space="preserve">
+    <value>Abonnieren</value>
   </data>
   <data name="Teamspeak" xml:space="preserve">
     <value>Teamspeak</value>
@@ -221,6 +239,12 @@
   </data>
   <data name="TFAR" xml:space="preserve">
     <value>TFAR</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>Unbekannt</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
   </data>
   <data name="Wiki" xml:space="preserve">
     <value>Wiki</value>

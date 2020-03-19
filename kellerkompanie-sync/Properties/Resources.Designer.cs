@@ -97,6 +97,24 @@ namespace kellerkompanie_sync.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All mods downloaded, but not subscribed.
+        /// </summary>
+        public static string AllModsDownloadedButNotSubscribed {
+            get {
+                return ResourceManager.GetString("AllModsDownloadedButNotSubscribed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All mods missing.
+        /// </summary>
+        public static string AllModsMissing {
+            get {
+                return ResourceManager.GetString("AllModsMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Arma 3 executable location:.
         /// </summary>
         public static string ArmaExecutableLocation {
@@ -192,6 +210,15 @@ namespace kellerkompanie_sync.Properties {
         public static string Mods {
             get {
                 return ResourceManager.GetString("Mods", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Needs update.
+        /// </summary>
+        public static string NeedsUpdate {
+            get {
+                return ResourceManager.GetString("NeedsUpdate", resourceCulture);
             }
         }
         
@@ -304,6 +331,15 @@ namespace kellerkompanie_sync.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ready.
+        /// </summary>
+        public static string Ready {
+            get {
+                return ResourceManager.GetString("Ready", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Remove.
         /// </summary>
         public static string Remove {
@@ -340,11 +376,29 @@ namespace kellerkompanie_sync.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Some mods already downloaded.
+        /// </summary>
+        public static string SomeModsAlreadyDownloaded {
+            get {
+                return ResourceManager.GetString("SomeModsAlreadyDownloaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Steam is not running, please start Steam first!.
         /// </summary>
         public static string SteamNotRunningInfoMessage {
             get {
                 return ResourceManager.GetString("SteamNotRunningInfoMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Subscribe.
+        /// </summary>
+        public static string Subscribe {
+            get {
+                return ResourceManager.GetString("Subscribe", resourceCulture);
             }
         }
         
@@ -372,6 +426,24 @@ namespace kellerkompanie_sync.Properties {
         public static string TFAR {
             get {
                 return ResourceManager.GetString("TFAR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown.
+        /// </summary>
+        public static string Unknown {
+            get {
+                return ResourceManager.GetString("Unknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update.
+        /// </summary>
+        public static string Update {
+            get {
+                return ResourceManager.GetString("Update", resourceCulture);
             }
         }
         

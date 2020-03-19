@@ -110,7 +110,7 @@ namespace kellerkompanie_sync
                 {
                     case AddonGroupState.Unknown:
                         Icon = "/Images/questionmark.png";
-                        IconTooltip = "Unknown";
+                        IconTooltip = Properties.Resources.Unknown;
                         IconColor = Red;
 
                         CheckBoxVisibility = Visibility.Hidden;
@@ -122,55 +122,55 @@ namespace kellerkompanie_sync
 
                     case AddonGroupState.NonExistent:
                         Icon = "/Images/link.png";
-                        IconTooltip = "All mods missing";
+                        IconTooltip = Properties.Resources.AllModsMissing;
                         IconColor = Red;
 
                         CheckBoxVisibility = Visibility.Hidden;
 
                         ButtonVisibility = Visibility.Visible;
-                        ButtonText = "Subscribe";
+                        ButtonText = Properties.Resources.Subscribe;
                         ButtonIsEnabled = true;
                         break;
 
                     case AddonGroupState.CompleteButNotSubscribed:
                         Icon = "/Images/link.png";
-                        IconTooltip = "All mods downloaded, but not subscribed";
+                        IconTooltip = Properties.Resources.AllModsDownloadedButNotSubscribed;
                         IconColor = Green;
 
                         CheckBoxVisibility = Visibility.Hidden;
 
                         ButtonVisibility = Visibility.Visible;
-                        ButtonText = "Subscribe";
+                        ButtonText = Properties.Resources.Subscribe;
                         ButtonIsEnabled = true;
                         break;
 
                     case AddonGroupState.Partial:
                         Icon = "/Images/link.png";
-                        IconTooltip = "Some mods already downloaded";
+                        IconTooltip = Properties.Resources.SomeModsAlreadyDownloaded;
                         IconColor = Yellow;
 
                         CheckBoxVisibility = Visibility.Hidden;
 
                         ButtonVisibility = Visibility.Visible;
-                        ButtonText = "Subscribe";
+                        ButtonText = Properties.Resources.Subscribe;
                         ButtonIsEnabled = true;
                         break;
 
                     case AddonGroupState.NeedsUpdate:
                         Icon = "/Images/download.png";
-                        IconTooltip = "Needs update";
+                        IconTooltip = Properties.Resources.NeedsUpdate;
                         IconColor = Yellow;
 
                         CheckBoxVisibility = Visibility.Hidden;
 
                         ButtonVisibility = Visibility.Visible;
-                        ButtonText = "Update";
+                        ButtonText = Properties.Resources.Update;
                         ButtonIsEnabled = true;
                         break;
 
                     case AddonGroupState.Ready:
                         Icon = "/Images/checkmark.png";
-                        IconTooltip = "Ready";
+                        IconTooltip = Properties.Resources.Ready;
                         IconColor = Green;
 
                         CheckBoxVisibility = Visibility.Visible;
