@@ -241,7 +241,6 @@
                 Click="PlayUpdateButton_Click"
                 Content="Play"
                 DockPanel.Dock="Bottom"
-                IsEnabled="False"
                 Style="{StaticResource PlayUpdateButton}"
                 Template="{DynamicResource OrangeButtonTemplate}" />
 
