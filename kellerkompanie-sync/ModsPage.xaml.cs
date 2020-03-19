@@ -22,56 +22,96 @@ namespace kellerkompanie_sync
             }
             ListViewAddonGroups.ItemsSource = FileIndexer.Instance.AddonGroups;
         }
-        
+
+        private DownloadManager downloadManager = null;
+
         private void ButtonDownload_Click(object sender, RoutedEventArgs e)
         {
             Button button = (Button)sender;
             AddonGroup addonGroup = (AddonGroup)button.DataContext;
 
-            MainWindow.Instance.PlayUpdateButton.IsEnabled = false;
-
-            string downloadDirectory = null;
-            if (addonGroup.State == AddonGroupState.CompleteButNotSubscribed)
+            if (downloadManager == null)
             {
-                // all addons are already downloaded, directly proceed with validation
-                addonGroup.StatusText = Properties.Resources.ProgressValidating;
-                addonGroup.StatusVisibility = Visibility.Visible;
-                ValidateAddonGroup(addonGroup);
-            }
-            else
-            {
-                // decide where to download missing addons to
-                switch (Settings.Instance.AddonSearchDirectories.Count)
+                // start new download
+                foreach (AddonGroup addonGrp in FileIndexer.Instance.AddonGroups)
                 {
-                    case 0:
-                        MessageBox.Show(Properties.Resources.MissingAddonSearchDirectoryInfoMessage, "kellerkompanie-sync");
-                        return;
-
-                    case 1:
-                        foreach (string addonSearchDirectory in Settings.Instance.AddonSearchDirectories)
-                        {
-                            downloadDirectory = addonSearchDirectory;
-                            break;
-                        }
-                        break;
-
-                    default:
-                        ChooseDirectoryWindow inputDialog = new ChooseDirectoryWindow();
-                        if (inputDialog.ShowDialog() == true)
-                        {
-                            downloadDirectory = inputDialog.ChosenDirectory;
-                        }
-                        else
-                        {
-                            MainWindow.Instance.PlayUpdateButton.IsEnabled = true;
-                            return;
-                        }
-                        break;
+                    if (addonGroup != addonGrp)
+                    {
+                        addonGrp.ButtonIsEnabled = false;
+                    }
                 }
 
-                addonGroup.StatusText = Properties.Resources.ProgressDownloading;
-                addonGroup.StatusVisibility = Visibility.Visible;
-                DownloadToDirectory(addonGroup, downloadDirectory);
+                MainWindow.Instance.PlayUpdateButton.IsEnabled = false;
+
+                string downloadDirectory = null;
+                if (addonGroup.State == AddonGroupState.CompleteButNotSubscribed)
+                {
+                    // all addons are already downloaded, directly proceed with validation
+                    addonGroup.StatusText = Properties.Resources.ProgressValidating;
+                    addonGroup.StatusVisibility = Visibility.Visible;
+                    ValidateAddonGroup(addonGroup);
+                }
+                else
+                {
+                    // decide where to download missing addons to
+                    switch (Settings.Instance.AddonSearchDirectories.Count)
+                    {
+                        case 0:
+                            MessageBox.Show(Properties.Resources.MissingAddonSearchDirectoryInfoMessage, "kellerkompanie-sync");
+                            return;
+
+                        case 1:
+                            foreach (string addonSearchDirectory in Settings.Instance.AddonSearchDirectories)
+                            {
+                                downloadDirectory = addonSearchDirectory;
+                                break;
+                            }
+                            break;
+
+                        default:
+                            ChooseDirectoryWindow inputDialog = new ChooseDirectoryWindow();
+                            if (inputDialog.ShowDialog() == true)
+                            {
+                                downloadDirectory = inputDialog.ChosenDirectory;
+                            }
+                            else
+                            {
+                                MainWindow.Instance.PlayUpdateButton.IsEnabled = true;
+                                foreach (AddonGroup addonGrp in FileIndexer.Instance.AddonGroups)
+                                {
+                                    addonGrp.ButtonIsEnabled = true;
+                                }
+                                return;
+                            }
+                            break;
+                    }
+
+                    addonGroup.StatusText = Properties.Resources.ProgressDownloading;
+                    addonGroup.StatusVisibility = Visibility.Visible;
+                    addonGroup.ButtonText = Properties.Resources.Pause;
+
+                    BackgroundWorker worker = new BackgroundWorker();
+                    worker.WorkerReportsProgress = true;
+                    worker.DoWork += DownloadWorker_DoWork;
+                    worker.ProgressChanged += DownloadWorker_ProgressChanged;
+                    worker.RunWorkerCompleted += DownloadWorker_RunWorkerCompleted;
+                    DownloadArguments args = new DownloadArguments
+                    {
+                        AddonGroup = addonGroup,
+                        DownloadDirectory = downloadDirectory
+                    };
+                    worker.RunWorkerAsync(args);
+                }
+            }
+            else if (downloadManager?.State == DownloadState.Paused)
+            {
+                // previous download is about to be resumed
+                downloadManager.StartDownloads();
+            }
+            else if (downloadManager?.State == DownloadState.Downloading)
+            {
+                // download is currently running, pause it
+                downloadManager.PauseDownloads();
             }
         }
 
@@ -79,21 +119,6 @@ namespace kellerkompanie_sync
         {
             public AddonGroup AddonGroup { get; set; }
             public string DownloadDirectory { get; set; }
-        }
-
-        private void DownloadToDirectory(AddonGroup addonGroup, string downloadDirectory)
-        {
-            BackgroundWorker worker = new BackgroundWorker();
-            worker.WorkerReportsProgress = true;
-            worker.DoWork += DownloadWorker_DoWork;
-            worker.ProgressChanged += DownloadWorker_ProgressChanged;
-            worker.RunWorkerCompleted += DownloadWorker_RunWorkerCompleted;
-            DownloadArguments args = new DownloadArguments
-            {
-                AddonGroup = addonGroup,
-                DownloadDirectory = downloadDirectory
-            };
-            worker.RunWorkerAsync(args);
         }
 
         void DownloadWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -191,28 +216,52 @@ namespace kellerkompanie_sync
                 }
             }
 
-            DownloadManager downloadManager = new DownloadManager(args.AddonGroup);
-            downloadManager.DownloadsFinished += DownloadManager_DownloadsFinished;
+            downloadManager = new DownloadManager(args.AddonGroup);
+            downloadManager.StateChanged += DownloadManager_StateChanged;
             downloadManager.ProgressChanged += DownloadManager_ProgressChanged;
 
             foreach ((string url, string destinationFile, long filesize) in downloads)
+            {
                 downloadManager.AddDownload(url, destinationFile, filesize);
+            }
 
             downloadManager.StartDownloads();
         }
 
-        void DownloadManager_DownloadsFinished(object sender, bool status)
+        void DownloadManager_StateChanged(object sender, DownloadState state)
         {
             DownloadManager downloadManager = sender as DownloadManager;
 
-            ValidateAddonGroup(downloadManager.AddonGroup);
-
-            Application.Current.Dispatcher.Invoke(new Action(() =>
+            switch (state)
             {
-                MainWindow wnd = (MainWindow)Window.GetWindow(this);
-                wnd.ProgressBar.Value = 0;
-                wnd.ProgressBarText.Text = Properties.Resources.EverythingUpToDate;
-            }));
+                case DownloadState.Completed:
+                    ValidateAddonGroup(downloadManager.AddonGroup);
+
+                    Application.Current.Dispatcher.Invoke(new Action(() =>
+                    {
+                        MainWindow mainWindow = (MainWindow)Window.GetWindow(this);
+                        mainWindow.ProgressBar.Value = 0;
+                        mainWindow.ProgressBarText.Text = Properties.Resources.EverythingUpToDate;
+                        downloadManager.AddonGroup.StatusText = "";
+                    }));
+                    break;
+
+                case DownloadState.Paused:
+                    Application.Current.Dispatcher.Invoke(new Action(() =>
+                    {
+                        downloadManager.AddonGroup.ButtonText = Properties.Resources.Continue;
+                        downloadManager.AddonGroup.StatusText = Properties.Resources.ProgressDownloadPaused;
+                    }));
+                    break;
+
+                case DownloadState.Downloading:
+                    Application.Current.Dispatcher.Invoke(new Action(() =>
+                    {
+                        downloadManager.AddonGroup.ButtonText = Properties.Resources.Pause;
+                        downloadManager.AddonGroup.StatusText = Properties.Resources.ProgressDownloading;
+                    }));
+                    break;
+            }
         }
 
         void DownloadManager_ProgressChanged(object sender, DownloadProgress downloadProgress)
@@ -221,8 +270,8 @@ namespace kellerkompanie_sync
 
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
-                MainWindow wnd = (MainWindow)Window.GetWindow(this);
-                wnd.ProgressBar.Value = downloadProgress.Progress;
+                MainWindow mainWindow = (MainWindow)Window.GetWindow(this);
+                mainWindow.ProgressBar.Value = downloadProgress.Progress;
 
                 string downloadSize = string.Format("{0:n1}/{1:n1} MB", downloadProgress.CurrentDownloadSize / 1024 / 1024, downloadProgress.TotalDownloadSize / 1024 / 1024);
                 string downloadSpeed = string.Format("{0:n1} MB/s", downloadProgress.DownloadSpeed / 1024);
@@ -241,7 +290,7 @@ namespace kellerkompanie_sync
                     remainingTime = string.Format("{0}s {1}", t.Seconds, Properties.Resources.Left);
                 }
 
-                wnd.ProgressBarText.Text = string.Format("{0} ({1} @ {2}, {3})", Properties.Resources.DownloadingModsProgress, downloadSize, downloadSpeed, remainingTime);
+                mainWindow.ProgressBarText.Text = string.Format("{0} ({1} @ {2}, {3})", Properties.Resources.DownloadingModsProgress, downloadSize, downloadSpeed, remainingTime);
             }));
         }
 
@@ -261,10 +310,15 @@ namespace kellerkompanie_sync
 
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
+                downloadManager = null;
                 addonGroup.StatusText = "";
                 addonGroup.StatusVisibility = Visibility.Hidden;
                 addonGroup.State = AddonGroupState.Ready;
                 MainWindow.Instance.PlayUpdateButton.IsEnabled = true;
+                foreach (AddonGroup addonGrp in FileIndexer.Instance.AddonGroups)
+                {
+                    addonGrp.ButtonIsEnabled = true;
+                }
             }));
         }
     }

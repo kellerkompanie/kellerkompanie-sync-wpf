@@ -138,11 +138,17 @@
   <data name="ArmaExecutableLocation" xml:space="preserve">
     <value>Arma 3 Pfad zur ausführbaren Datei:</value>
   </data>
+  <data name="Continue" xml:space="preserve">
+    <value>Download fortsetzen</value>
+  </data>
   <data name="DefaultWorldEmpty" xml:space="preserve">
     <value>leere Standard-Welt</value>
   </data>
   <data name="DownloadingModsProgress" xml:space="preserve">
-    <value>Lade Mods runter...</value>
+    <value>Lade Dateien herunter...</value>
+  </data>
+  <data name="DownloadPausedProgress" xml:space="preserve">
+    <value>Download pausiert</value>
   </data>
   <data name="DownloadSettings" xml:space="preserve">
     <value>Download Einstellungen</value>
@@ -189,6 +195,9 @@
   <data name="Open" xml:space="preserve">
     <value>Öffnen</value>
   </data>
+  <data name="Pause" xml:space="preserve">
+    <value>Download pausieren</value>
+  </data>
   <data name="Play" xml:space="preserve">
     <value>Spielen</value>
   </data>
@@ -196,7 +205,10 @@
     <value>Vergleiche mit Online Version...</value>
   </data>
   <data name="ProgressDownloading" xml:space="preserve">
-    <value>(lade herunter...)</value>
+    <value>(Download läuft...)</value>
+  </data>
+  <data name="ProgressDownloadPaused" xml:space="preserve">
+    <value>(Download pausiert)</value>
   </data>
   <data name="ProgressIndexingComplete" xml:space="preserve">
     <value>Indizierung fertig</value>
@@ -205,7 +217,7 @@
     <value>Dateien werden indiziert...</value>
   </data>
   <data name="ProgressValidating" xml:space="preserve">
-    <value>(validiere...)</value>
+    <value>(Download wird validiert...)</value>
   </data>
   <data name="Ready" xml:space="preserve">
     <value>Bereit</value>
@@ -223,7 +235,7 @@
     <value>Scriptfehler anzeigen</value>
   </data>
   <data name="SomeModsAlreadyDownloaded" xml:space="preserve">
-    <value>Einige Addons bereits runtergeladen</value>
+    <value>Einige Dateien bereits runtergeladen</value>
   </data>
   <data name="SteamNotRunningInfoMessage" xml:space="preserve">
     <value>Steam läuft nicht, bitte erst Steam starten!</value>

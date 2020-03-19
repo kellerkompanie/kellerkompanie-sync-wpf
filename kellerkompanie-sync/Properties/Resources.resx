@@ -138,11 +138,17 @@
   <data name="ArmaExecutableLocation" xml:space="preserve">
     <value>Arma 3 executable location:</value>
   </data>
+  <data name="Continue" xml:space="preserve">
+    <value>Continue download</value>
+  </data>
   <data name="DefaultWorldEmpty" xml:space="preserve">
     <value>default world empty</value>
   </data>
   <data name="DownloadingModsProgress" xml:space="preserve">
-    <value>Downloading mods...</value>
+    <value>Downloading files...</value>
+  </data>
+  <data name="DownloadPausedProgress" xml:space="preserve">
+    <value>Download paused</value>
   </data>
   <data name="DownloadSettings" xml:space="preserve">
     <value>Download Settings</value>
@@ -189,6 +195,9 @@
   <data name="Open" xml:space="preserve">
     <value>Open</value>
   </data>
+  <data name="Pause" xml:space="preserve">
+    <value>Pause download</value>
+  </data>
   <data name="Play" xml:space="preserve">
     <value>Play</value>
   </data>
@@ -197,6 +206,9 @@
   </data>
   <data name="ProgressDownloading" xml:space="preserve">
     <value>(downloading...)</value>
+  </data>
+  <data name="ProgressDownloadPaused" xml:space="preserve">
+    <value>(paused)</value>
   </data>
   <data name="ProgressIndexingComplete" xml:space="preserve">
     <value>Indexing completed</value>
@@ -223,7 +235,7 @@
     <value>show script errors</value>
   </data>
   <data name="SomeModsAlreadyDownloaded" xml:space="preserve">
-    <value>Some mods already downloaded</value>
+    <value>Some files already downloaded</value>
   </data>
   <data name="SteamNotRunningInfoMessage" xml:space="preserve">
     <value>Steam is not running, please start Steam first!</value>

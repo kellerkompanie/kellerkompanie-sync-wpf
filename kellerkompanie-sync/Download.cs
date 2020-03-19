@@ -43,15 +43,15 @@ namespace kellerkompanie_sync
 
         public DownloadState DownloadState { get; private set; } = DownloadState.Created;
 
-        public EventHandler<long> eSize;
-        public EventHandler<long> SizeChanged;
         public EventHandler<DownloadState> StateChanged;
 
         public Download(string url, string filePath)
         {
             // convert string to uri using Uri.TryCreate
             if (!Uri.TryCreate(url, UriKind.Absolute, out uri))
+            {
                 throw new ArgumentException("invalid url");
+            }                
 
             this.filePath = filePath;
         }
@@ -60,30 +60,19 @@ namespace kellerkompanie_sync
         {
             Log.Debug("starting download: " + this);
 
-            var directory = Path.GetDirectoryName(filePath);
+            string directory = Path.GetDirectoryName(filePath);
             Directory.CreateDirectory(directory);                        
-            fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
-
-            // if file not exists fileStream.Length will return 0
-            DownloadedSize = fileStream.Length;   
+            fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);                       
                         
-            request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(uri);
-            // check if downloaded-length != 0, which equals to download resume
-            if (DownloadedSize > 0)
-            {
-                // continue download at previous point
-                request.AddRange(DownloadedSize);      
-            }
-            
+            request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(uri);                        
             using (response = (System.Net.HttpWebResponse)await request.GetResponseAsync())
             {
                 using (stream = response.GetResponseStream())
                 {
                     await System.Threading.Tasks.Task.Run(() =>
                     {
-                        FileSize = response.ContentLength + DownloadedSize;
-                        eSize?.Invoke(this, FileSize);
-                        SizeChanged?.Invoke(this, DownloadedSize);
+                        DownloadedSize = 0;
+                        FileSize = response.ContentLength;                        
                         downloadStart = DateTime.Now;
 
                         // update the download-state.
@@ -110,22 +99,12 @@ namespace kellerkompanie_sync
             }
 
             DownloadSpeed = 0;
-            StateChanged?.Invoke(this, DownloadState);            
-            SizeChanged?.Invoke(this, DownloadedSize);
+            StateChanged?.Invoke(this, DownloadState);
         }
         
-
         public void PauseDownload()
         {
             DownloadState = DownloadState.Paused;
-        }
-
-        public void ResumeDownload()
-        {
-            if (DownloadState != DownloadState.Paused)
-                throw new InvalidOperationException("can only resume paused downloads");
-            
-            StartDownload();            
         }
 
         public override string ToString()

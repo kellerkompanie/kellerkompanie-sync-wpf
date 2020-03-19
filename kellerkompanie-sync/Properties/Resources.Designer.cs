@@ -124,6 +124,15 @@ namespace kellerkompanie_sync.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Continue download.
+        /// </summary>
+        public static string Continue {
+            get {
+                return ResourceManager.GetString("Continue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to default world empty.
         /// </summary>
         public static string DefaultWorldEmpty {
@@ -133,11 +142,20 @@ namespace kellerkompanie_sync.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Downloading mods....
+        ///   Looks up a localized string similar to Downloading files....
         /// </summary>
         public static string DownloadingModsProgress {
             get {
                 return ResourceManager.GetString("DownloadingModsProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download paused.
+        /// </summary>
+        public static string DownloadPausedProgress {
+            get {
+                return ResourceManager.GetString("DownloadPausedProgress", resourceCulture);
             }
         }
         
@@ -277,6 +295,15 @@ namespace kellerkompanie_sync.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pause download.
+        /// </summary>
+        public static string Pause {
+            get {
+                return ResourceManager.GetString("Pause", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Play.
         /// </summary>
         public static string Play {
@@ -300,6 +327,15 @@ namespace kellerkompanie_sync.Properties {
         public static string ProgressDownloading {
             get {
                 return ResourceManager.GetString("ProgressDownloading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (paused).
+        /// </summary>
+        public static string ProgressDownloadPaused {
+            get {
+                return ResourceManager.GetString("ProgressDownloadPaused", resourceCulture);
             }
         }
         
@@ -376,7 +412,7 @@ namespace kellerkompanie_sync.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Some mods already downloaded.
+        ///   Looks up a localized string similar to Some files already downloaded.
         /// </summary>
         public static string SomeModsAlreadyDownloaded {
             get {

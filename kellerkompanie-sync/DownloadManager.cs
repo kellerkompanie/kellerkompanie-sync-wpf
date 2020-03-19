@@ -18,22 +18,19 @@ namespace kellerkompanie_sync
 
     public class DownloadManager
     {
-        private bool isDownloading = false;
         private readonly List<Download> queuedDownloads = new List<Download>();
         private readonly List<Download> runningDownloads = new List<Download>();
         private readonly List<Download> finishedDownloads = new List<Download>();
 
         private static readonly ReaderWriterLock ReaderWriterLock = new ReaderWriterLock();
         private const int TIMEOUT = 100;
-
+        private readonly System.Timers.Timer timer = new System.Timers.Timer(500);
         private long totalDownloadSize = 0;
 
-        public EventHandler<bool> DownloadsFinished;
-        public EventHandler<DownloadProgress> ProgressChanged;
+        public DownloadState State { get; private set; } = DownloadState.Created;
         public AddonGroup AddonGroup { get; }
-
-        /// a timer used to update downloading information every x millisecond
-        private readonly System.Timers.Timer timer = new System.Timers.Timer(500);
+        public EventHandler<DownloadState> StateChanged;
+        public EventHandler<DownloadProgress> ProgressChanged;                
 
         public DownloadManager(AddonGroup addonGroup)
         {
@@ -43,8 +40,10 @@ namespace kellerkompanie_sync
 
         public void StartDownloads()
         {
-            isDownloading = true;
-            timer.Elapsed += Timer_Elapsed;
+            Debug.WriteLine(string.Format("DownloadManager starting with queued={0} running={1} finished={2} total={3}", queuedDownloads.Count, runningDownloads.Count, finishedDownloads.Count, queuedDownloads.Count + runningDownloads.Count + finishedDownloads.Count));
+
+            State = DownloadState.Downloading;
+            timer.Elapsed += Timer_Elapsed;           
             timer.Start();
 
             int n = Math.Min(Settings.Instance.SimultaneousDownloads, queuedDownloads.Count);
@@ -53,39 +52,54 @@ namespace kellerkompanie_sync
             {
                 DownloadNext();
             }
+
+            StateChanged?.Invoke(this, State);
         }
 
         private void DownloadNext()
         {
-            Download download = queuedDownloads[0];
-            download.StateChanged += Download_StateChanged;
-            queuedDownloads.RemoveAt(0);
-            download.StartDownload();
+            ReaderWriterLock.AcquireWriterLock(TIMEOUT);
+            try
+            {
+                Download download = queuedDownloads[0];
+                download.StateChanged += Download_StateChanged;
+                queuedDownloads.RemoveAt(0);
+                download.StartDownload();
+            }
+            finally
+            {
+                ReaderWriterLock.ReleaseWriterLock();
+            }            
         }
 
         public void PauseDownloads()
         {
-            isDownloading = false;
-            timer.Stop();
+            State = DownloadState.Paused;
+            timer.Elapsed -= Timer_Elapsed;
+            timer.Stop();            
 
             ReaderWriterLock.AcquireWriterLock(TIMEOUT);
             try
             {
                 foreach (Download download in runningDownloads)
+                {
                     download.PauseDownload();
-
-                runningDownloads.Clear();
+                }
             }
             finally
             {
                 ReaderWriterLock.ReleaseWriterLock();
             }
+
+            StateChanged?.Invoke(this, State);
         }
 
         public void AddDownload(string sourceUrl, string filepath, long expectedFileSize)
         {
-            if (isDownloading)
-                throw new InvalidOperationException("can only add new downloads while downloader is not running");
+            if (State != DownloadState.Created)
+            {
+                throw new InvalidOperationException("can only add new downloads before downloader started");
+            }
 
             Download download = new Download(sourceUrl, filepath);
             totalDownloadSize += expectedFileSize;
@@ -143,16 +157,17 @@ namespace kellerkompanie_sync
                         runningDownloads.Remove(download);
                         finishedDownloads.Add(download);
                         
-                        if (queuedDownloads.Count > 0)
+                        if (queuedDownloads.Count > 0 && State != DownloadState.Paused && runningDownloads.Count < Settings.Instance.SimultaneousDownloads)
                         {
                             DownloadNext();
                         }
                         else if (queuedDownloads.Count == 0 && runningDownloads.Count == 0)
                         {
-                            isDownloading = false;
-                            timer.Stop();
+                            State = DownloadState.Completed;
+                            timer.Elapsed -= Timer_Elapsed;
+                            timer.Stop();                            
                             Log.Debug("DownloadManager: all downloads finished");
-                            DownloadsFinished?.Invoke(this, true);
+                            StateChanged?.Invoke(this, State);
                         }
                     }
                     finally
@@ -178,6 +193,7 @@ namespace kellerkompanie_sync
                     ReaderWriterLock.AcquireWriterLock(TIMEOUT);
                     try
                     {
+                        download.StateChanged -= Download_StateChanged;
                         runningDownloads.Remove(download);
                         queuedDownloads.Add(download);
                     }

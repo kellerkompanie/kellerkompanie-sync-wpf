@@ -161,7 +161,7 @@
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                             <Button
                                 Name="ButtonDownloadOrUpdate"
-                                Width="80"
+                                Width="120"
                                 Height="28"
                                 Margin="8,0,0,0"
                                 VerticalAlignment="Center"
