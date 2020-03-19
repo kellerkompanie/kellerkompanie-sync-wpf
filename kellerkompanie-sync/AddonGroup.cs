@@ -72,11 +72,11 @@ namespace kellerkompanie_sync
             set { checkBoxVisibility = value; Parent?.Items.Refresh(); }
         }
 
-        private bool checkBoxIsSelected;
-        public bool CheckBoxIsSelected
+        private bool checkBoxIsChecked;
+        public bool CheckBoxIsChecked
         {
-            get { return checkBoxIsSelected; }
-            set { checkBoxIsSelected = value; Parent?.Items.Refresh(); }
+            get { return checkBoxIsChecked; }
+            set { checkBoxIsChecked = value; Parent?.Items.Refresh(); }
         }
 
         private string statusText;
