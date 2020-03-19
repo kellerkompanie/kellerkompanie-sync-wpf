@@ -64,12 +64,16 @@ namespace kellerkompanie_sync
             Directory.CreateDirectory(directory);                        
             fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
 
-            DownloadedSize = fileStream.Length;   // if file not exists fileStream.Length will return 0
+            // if file not exists fileStream.Length will return 0
+            DownloadedSize = fileStream.Length;   
                         
             request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(uri);
             // check if downloaded-length != 0, which equals to download resume
             if (DownloadedSize > 0)
-                request.AddRange(DownloadedSize);      // add range to the 'req' to change the point of start download.
+            {
+                // continue download at previous point
+                request.AddRange(DownloadedSize);      
+            }
             
             using (response = (System.Net.HttpWebResponse)await request.GetResponseAsync())
             {
@@ -128,7 +132,7 @@ namespace kellerkompanie_sync
         {
             StringBuilder sb = new StringBuilder("{");
             sb.Append(DownloadState);
-            sb.Append(",");
+            sb.Append(", ");
             sb.Append(uri);
             sb.Append("}");
             return sb.ToString();
