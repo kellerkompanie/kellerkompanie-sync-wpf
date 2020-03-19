@@ -25,6 +25,99 @@
             <Setter Property="Background" Value="#ee4d2e" />
             <Setter Property="BorderThickness" Value="0" />
         </Style>
+
+        <SolidColorBrush x:Key="OrangeButton.MouseOver.Background" Color="#f2f5f4" />
+        <SolidColorBrush x:Key="OrangeButton.MouseOver.Foreground" Color="#888888" />
+        <SolidColorBrush x:Key="OrangeButton.Pressed.Background" Color="#888888" />
+        <SolidColorBrush x:Key="OrangeButton.Pressed.Foreground" Color="#f2f5f4" />
+        <SolidColorBrush x:Key="OrangeButton.Disabled.Background" Color="#212121" />
+        <SolidColorBrush x:Key="OrangeButton.Disabled.Foreground" Color="#2a2e31" />
+        <ControlTemplate x:Key="OrangeButtonTemplate" TargetType="{x:Type ButtonBase}">
+            <Border
+                x:Name="border"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                SnapsToDevicePixels="true">
+                <ContentPresenter
+                    x:Name="contentPresenter"
+                    Margin="{TemplateBinding Padding}"
+                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                    Focusable="False"
+                    RecognizesAccessKey="True"
+                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="Button.IsDefaulted" Value="true">
+                    <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter TargetName="border" Property="Background" Value="{StaticResource OrangeButton.MouseOver.Background}" />
+                    <Setter TargetName="contentPresenter" Property="TextElement.Foreground" Value="{StaticResource OrangeButton.MouseOver.Foreground}" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="true">
+                    <Setter TargetName="border" Property="Background" Value="{StaticResource OrangeButton.Pressed.Background}" />
+                    <Setter TargetName="contentPresenter" Property="TextElement.Foreground" Value="{StaticResource OrangeButton.Pressed.Foreground}" />
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="false">
+                    <Setter TargetName="border" Property="Background" Value="{StaticResource OrangeButton.Disabled.Background}" />
+                    <Setter TargetName="contentPresenter" Property="TextElement.Foreground" Value="{StaticResource OrangeButton.Disabled.Foreground}" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <Style
+            x:Key="GreyButton"
+            BasedOn="{StaticResource {x:Type Button}}"
+            TargetType="Button">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="#f2f5f4" />
+            <Setter Property="Background" Value="#212121" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+
+        <SolidColorBrush x:Key="GreyButton.MouseOver.Background" Color="#888888" />
+        <SolidColorBrush x:Key="GreyButton.MouseOver.Foreground" Color="#f2f5f4" />
+        <SolidColorBrush x:Key="GreyButton.Pressed.Background" Color="#f2f5f4" />
+        <SolidColorBrush x:Key="GreyButton.Pressed.Foreground" Color="#888888" />
+        <SolidColorBrush x:Key="GreyButton.Disabled.Background" Color="#888888" />
+        <SolidColorBrush x:Key="GreyButton.Disabled.Foreground" Color="#f2f5f4" />
+        <ControlTemplate x:Key="GreyButtonTemplate" TargetType="{x:Type ButtonBase}">
+            <Border
+                x:Name="border"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                SnapsToDevicePixels="true">
+                <ContentPresenter
+                    x:Name="contentPresenter"
+                    Margin="{TemplateBinding Padding}"
+                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                    Focusable="False"
+                    RecognizesAccessKey="True"
+                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="Button.IsDefaulted" Value="true">
+                    <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter TargetName="border" Property="Background" Value="{StaticResource GreyButton.MouseOver.Background}" />
+                    <Setter TargetName="contentPresenter" Property="TextElement.Foreground" Value="{StaticResource GreyButton.MouseOver.Foreground}" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="true">
+                    <Setter TargetName="border" Property="Background" Value="{StaticResource GreyButton.Pressed.Background}" />
+                    <Setter TargetName="contentPresenter" Property="TextElement.Foreground" Value="{StaticResource GreyButton.Pressed.Foreground}" />
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="false">
+                    <Setter TargetName="border" Property="Background" Value="{StaticResource GreyButton.Disabled.Background}" />
+                    <Setter TargetName="contentPresenter" Property="TextElement.Foreground" Value="{StaticResource GreyButton.Disabled.Foreground}" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
         <Style
             x:Key="PlayUpdateButton"
             BasedOn="{StaticResource OrangeButton}"
@@ -35,15 +128,7 @@
             <Setter Property="VerticalAlignment" Value="Bottom" />
             <Setter Property="FontSize" Value="24" />
         </Style>
-        <Style
-            x:Key="GreyButton"
-            BasedOn="{StaticResource {x:Type Button}}"
-            TargetType="Button">
-            <Setter Property="HorizontalAlignment" Value="Center" />
-            <Setter Property="Foreground" Value="#f2f5f4" />
-            <Setter Property="Background" Value="#212121" />
-            <Setter Property="BorderThickness" Value="0" />
-        </Style>
+
         <Style
             x:Key="NavigationButton"
             BasedOn="{StaticResource GreyButton}"
@@ -53,13 +138,56 @@
             <Setter Property="Width" Value="140" />
             <Setter Property="Height" Value="36" />
         </Style>
+
+        <SolidColorBrush x:Key="QuickBarButton.MouseOver.Background" Color="#888888" />
+        <SolidColorBrush x:Key="QuickBarButton.MouseOver.Foreground" Color="#f2f5f4" />
+        <SolidColorBrush x:Key="QuickBarButton.Pressed.Background" Color="#888888" />
+        <SolidColorBrush x:Key="QuickBarButton.Pressed.Foreground" Color="#f2f5f4" />
+        <SolidColorBrush x:Key="QuickBarButton.Disabled.Background" Color="#888888" />
+        <SolidColorBrush x:Key="QuickBarButton.Disabled.Foreground" Color="#f2f5f4" />
+        <ControlTemplate x:Key="QuickBarButtonTemplate" TargetType="{x:Type ButtonBase}">
+            <Border
+                x:Name="border"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                SnapsToDevicePixels="true">
+                <ContentPresenter
+                    x:Name="contentPresenter"
+                    Margin="{TemplateBinding Padding}"
+                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                    Focusable="False"
+                    RecognizesAccessKey="True"
+                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="Button.IsDefaulted" Value="true">
+                    <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter TargetName="border" Property="Background" Value="{StaticResource QuickBarButton.MouseOver.Background}" />
+                    <Setter TargetName="contentPresenter" Property="TextElement.Foreground" Value="{StaticResource QuickBarButton.MouseOver.Foreground}" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="true">
+                    <Setter TargetName="border" Property="Background" Value="{StaticResource QuickBarButton.Pressed.Background}" />
+                    <Setter TargetName="contentPresenter" Property="TextElement.Foreground" Value="{StaticResource QuickBarButton.Pressed.Foreground}" />
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="false">
+                    <Setter TargetName="border" Property="Background" Value="{StaticResource QuickBarButton.Disabled.Background}" />
+                    <Setter TargetName="contentPresenter" Property="TextElement.Foreground" Value="{StaticResource QuickBarButton.Disabled.Foreground}" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
         <Style
             x:Key="QuickBarButton"
             BasedOn="{StaticResource GreyButton}"
             TargetType="Button">
-            <Setter Property="Margin" Value="8,0,0,0" />
+            <Setter Property="Margin" Value="16,0,0,0" />
             <Setter Property="Height" Value="42" />
         </Style>
+
         <Style
             x:Key="QuickBarButtonText"
             BasedOn="{StaticResource {x:Type TextBlock}}"
@@ -91,17 +219,20 @@
                     Name="buttonNews"
                     Click="ButtonNews_Click"
                     Content="News"
-                    Style="{StaticResource NavigationButton}" />
+                    Style="{StaticResource NavigationButton}"
+                    Template="{DynamicResource GreyButtonTemplate}" />
                 <Button
                     Name="buttonMods"
                     Click="ButtonMods_Click"
                     Content="Mods"
-                    Style="{StaticResource NavigationButton}" />
+                    Style="{StaticResource NavigationButton}"
+                    Template="{DynamicResource GreyButtonTemplate}" />
                 <Button
                     Name="buttonSettings"
                     Click="ButtonSettings_Click"
                     Content="Settings"
-                    Style="{StaticResource NavigationButton}" />
+                    Style="{StaticResource NavigationButton}"
+                    Template="{DynamicResource GreyButtonTemplate}" />
 
             </StackPanel>
 
@@ -110,7 +241,9 @@
                 Click="PlayUpdateButton_Click"
                 Content="Play"
                 DockPanel.Dock="Bottom"
-                Style="{StaticResource PlayUpdateButton}" />
+                IsEnabled="False"
+                Style="{StaticResource PlayUpdateButton}"
+                Template="{DynamicResource OrangeButtonTemplate}" />
 
         </DockPanel>
 
@@ -130,7 +263,8 @@
                     <Button
                         Name="buttonTeamspeak"
                         Click="ButtonTeamspeak_Click"
-                        Style="{StaticResource QuickBarButton}">
+                        Style="{StaticResource QuickBarButton}"
+                        Template="{DynamicResource QuickBarButtonTemplate}">
                         <StackPanel Orientation="Horizontal">
                             <Image Margin="6,0,0,0" Source="/Images/headset.png" />
                             <TextBlock Style="{StaticResource QuickBarButtonText}" Text="Teamspeak" />
@@ -139,7 +273,8 @@
                     <Button
                         Name="buttonForum"
                         Click="ButtonForum_Click"
-                        Style="{StaticResource QuickBarButton}">
+                        Style="{StaticResource QuickBarButton}"
+                        Template="{DynamicResource QuickBarButtonTemplate}">
                         <StackPanel Orientation="Horizontal">
                             <Image Margin="6,0,0,0" Source="/Images/forum.png" />
                             <TextBlock Style="{StaticResource QuickBarButtonText}" Text="Forum" />
@@ -148,7 +283,8 @@
                     <Button
                         Name="buttonServer"
                         Click="ButtonServer_Click"
-                        Style="{StaticResource QuickBarButton}">
+                        Style="{StaticResource QuickBarButton}"
+                        Template="{DynamicResource QuickBarButtonTemplate}">
                         <StackPanel Orientation="Horizontal">
                             <Image Margin="6,0,0,0" Source="/Images/server.png" />
                             <TextBlock Style="{StaticResource QuickBarButtonText}" Text="Server" />
@@ -157,7 +293,8 @@
                     <Button
                         Name="buttonWiki"
                         Click="ButtonWiki_Click"
-                        Style="{StaticResource QuickBarButton}">
+                        Style="{StaticResource QuickBarButton}"
+                        Template="{DynamicResource QuickBarButtonTemplate}">
                         <StackPanel Orientation="Horizontal">
                             <Image Margin="6,0,0,0" Source="/Images/wiki.png" />
                             <TextBlock Style="{StaticResource QuickBarButtonText}" Text="Wiki" />
@@ -166,14 +303,14 @@
                     <Button
                         Name="buttonTFAR"
                         Click="buttonTFAR_Click"
-                        Style="{StaticResource QuickBarButton}">
+                        Style="{StaticResource QuickBarButton}"
+                        Template="{DynamicResource QuickBarButtonTemplate}">
                         <StackPanel Orientation="Horizontal">
                             <Image Margin="6,0,0,0" Source="/Images/tfar.png" />
                             <TextBlock Style="{StaticResource QuickBarButtonText}" Text="TFAR" />
                         </StackPanel>
                     </Button>
                 </StackPanel>
-
             </StackPanel>
 
             <Grid

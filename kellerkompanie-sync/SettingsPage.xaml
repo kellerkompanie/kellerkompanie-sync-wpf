@@ -67,6 +67,58 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style
+            x:Key="OrangeButton"
+            BasedOn="{StaticResource {x:Type Button}}"
+            TargetType="Button">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+
+            <Setter Property="Foreground" Value="#f2f5f4" />
+            <Setter Property="Background" Value="#ee4d2e" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+
+        <SolidColorBrush x:Key="OrangeButton.MouseOver.Background" Color="#f2f5f4" />
+        <SolidColorBrush x:Key="OrangeButton.MouseOver.Foreground" Color="#888888" />
+        <SolidColorBrush x:Key="OrangeButton.Pressed.Background" Color="#888888" />
+        <SolidColorBrush x:Key="OrangeButton.Pressed.Foreground" Color="#f2f5f4" />
+        <SolidColorBrush x:Key="OrangeButton.Disabled.Background" Color="#212121" />
+        <SolidColorBrush x:Key="OrangeButton.Disabled.Foreground" Color="#2a2e31" />
+        <ControlTemplate x:Key="OrangeButtonTemplate" TargetType="{x:Type ButtonBase}">
+            <Border
+                x:Name="border"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                SnapsToDevicePixels="true">
+                <ContentPresenter
+                    x:Name="contentPresenter"
+                    Margin="{TemplateBinding Padding}"
+                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                    Focusable="False"
+                    RecognizesAccessKey="True"
+                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="Button.IsDefaulted" Value="true">
+                    <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter TargetName="border" Property="Background" Value="{StaticResource OrangeButton.MouseOver.Background}" />
+                    <Setter TargetName="contentPresenter" Property="TextElement.Foreground" Value="{StaticResource OrangeButton.MouseOver.Foreground}" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="true">
+                    <Setter TargetName="border" Property="Background" Value="{StaticResource OrangeButton.Pressed.Background}" />
+                    <Setter TargetName="contentPresenter" Property="TextElement.Foreground" Value="{StaticResource OrangeButton.Pressed.Foreground}" />
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="false">
+                    <Setter TargetName="border" Property="Background" Value="{StaticResource OrangeButton.Disabled.Background}" />
+                    <Setter TargetName="contentPresenter" Property="TextElement.Foreground" Value="{StaticResource OrangeButton.Disabled.Foreground}" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
     </Page.Resources>
 
     <StackPanel>
@@ -88,7 +140,9 @@
                 Click="SettingsExecutableLocationPicker_Click"
                 Content="..."
                 DockPanel.Dock="Right"
-                Foreground="#f2f5f4" />
+                Foreground="#f2f5f4"
+                Style="{StaticResource OrangeButton}"
+                Template="{StaticResource OrangeButtonTemplate}" />
             <TextBox
                 Name="TextBoxExecutableLocation"
                 Margin="8,0,0,0"
@@ -220,7 +274,9 @@
                                     BorderThickness="0"
                                     Click="ButtonOpen_Click"
                                     Content="Open"
-                                    Foreground="#f2f5f4" />
+                                    Foreground="#f2f5f4"
+                                    Style="{StaticResource OrangeButton}"
+                                    Template="{StaticResource OrangeButtonTemplate}" />
                                 <Button
                                     Name="ButtonRemove"
                                     Width="64"
@@ -231,7 +287,9 @@
                                     BorderThickness="0"
                                     Click="ButtonRemove_Click"
                                     Content="Remove"
-                                    Foreground="#f2f5f4" />
+                                    Foreground="#f2f5f4"
+                                    Style="{StaticResource OrangeButton}"
+                                    Template="{StaticResource OrangeButtonTemplate}" />
                             </StackPanel>
 
                             <TextBlock
@@ -254,7 +312,9 @@
                 BorderThickness="0"
                 Click="ButtonAddAddonSearchDirectory_Click"
                 Content="Add Directory"
-                Foreground="#f2f5f4" />
+                Foreground="#f2f5f4"
+                Style="{StaticResource OrangeButton}"
+                Template="{StaticResource OrangeButtonTemplate}" />
         </StackPanel>
 
     </StackPanel>
