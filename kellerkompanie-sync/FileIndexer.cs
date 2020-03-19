@@ -293,13 +293,13 @@ namespace kellerkompanie_sync
         void LocalIndexingWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             ProgressBar.Value = e.ProgressPercentage;
-            ProgressBarText.Text = "Indexing your files... (" + e.ProgressPercentage + "%)";
+            ProgressBarText.Text = string.Format("{0} ({1}%)", Properties.Resources.ProgressIndexingFiles, e.ProgressPercentage);
         }
 
         void LocalIndexingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             ProgressBar.Value = 0;
-            ProgressBarText.Text = "Indexing completed";
+            ProgressBarText.Text = Properties.Resources.ProgressIndexingComplete;
             UpdateAddonGroupStates();
         }
 
@@ -379,13 +379,13 @@ namespace kellerkompanie_sync
         void AddonGroupStateWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             ProgressBar.Value = e.ProgressPercentage;
-            ProgressBarText.Text = "Comparing online version... (" + e.ProgressPercentage + "%)";
+            ProgressBarText.Text = string.Format("{0} ({1}%)", Properties.Resources.ProgressComparingOnlineVersion, e.ProgressPercentage);
         }
 
         void AddonGroupStateWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             ProgressBar.Value = 0;
-            ProgressBarText.Text = "Everything up-to-date";
+            ProgressBarText.Text = Properties.Resources.EverythingUpToDate;
         }
     }
 }

@@ -3,8 +3,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:kellerkompanie_sync"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:p="clr-namespace:kellerkompanie_sync.Properties"
     Title="Settings"
     d:DesignHeight="450"
     d:DesignWidth="800"
@@ -131,7 +131,7 @@
                 VerticalAlignment="Center"
                 DockPanel.Dock="Left"
                 Foreground="#f2f5f4"
-                Text="Arma 3 executable location:" />
+                Text="{x:Static p:Resources.ArmaExecutableLocation}" />
             <Button
                 Name="SettingsExecutableLocationPicker"
                 Width="24"
@@ -159,47 +159,47 @@
                 Margin="0,8,0,0"
                 Background="#212121"
                 Click="CheckBoxShowScriptErrors_Click"
-                Content="show script errors"
+                Content="{x:Static p:Resources.ShowScriptErrors}"
                 Foreground="#f2f5f4" />
             <CheckBox
                 Name="CheckBoxNoPause"
                 Margin="0,8,0,0"
                 Background="#212121"
                 Click="CheckBoxNoPause_Click"
-                Content="no pause"
+                Content="{x:Static p:Resources.NoPause}"
                 Foreground="#f2f5f4" />
             <CheckBox
                 Name="CheckBoxWindowMode"
                 Margin="0,8,0,0"
                 Background="#212121"
                 Click="CheckBoxWindowMode_Click"
-                Content="window mode"
+                Content="{x:Static p:Resources.WindowMode}"
                 Foreground="#f2f5f4" />
             <CheckBox
                 Name="CheckBoxNoSplashScreen"
                 Margin="0,8,0,0"
                 Background="#212121"
                 Click="CheckBoxNoSplashScreen_Click"
-                Content="no splash screen"
+                Content="{x:Static p:Resources.NoSplashScreen}"
                 Foreground="#f2f5f4" />
             <CheckBox
                 Name="CheckBoxDefaultWorldEmpty"
                 Margin="0,8,0,0"
                 Background="#212121"
                 Click="CheckBoxDefaultWorldEmpty_Click"
-                Content="default world empty"
+                Content="{x:Static p:Resources.DefaultWorldEmpty}"
                 Foreground="#f2f5f4" />
             <CheckBox
                 Name="CheckBoxNoLogs"
                 Margin="0,8,0,0"
                 Background="#212121"
                 Click="CheckBoxNoLogs_Click"
-                Content="no logs"
+                Content="{x:Static p:Resources.NoLogs}"
                 Foreground="#f2f5f4" />
         </StackPanel>
 
         <StackPanel Name="SettingsAdditionalParametersPanel" Margin="8,8,8,8">
-            <TextBlock Foreground="#f2f5f4" Text="Additional Parameters" />
+            <TextBlock Foreground="#f2f5f4" Text="{x:Static p:Resources.AdditionalParameters}" />
             <TextBox
                 Name="TextBoxAdditionalParameters"
                 Height="60"
@@ -215,9 +215,9 @@
             <TextBlock
                 Margin="0,0,0,8"
                 Foreground="#f2f5f4"
-                Text="Download Settings" />
+                Text="{x:Static p:Resources.DownloadSettings}" />
             <DockPanel>
-                <TextBlock Foreground="#f2f5f4" Text="Number of simultaneous downloads:" />
+                <TextBlock Foreground="#f2f5f4" Text="{x:Static p:Resources.NumberOfSimultaneousDownloads}" />
                 <TextBox
                     Width="40"
                     Background="#212121"
@@ -240,10 +240,10 @@
         </StackPanel>
 
         <StackPanel Margin="8,8,8,8">
-            <TextBlock Foreground="#f2f5f4" Text="Addon Search Directories" />
+            <TextBlock Foreground="#f2f5f4" Text="{x:Static p:Resources.AddonSearchDirectories}" />
             <TextBlock
                 Foreground="#888888"
-                Text="A list of directories on your computer in which the tool will look for addons (folders starting with @). You can also select folders that already contain addons, in which case the tool will try to discover existing addons before downloading."
+                Text="{x:Static p:Resources.AddonSearchDirectoriesExplanation}"
                 TextWrapping="Wrap" />
             <ListView
                 Name="ListViewAddonSearchDirectories"
@@ -273,7 +273,7 @@
                                     Background="#ee4d2e"
                                     BorderThickness="0"
                                     Click="ButtonOpen_Click"
-                                    Content="Open"
+                                    Content="{x:Static p:Resources.Open}"
                                     Foreground="#f2f5f4"
                                     Style="{StaticResource OrangeButton}"
                                     Template="{StaticResource OrangeButtonTemplate}" />
@@ -286,7 +286,7 @@
                                     Background="#ee4d2e"
                                     BorderThickness="0"
                                     Click="ButtonRemove_Click"
-                                    Content="Remove"
+                                    Content="{x:Static p:Resources.Remove}"
                                     Foreground="#f2f5f4"
                                     Style="{StaticResource OrangeButton}"
                                     Template="{StaticResource OrangeButtonTemplate}" />
@@ -311,7 +311,7 @@
                 Background="#ee4d2e"
                 BorderThickness="0"
                 Click="ButtonAddAddonSearchDirectory_Click"
-                Content="Add Directory"
+                Content="{x:Static p:Resources.AddDirectory}"
                 Foreground="#f2f5f4"
                 Style="{StaticResource OrangeButton}"
                 Template="{StaticResource OrangeButtonTemplate}" />

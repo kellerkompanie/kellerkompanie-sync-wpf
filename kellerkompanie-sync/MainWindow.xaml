@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:p="clr-namespace:kellerkompanie_sync.Properties"
     Title="kellerkompanie-sync (0.1.0-alpha)"
     Width="800"
     Height="600"
@@ -218,19 +219,19 @@
                 <Button
                     Name="buttonNews"
                     Click="ButtonNews_Click"
-                    Content="News"
+                    Content="{x:Static p:Resources.News}"
                     Style="{StaticResource NavigationButton}"
                     Template="{DynamicResource GreyButtonTemplate}" />
                 <Button
                     Name="buttonMods"
                     Click="ButtonMods_Click"
-                    Content="Mods"
+                    Content="{x:Static p:Resources.Mods}"
                     Style="{StaticResource NavigationButton}"
                     Template="{DynamicResource GreyButtonTemplate}" />
                 <Button
                     Name="buttonSettings"
                     Click="ButtonSettings_Click"
-                    Content="Settings"
+                    Content="{x:Static p:Resources.Settings}"
                     Style="{StaticResource NavigationButton}"
                     Template="{DynamicResource GreyButtonTemplate}" />
 
@@ -239,7 +240,7 @@
             <Button
                 Name="PlayUpdateButton"
                 Click="PlayUpdateButton_Click"
-                Content="Play"
+                Content="{x:Static p:Resources.Play}"
                 DockPanel.Dock="Bottom"
                 Style="{StaticResource PlayUpdateButton}"
                 Template="{DynamicResource OrangeButtonTemplate}" />
@@ -266,7 +267,7 @@
                         Template="{DynamicResource QuickBarButtonTemplate}">
                         <StackPanel Orientation="Horizontal">
                             <Image Margin="6,0,0,0" Source="/Images/headset.png" />
-                            <TextBlock Style="{StaticResource QuickBarButtonText}" Text="Teamspeak" />
+                            <TextBlock Style="{StaticResource QuickBarButtonText}" Text="{x:Static p:Resources.Teamspeak}" />
                         </StackPanel>
                     </Button>
                     <Button
@@ -276,7 +277,7 @@
                         Template="{DynamicResource QuickBarButtonTemplate}">
                         <StackPanel Orientation="Horizontal">
                             <Image Margin="6,0,0,0" Source="/Images/forum.png" />
-                            <TextBlock Style="{StaticResource QuickBarButtonText}" Text="Forum" />
+                            <TextBlock Style="{StaticResource QuickBarButtonText}" Text="{x:Static p:Resources.Forum}" />
                         </StackPanel>
                     </Button>
                     <Button
@@ -286,7 +287,7 @@
                         Template="{DynamicResource QuickBarButtonTemplate}">
                         <StackPanel Orientation="Horizontal">
                             <Image Margin="6,0,0,0" Source="/Images/server.png" />
-                            <TextBlock Style="{StaticResource QuickBarButtonText}" Text="Server" />
+                            <TextBlock Style="{StaticResource QuickBarButtonText}" Text="{x:Static p:Resources.Server}" />
                         </StackPanel>
                     </Button>
                     <Button
@@ -296,7 +297,7 @@
                         Template="{DynamicResource QuickBarButtonTemplate}">
                         <StackPanel Orientation="Horizontal">
                             <Image Margin="6,0,0,0" Source="/Images/wiki.png" />
-                            <TextBlock Style="{StaticResource QuickBarButtonText}" Text="Wiki" />
+                            <TextBlock Style="{StaticResource QuickBarButtonText}" Text="{x:Static p:Resources.Wiki}" />
                         </StackPanel>
                     </Button>
                     <Button
@@ -306,7 +307,7 @@
                         Template="{DynamicResource QuickBarButtonTemplate}">
                         <StackPanel Orientation="Horizontal">
                             <Image Margin="6,0,0,0" Source="/Images/tfar.png" />
-                            <TextBlock Style="{StaticResource QuickBarButtonText}" Text="TFAR" />
+                            <TextBlock Style="{StaticResource QuickBarButtonText}" Text="{x:Static p:Resources.TFAR}" />
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -334,7 +335,7 @@
                     VerticalAlignment="Center"
                     FontSize="18"
                     Foreground="#f2f5f4"
-                    Text="Loading Addons..." />
+                    Text="{x:Static p:Resources.LoadingAddons}" />
             </Grid>
 
             <Frame

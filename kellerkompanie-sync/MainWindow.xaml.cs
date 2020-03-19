@@ -25,8 +25,8 @@ namespace kellerkompanie_sync
 
             InitializeComponent();
 
-            ProgressBar.Value = 0;
-            ProgressBarText.Text = "Everything up-to-date";
+            ProgressBar.Value = 0;            
+            ProgressBarText.Text = Properties.Resources.EverythingUpToDate;
 
             NavigateToPage(Page.News);
 
@@ -44,7 +44,7 @@ namespace kellerkompanie_sync
             else
             {
                 PlayUpdateButton.IsEnabled = false;
-                PlayUpdateButton.ToolTip = "Executable not found, check settings";
+                PlayUpdateButton.ToolTip = Properties.Resources.ExecutableNotFoundTooltip;
             }
         }
 
@@ -79,7 +79,7 @@ namespace kellerkompanie_sync
         {
             if (IsTeamspeakRunning())
             {
-                MessageBox.Show("Teamspeak is running, please close Teamspeak before installing the TFAR plugin!", "kellerkompanie-sync");
+                MessageBox.Show(Properties.Resources.TeamspeakNotRunningInfoMessage, "kellerkompanie-sync");
                 return;
             }
 
@@ -171,7 +171,7 @@ namespace kellerkompanie_sync
             if (!IsSteamRunning())
             {
                 Log.Information("PlayUpdateButton_Click: steam is not running");
-                MessageBox.Show("Steam is not running, please start Steam first!", "kellerkompanie-sync");
+                MessageBox.Show(Properties.Resources.SteamNotRunningInfoMessage, "kellerkompanie-sync");
                 return;
             }
 

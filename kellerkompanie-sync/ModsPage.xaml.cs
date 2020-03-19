@@ -34,7 +34,7 @@ namespace kellerkompanie_sync
             if (addonGroup.State == AddonGroupState.CompleteButNotSubscribed)
             {
                 // all addons are already downloaded, directly proceed with validation
-                addonGroup.StatusText = "(validating...)";
+                addonGroup.StatusText = Properties.Resources.ProgressValidating;
                 addonGroup.StatusVisibility = Visibility.Visible;
                 ValidateAddonGroup(addonGroup);
             }
@@ -44,7 +44,7 @@ namespace kellerkompanie_sync
                 switch (Settings.Instance.AddonSearchDirectories.Count)
                 {
                     case 0:
-                        MessageBox.Show("Please first add a addon search directory under settings.", "kellerkompanie-sync");
+                        MessageBox.Show(Properties.Resources.MissingAddonSearchDirectoryInfoMessage, "kellerkompanie-sync");
                         return;
 
                     case 1:
@@ -68,7 +68,7 @@ namespace kellerkompanie_sync
                         break;
                 }
 
-                addonGroup.StatusText = "(downloading...)";
+                addonGroup.StatusText = Properties.Resources.ProgressDownloading;
                 addonGroup.StatusVisibility = Visibility.Visible;
                 DownloadToDirectory(addonGroup, downloadDirectory);
             }
@@ -210,7 +210,7 @@ namespace kellerkompanie_sync
             {
                 MainWindow wnd = (MainWindow)Window.GetWindow(this);
                 wnd.ProgressBar.Value = 0;
-                wnd.ProgressBarText.Text = "Everything up-to-date";
+                wnd.ProgressBarText.Text = Properties.Resources.EverythingUpToDate;
             }));
         }
 
@@ -229,18 +229,18 @@ namespace kellerkompanie_sync
                 string remainingTime;
                 if (t.Hours > 0)
                 {
-                    remainingTime = string.Format("{0}h:{1}m:{2}s left", t.Hours, t.Minutes, t.Seconds);
+                    remainingTime = string.Format("{0}h:{1}m:{2}s {3}", t.Hours, t.Minutes, t.Seconds, Properties.Resources.Left);
                 }
                 else if (t.Hours == 0 && t.Minutes > 0)
                 {
-                    remainingTime = string.Format("{0}m:{1}s left", t.Minutes, t.Seconds);
+                    remainingTime = string.Format("{0}m:{1}s {2}", t.Minutes, t.Seconds, Properties.Resources.Left);
                 }
                 else
                 {
-                    remainingTime = string.Format("{0}s left", t.Seconds);
+                    remainingTime = string.Format("{0}s {1}", t.Seconds, Properties.Resources.Left);
                 }
 
-                wnd.ProgressBarText.Text = string.Format("Downloading mods... ({0} @ {1}, {2})", downloadSize, downloadSpeed, remainingTime);
+                wnd.ProgressBarText.Text = string.Format("{0} ({1} @ {2}, {3})", Properties.Resources.DownloadingModsProgress, downloadSize, downloadSpeed, remainingTime);
             }));
         }
 
