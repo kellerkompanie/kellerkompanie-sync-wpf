@@ -255,62 +255,64 @@
                 x:Name="QuickBarPanel"
                 Background="#161618"
                 DockPanel.Dock="Top">
-                <StackPanel
-                    Margin="12"
-                    HorizontalAlignment="Center"
-                    Background="#161618"
-                    Orientation="Horizontal">
-                    <Button
-                        Name="buttonTeamspeak"
-                        Click="ButtonTeamspeak_Click"
-                        Style="{StaticResource QuickBarButton}"
-                        Template="{DynamicResource QuickBarButtonTemplate}">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Margin="6,0,0,0" Source="/Images/headset.png" />
-                            <TextBlock Style="{StaticResource QuickBarButtonText}" Text="{x:Static p:Resources.Teamspeak}" />
-                        </StackPanel>
-                    </Button>
-                    <Button
-                        Name="buttonForum"
-                        Click="ButtonForum_Click"
-                        Style="{StaticResource QuickBarButton}"
-                        Template="{DynamicResource QuickBarButtonTemplate}">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Margin="6,0,0,0" Source="/Images/forum.png" />
-                            <TextBlock Style="{StaticResource QuickBarButtonText}" Text="{x:Static p:Resources.Forum}" />
-                        </StackPanel>
-                    </Button>
-                    <Button
-                        Name="buttonServer"
-                        Click="ButtonServer_Click"
-                        Style="{StaticResource QuickBarButton}"
-                        Template="{DynamicResource QuickBarButtonTemplate}">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Margin="6,0,0,0" Source="/Images/server.png" />
-                            <TextBlock Style="{StaticResource QuickBarButtonText}" Text="{x:Static p:Resources.Server}" />
-                        </StackPanel>
-                    </Button>
-                    <Button
-                        Name="buttonWiki"
-                        Click="ButtonWiki_Click"
-                        Style="{StaticResource QuickBarButton}"
-                        Template="{DynamicResource QuickBarButtonTemplate}">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Margin="6,0,0,0" Source="/Images/wiki.png" />
-                            <TextBlock Style="{StaticResource QuickBarButtonText}" Text="{x:Static p:Resources.Wiki}" />
-                        </StackPanel>
-                    </Button>
-                    <Button
-                        Name="buttonTFAR"
-                        Click="buttonTFAR_Click"
-                        Style="{StaticResource QuickBarButton}"
-                        Template="{DynamicResource QuickBarButtonTemplate}">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Margin="6,0,0,0" Source="/Images/tfar.png" />
-                            <TextBlock Style="{StaticResource QuickBarButtonText}" Text="{x:Static p:Resources.TFAR}" />
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
+                <Border BorderBrush="#212121" BorderThickness="1,0,0,0">
+                    <StackPanel
+                        Margin="12"
+                        HorizontalAlignment="Center"
+                        Background="#161618"
+                        Orientation="Horizontal">
+                        <Button
+                            Name="buttonTeamspeak"
+                            Click="ButtonTeamspeak_Click"
+                            Style="{StaticResource QuickBarButton}"
+                            Template="{DynamicResource QuickBarButtonTemplate}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Margin="6,0,0,0" Source="/Images/headset.png" />
+                                <TextBlock Style="{StaticResource QuickBarButtonText}" Text="{x:Static p:Resources.Teamspeak}" />
+                            </StackPanel>
+                        </Button>
+                        <Button
+                            Name="buttonForum"
+                            Click="ButtonForum_Click"
+                            Style="{StaticResource QuickBarButton}"
+                            Template="{DynamicResource QuickBarButtonTemplate}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Margin="6,0,0,0" Source="/Images/forum.png" />
+                                <TextBlock Style="{StaticResource QuickBarButtonText}" Text="{x:Static p:Resources.Forum}" />
+                            </StackPanel>
+                        </Button>
+                        <Button
+                            Name="buttonServer"
+                            Click="ButtonServer_Click"
+                            Style="{StaticResource QuickBarButton}"
+                            Template="{DynamicResource QuickBarButtonTemplate}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Margin="6,0,0,0" Source="/Images/server.png" />
+                                <TextBlock Style="{StaticResource QuickBarButtonText}" Text="{x:Static p:Resources.Server}" />
+                            </StackPanel>
+                        </Button>
+                        <Button
+                            Name="buttonWiki"
+                            Click="ButtonWiki_Click"
+                            Style="{StaticResource QuickBarButton}"
+                            Template="{DynamicResource QuickBarButtonTemplate}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Margin="6,0,0,0" Source="/Images/wiki.png" />
+                                <TextBlock Style="{StaticResource QuickBarButtonText}" Text="{x:Static p:Resources.Wiki}" />
+                            </StackPanel>
+                        </Button>
+                        <Button
+                            Name="buttonTFAR"
+                            Click="buttonTFAR_Click"
+                            Style="{StaticResource QuickBarButton}"
+                            Template="{DynamicResource QuickBarButtonTemplate}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Margin="6,0,0,0" Source="/Images/tfar.png" />
+                                <TextBlock Style="{StaticResource QuickBarButtonText}" Text="{x:Static p:Resources.TFAR}" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
             </StackPanel>
 
             <Grid
@@ -323,7 +325,8 @@
                     Name="ProgressBar"
                     Height="40"
                     Background="#161618"
-                    BorderThickness="0"
+                    BorderBrush="#212121"
+                    BorderThickness="1,1,0,0"
                     Foreground="#ee4d2e"
                     Maximum="100"
                     Minimum="0"
@@ -341,6 +344,8 @@
             <Frame
                 Name="MainFrame"
                 Background="#161618"
+                BorderBrush="#212121"
+                BorderThickness="1,0,0,0"
                 NavigationUIVisibility="Hidden" />
         </DockPanel>
     </DockPanel>

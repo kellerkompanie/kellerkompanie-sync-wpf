@@ -63,6 +63,7 @@ namespace kellerkompanie_sync
                         }
                         else
                         {
+                            MainWindow.Instance.PlayUpdateButton.IsEnabled = true;
                             return;
                         }
                         break;
