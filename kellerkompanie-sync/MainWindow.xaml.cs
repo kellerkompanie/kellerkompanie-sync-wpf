@@ -10,8 +10,12 @@ namespace kellerkompanie_sync
 {
     public partial class MainWindow : Window
     {
+        public static MainWindow Instance { get; private set; }
+
         public MainWindow()
         {
+            Instance = this;
+
             Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .WriteTo.Console()
@@ -70,16 +74,7 @@ namespace kellerkompanie_sync
         {
             LaunchUri("https://wiki.kellerkompanie.com");
         }
-
-        private bool IsTeamspeakRunning()
-        {
-            Process[] pname = Process.GetProcessesByName("ts3client_win64");
-            if (pname.Length == 0)
-                return false;
-            else
-                return true;
-        }
-
+               
         private void buttonTFAR_Click(object sender, RoutedEventArgs e)
         {
             if (IsTeamspeakRunning())
@@ -145,22 +140,28 @@ namespace kellerkompanie_sync
             MainFrame.Navigate(new Uri(destination, UriKind.Relative));
         }
 
-        private bool IsSteamRunning()
+        private bool IsProcessRunning(string processName)
         {
-            Process[] pname = Process.GetProcessesByName("Steam");
+            Process[] pname = Process.GetProcessesByName(processName);
             if (pname.Length == 0)
                 return false;
             else
                 return true;
         }
 
+        private bool IsSteamRunning()
+        {
+            return IsProcessRunning("Steam");
+        }
+
         private bool IsArmaRunning()
         {
-            Process[] pname = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(Settings.Instance.ExecutableLocation));
-            if (pname.Length == 0)
-                return false;
-            else
-                return true;
+            return IsProcessRunning(Path.GetFileNameWithoutExtension(Settings.Instance.ExecutableLocation));
+        }
+
+        private bool IsTeamspeakRunning()
+        {
+            return IsProcessRunning("ts3client_win64");
         }
 
         private readonly System.Timers.Timer timer = new System.Timers.Timer(5000);
@@ -208,7 +209,7 @@ namespace kellerkompanie_sync
 
             foreach (AddonGroup addonGroup in FileIndexer.Instance.AddonGroups)
             {
-                if (!addonGroup.CheckBoxIsSelected)
+                if (!addonGroup.CheckBoxIsChecked)
                     continue;
 
                 WebAddonGroup webAddonGroup = WebAPI.GetAddonGroup(addonGroup.WebAddonGroupBase);
