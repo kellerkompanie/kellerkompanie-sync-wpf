@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using Path = System.IO.Path;
@@ -22,61 +21,21 @@ namespace kellerkompanie_sync
                 addonGroup.Parent = ListViewAddonGroups;
             }
             ListViewAddonGroups.ItemsSource = FileIndexer.Instance.AddonGroups;
-
-            //BackgroundWorker worker = new BackgroundWorker();
-            //worker.DoWork += DebugNotifier_DoWork;
-            //worker.RunWorkerAsync();
-        }
-
-        void DebugNotifier_DoWork(object sender, DoWorkEventArgs e)
-        {
-            List<AddonGroupState> addonGroupStates = new List<AddonGroupState>() 
-            { 
-                AddonGroupState.CompleteButNotSubscribed,
-                AddonGroupState.NeedsUpdate,
-                AddonGroupState.NonExistent,
-                AddonGroupState.Partial,
-                AddonGroupState.Ready,
-                AddonGroupState.Unknown
-            };
-            Random random = new Random();
-            while (true)
-            {
-                int n = FileIndexer.Instance.AddonGroups.Count;
-                AddonGroup randomAddonGroup = FileIndexer.Instance.AddonGroups[random.Next(n)];
-                var randomState = addonGroupStates[random.Next(addonGroupStates.Count)];
-                randomAddonGroup.State = randomState;
-                Debug.WriteLine(string.Format("setting group {0} to {1}", randomAddonGroup, randomState));
-                foreach (AddonGroup addonGroup in FileIndexer.Instance.AddonGroups)
-                {
-                    addonGroup.ButtonVisibility = random.Next(0, 2) == 0 ? Visibility.Visible : Visibility.Hidden;
-                    addonGroup.StatusVisibility = random.Next(0, 2) == 0 ? Visibility.Visible : Visibility.Hidden;
-                    addonGroup.CheckBoxVisibility = random.Next(0, 2) == 0 ? Visibility.Visible : Visibility.Hidden;
-                }               
-                
-                Thread.Sleep(1000);
-            }
         }
         
-        private void CheckBox_Click(object sender, RoutedEventArgs e)
-        {
-            CheckBox checkBox = (CheckBox)sender;
-            AddonGroup addonGroup = (AddonGroup)checkBox.DataContext;
-            addonGroup.CheckBoxIsSelected = checkBox.IsChecked == true;
-        }
-
         private void ButtonDownload_Click(object sender, RoutedEventArgs e)
         {
-            var button = (Button)sender;
+            Button button = (Button)sender;
             AddonGroup addonGroup = (AddonGroup)button.DataContext;
 
-            addonGroup.StatusText = "(downloading...)";
-            addonGroup.StatusVisibility = Visibility.Visible;
+            MainWindow.Instance.PlayUpdateButton.IsEnabled = false;
 
             string downloadDirectory = null;
             if (addonGroup.State == AddonGroupState.CompleteButNotSubscribed)
             {
                 // all addons are already downloaded, directly proceed with validation
+                addonGroup.StatusText = "(validating...)";
+                addonGroup.StatusVisibility = Visibility.Visible;
                 ValidateAddonGroup(addonGroup);
             }
             else
@@ -99,12 +58,18 @@ namespace kellerkompanie_sync
                     default:
                         ChooseDirectoryWindow inputDialog = new ChooseDirectoryWindow();
                         if (inputDialog.ShowDialog() == true)
+                        {
                             downloadDirectory = inputDialog.ChosenDirectory;
+                        }
                         else
+                        {
                             return;
+                        }
                         break;
                 }
 
+                addonGroup.StatusText = "(downloading...)";
+                addonGroup.StatusVisibility = Visibility.Visible;
                 DownloadToDirectory(addonGroup, downloadDirectory);
             }
         }
@@ -122,9 +87,11 @@ namespace kellerkompanie_sync
             worker.DoWork += DownloadWorker_DoWork;
             worker.ProgressChanged += DownloadWorker_ProgressChanged;
             worker.RunWorkerCompleted += DownloadWorker_RunWorkerCompleted;
-            DownloadArguments args = new DownloadArguments();
-            args.AddonGroup = addonGroup;
-            args.DownloadDirectory = downloadDirectory;
+            DownloadArguments args = new DownloadArguments
+            {
+                AddonGroup = addonGroup,
+                DownloadDirectory = downloadDirectory
+            };
             worker.RunWorkerAsync(args);
         }
 
@@ -295,7 +262,8 @@ namespace kellerkompanie_sync
             {
                 addonGroup.StatusText = "";
                 addonGroup.StatusVisibility = Visibility.Hidden;
-                FileIndexer.Instance.SetAddonGroupState(addonGroup, AddonGroupState.Ready);
+                addonGroup.State = AddonGroupState.Ready;
+                MainWindow.Instance.PlayUpdateButton.IsEnabled = true;
             }));
         }
     }
