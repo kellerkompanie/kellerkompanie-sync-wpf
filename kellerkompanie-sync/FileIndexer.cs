@@ -97,15 +97,7 @@ namespace kellerkompanie_sync
                 AddonGroups.Add(addonGroup);
             }
         }
-
-        public void SetAddonGroupState(AddonGroup addonGroup, AddonGroupState state)
-        {
-            int index = AddonGroups.IndexOf(addonGroup);
-            AddonGroups.RemoveAt(index);
-            addonGroup.State = state;
-            AddonGroups.Insert(index, addonGroup);
-        }
-
+        
         public static void Setup(ProgressBar progressBar, TextBlock progressBarText)
         {
             instance = new FileIndexer(progressBar, progressBarText);
@@ -362,17 +354,14 @@ namespace kellerkompanie_sync
                     if (foundAddonsLocally == webAddons.Count)
                     {
                         changes.Add((addonGroup, AddonGroupState.CompleteButNotSubscribed));
-                        //addonGroup.SetState(AddonGroupState.CompleteButNotSubscribed);
                     }
                     else if (foundAddonsLocally > 0)
                     {
                         changes.Add((addonGroup, AddonGroupState.Partial));
-                        //addonGroup.SetState(AddonGroupState.Partial);
                     }
                     else
                     {
                         changes.Add((addonGroup, AddonGroupState.NonExistent));
-                        //addonGroup.SetState(AddonGroupState.NonExistent);
                     }
                 }
 
@@ -383,7 +372,7 @@ namespace kellerkompanie_sync
 
             foreach((AddonGroup addonGroup, AddonGroupState addonGroupState) in changes)
             {
-                Application.Current.Dispatcher.Invoke(new Action(() => { SetAddonGroupState(addonGroup, addonGroupState); }));                
+                Application.Current.Dispatcher.Invoke(new Action(() => { addonGroup.State = addonGroupState; }));                
             }
         }
 
