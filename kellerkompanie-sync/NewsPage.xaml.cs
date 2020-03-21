@@ -1,16 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace kellerkompanie_sync
 {
@@ -32,23 +22,27 @@ namespace kellerkompanie_sync
             InitializeComponent();
 
             foreach (WebNews webNews in WebAPI.GetNews()) {
-                NewsItem newsItem = new NewsItem();
-                newsItem.Title = webNews.Title;
-                newsItem.Content = webNews.Content;
-                newsItem.Timestamp = webNews.Timestamp;
-                newsItem.Weblink = webNews.Weblink;
-                newsItem.Icon = "/Images/news.png";
+                NewsItem newsItem = new NewsItem
+                {
+                    Title = webNews.Title,
+                    Content = webNews.Content,
+                    Timestamp = webNews.Timestamp,
+                    Weblink = webNews.Weblink,
+                    Icon = "/Images/news.png"
+                };
                 news.Add(newsItem);
             }
 
             foreach (WebEvent webEvent in WebAPI.GetEvents())
             {
-                NewsItem newsItem = new NewsItem();
-                newsItem.Title = webEvent.Title;
-                newsItem.Content = webEvent.ExtractContent();
-                newsItem.Timestamp = webEvent.Timestamp;
-                newsItem.Weblink = webEvent.ExtractWeblink();
-                newsItem.Icon = "/Images/event.png";
+                NewsItem newsItem = new NewsItem
+                {
+                    Title = webEvent.Title,
+                    Content = webEvent.ExtractContent(),
+                    Timestamp = webEvent.Timestamp,
+                    Weblink = webEvent.ExtractWeblink(),
+                    Icon = "/Images/event.png"
+                };
                 news.Add(newsItem);
             }
 

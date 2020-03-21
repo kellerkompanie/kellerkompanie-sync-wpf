@@ -3,6 +3,14 @@ using System.Collections.Generic;
 
 namespace kellerkompanie_sync
 {
+    public class RemoteIndex
+    {
+        [JsonProperty("files_index")]
+        public Dictionary<string, RemoteAddon> FilesIndex { get; set; }
+        [JsonProperty("addon_groups")]
+        public List<WebAddonGroup> AddonGroups { get; set; }
+    }
+
     public class RemoteAddon
     {
         [JsonProperty("addon_name")]
@@ -28,15 +36,5 @@ namespace kellerkompanie_sync
 
         [JsonProperty("file_hash")]
         public string Hash { get; set; }
-    }
-
-    public class RemoteFileIndex
-    {
-        public RemoteFileIndex(Dictionary<string, RemoteAddon> map)
-        {
-            Map = map;
-        }
-
-        public Dictionary<string, RemoteAddon> Map { get; set; }
     }
 }

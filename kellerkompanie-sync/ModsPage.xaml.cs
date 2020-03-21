@@ -33,6 +33,8 @@ namespace kellerkompanie_sync
             if (downloadManager == null)
             {
                 // start new download
+
+                // disable all buttons that should not be pressed while download is running
                 foreach (AddonGroup addonGrp in FileIndexer.Instance.AddonGroups)
                 {
                     if (addonGroup != addonGrp)
@@ -40,43 +42,35 @@ namespace kellerkompanie_sync
                         addonGrp.ButtonIsEnabled = false;
                     }
                 }
-
                 MainWindow.Instance.PlayUpdateButton.IsEnabled = false;
 
-                string downloadDirectory = null;
-                if (addonGroup.State == AddonGroupState.CompleteButNotSubscribed)
+                // in case of missing addons decide where to download them to, if all addons already exist locally skip this step
+                string downloadDirectoryForMissingAddons = null;
+                if (addonGroup.State != AddonGroupState.CompleteButNotSubscribed)
                 {
-                    // all addons are already downloaded, directly proceed with validation
-                    addonGroup.StatusText = Properties.Resources.ProgressValidating;
-                    addonGroup.StatusVisibility = Visibility.Visible;
-                    ValidateAddonGroup(addonGroup);
-                }
-                else
-                {
-                    // decide where to download missing addons to
-                    switch (Settings.Instance.AddonSearchDirectories.Count)
+                    // decide where to download missing addons to                    
+                    switch (Settings.Instance.GetAddonSearchDirectories().Count)
                     {
                         case 0:
+                            // there is no addon search directory set, tell user to choose at least one
                             MessageBox.Show(Properties.Resources.MissingAddonSearchDirectoryInfoMessage, "kellerkompanie-sync");
                             return;
 
                         case 1:
-                            foreach (string addonSearchDirectory in Settings.Instance.AddonSearchDirectories)
-                            {
-                                downloadDirectory = addonSearchDirectory;
-                                break;
-                            }
+                            // there is exactly one folder set as search directory, so this one will be download destination for all
+                            downloadDirectoryForMissingAddons = Settings.Instance.GetAddonSearchDirectories()[0];
                             break;
 
                         default:
+                            // there is more than one addon search directory, make user choose to which one he wants to download missing files
                             ChooseDirectoryWindow inputDialog = new ChooseDirectoryWindow();
                             if (inputDialog.ShowDialog() == true)
                             {
-                                downloadDirectory = inputDialog.ChosenDirectory;
+                                downloadDirectoryForMissingAddons = inputDialog.ChosenDirectory;
                             }
                             else
                             {
-                                MainWindow.Instance.PlayUpdateButton.IsEnabled = true;
+                                MainWindow.Instance.EnablePlayButton();
                                 foreach (AddonGroup addonGrp in FileIndexer.Instance.AddonGroups)
                                 {
                                     addonGrp.ButtonIsEnabled = true;
@@ -85,23 +79,42 @@ namespace kellerkompanie_sync
                             }
                             break;
                     }
-
-                    addonGroup.StatusText = Properties.Resources.ProgressDownloading;
-                    addonGroup.StatusVisibility = Visibility.Visible;
-                    addonGroup.ButtonText = Properties.Resources.Pause;
-
-                    BackgroundWorker worker = new BackgroundWorker();
-                    worker.WorkerReportsProgress = true;
-                    worker.DoWork += DownloadWorker_DoWork;
-                    worker.ProgressChanged += DownloadWorker_ProgressChanged;
-                    worker.RunWorkerCompleted += DownloadWorker_RunWorkerCompleted;
-                    DownloadArguments args = new DownloadArguments
-                    {
-                        AddonGroup = addonGroup,
-                        DownloadDirectory = downloadDirectory
-                    };
-                    worker.RunWorkerAsync(args);
                 }
+
+                Dictionary<WebAddon, string> webAddonToDownloadDirectoryDict = new Dictionary<WebAddon, string>();
+                WebAddonGroup webAddonGroup = addonGroup.WebAddonGroup;
+                foreach (WebAddon webAddon in webAddonGroup.Addons)
+                {
+                    if (addonGroup.WebAddonToLocalAddonDict.ContainsKey(webAddon))
+                    {
+                        // some addons might already exist, for these download to existing folder
+                        LocalAddon existingLocalAddon = addonGroup.WebAddonToLocalAddonDict[webAddon];
+                        string parentFolder = Directory.GetParent(existingLocalAddon.AbsoluteFilepath).FullName;
+                        webAddonToDownloadDirectoryDict.Add(webAddon, parentFolder);
+                    }
+                    else
+                    {
+                        // for all others choose the previously selected folder
+                        Debug.Assert(addonGroup.State != AddonGroupState.CompleteButNotSubscribed);
+                        webAddonToDownloadDirectoryDict.Add(webAddon, downloadDirectoryForMissingAddons);
+                    }
+                }
+
+                addonGroup.StatusText = Properties.Resources.ProgressDownloading;
+                addonGroup.StatusVisibility = Visibility.Visible;
+                addonGroup.ButtonText = Properties.Resources.Pause;
+
+                BackgroundWorker worker = new BackgroundWorker();
+                worker.WorkerReportsProgress = true;
+                worker.DoWork += DownloadWorker_DoWork;
+                worker.ProgressChanged += DownloadWorker_ProgressChanged;
+                worker.RunWorkerCompleted += DownloadWorker_RunWorkerCompleted;
+                DownloadArguments args = new DownloadArguments
+                {
+                    AddonGroup = addonGroup,
+                    DownloadDirectoryDict = webAddonToDownloadDirectoryDict
+                };
+                worker.RunWorkerAsync(args);                
             }
             else if (downloadManager?.State == DownloadState.Paused)
             {
@@ -118,24 +131,24 @@ namespace kellerkompanie_sync
         class DownloadArguments
         {
             public AddonGroup AddonGroup { get; set; }
-            public string DownloadDirectory { get; set; }
+            public Dictionary<WebAddon, string> DownloadDirectoryDict { get; set; }
         }
 
         void DownloadWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             DownloadArguments args = (DownloadArguments)e.Argument;
 
-            RemoteFileIndex remoteIndex = WebAPI.GetFileIndex();
+            RemoteIndex remoteIndex = WebAPI.GetIndex();
 
             // determine files to delete            
-            WebAddonGroup webAddonGroup = WebAPI.GetAddonGroup(args.AddonGroup.WebAddonGroupBase);
+            WebAddonGroup webAddonGroup = args.AddonGroup.WebAddonGroup;
             foreach (WebAddon webAddon in webAddonGroup.Addons)
             {
                 string webAddonUuid = webAddon.Uuid;
                 if (!FileIndexer.Instance.addonUuidToLocalAddonMap.ContainsKey(webAddonUuid))
                     continue;
 
-                RemoteAddon remAddon = remoteIndex.Map[webAddon.Foldername];
+                RemoteAddon remAddon = remoteIndex.FilesIndex[webAddon.Foldername];
 
                 List<LocalAddon> localAddons = FileIndexer.Instance.addonUuidToLocalAddonMap[webAddonUuid];
                 foreach (LocalAddon localAddon in localAddons)
@@ -163,7 +176,7 @@ namespace kellerkompanie_sync
             List<(string, string, long)> downloads = new List<(string, string, long)>();
             foreach (WebAddon webAddon in webAddonGroup.Addons)
             {
-                RemoteAddon remoteAddon = remoteIndex.Map[webAddon.Foldername];
+                RemoteAddon remoteAddon = FileIndexer.Instance.RemoteIndex.FilesIndex[webAddon.Foldername];
                 string uuid = webAddon.Uuid;
                 string name = webAddon.Name;
 
@@ -172,12 +185,7 @@ namespace kellerkompanie_sync
                     throw new InvalidOperationException("uuid " + uuid + " of local addon " + name + " does not match remote uuid " + remoteAddon.Uuid + " of addon " + remoteAddon.Name);
                 }
 
-                string destinationFolder = args.DownloadDirectory;
-                foreach (string addonSearchDirectory in Settings.Instance.AddonSearchDirectories)
-                {
-                    destinationFolder = addonSearchDirectory;
-                    break;
-                }
+                string destinationFolder = args.DownloadDirectoryDict[webAddon];
 
                 if (!FileIndexer.Instance.addonUuidToLocalAddonMap.ContainsKey(uuid))
                 {
@@ -191,10 +199,11 @@ namespace kellerkompanie_sync
                 }
                 else
                 {
+                    // FIXME
                     List<LocalAddon> localAddons = FileIndexer.Instance.addonUuidToLocalAddonMap[uuid];
                     foreach (RemoteAddonFile remoteAddonFile in remoteAddon.Files.Values)
                     {
-                        string remoteFilePath = remoteAddonFile.Path;
+                        string remoteFilePath = remoteAddonFile.Path.Replace("/", "\\");
                         string remoteHash = remoteAddonFile.Hash;
 
                         foreach (LocalAddon localAddon in localAddons)
@@ -205,7 +214,7 @@ namespace kellerkompanie_sync
                                 {
                                     if (!fileIndex.Hash.Equals(remoteHash))
                                     {
-                                        string destinationFilepath = Path.Combine(destinationFolder, remoteFilePath.Replace("/", "\\"));
+                                        string destinationFilepath = Path.Combine(destinationFolder, remoteFilePath);
                                         downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath, destinationFilepath, remoteAddonFile.Size));
                                     }
                                     break;
@@ -314,7 +323,7 @@ namespace kellerkompanie_sync
                 addonGroup.StatusText = "";
                 addonGroup.StatusVisibility = Visibility.Hidden;
                 addonGroup.State = AddonGroupState.Ready;
-                MainWindow.Instance.PlayUpdateButton.IsEnabled = true;
+                MainWindow.Instance.EnablePlayButton();
                 foreach (AddonGroup addonGrp in FileIndexer.Instance.AddonGroups)
                 {
                     addonGrp.ButtonIsEnabled = true;

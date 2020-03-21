@@ -197,6 +197,16 @@
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Foreground" Value="#f2f5f4" />
         </Style>
+
+        <Style x:Key="ImageButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <ContentPresenter />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <DockPanel>
@@ -211,10 +221,15 @@
                 HorizontalAlignment="Center"
                 DockPanel.Dock="Top">
 
-                <Image
-                    Name="Logo"
-                    Width="200"
-                    Source="/Images/kk-signet-small-color.png" />
+                <Button
+                    Click="ButtonWebsite_Click"
+                    Style="{StaticResource ImageButtonStyle}"
+                    ToolTip="{x:Static p:Resources.Website}">
+                    <Image
+                        Name="Logo"
+                        Width="200"
+                        Source="/Images/kk-signet-small-color.png" />
+                </Button>
 
                 <Button
                     Name="buttonNews"

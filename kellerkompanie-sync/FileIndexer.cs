@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -28,7 +29,17 @@ namespace kellerkompanie_sync
             Files = new Dictionary<string, LocalFileIndex>();
             Version = DateTime.Now.ToString("yyyyMMdd-HHmmss");
             AbsoluteFilepath = absoluteFilepath;
-            Uuid = WebAPI.LookUpAddonName(addonName);
+            Uuid = FileIndexer.Instance.LookUpAddonName(addonName);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is LocalAddon addon && Uuid == addon.Uuid;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Uuid);
         }
     }
 
@@ -84,14 +95,16 @@ namespace kellerkompanie_sync
         private TextBlock ProgressBarText { get; set; }
         public ObservableCollection<AddonGroup> AddonGroups { get; set; } = new ObservableCollection<AddonGroup>();
         public Dictionary<string, List<LocalAddon>> addonUuidToLocalAddonMap = new Dictionary<string, List<LocalAddon>>();
+        public RemoteIndex RemoteIndex;
         
         private FileIndexer(ProgressBar progressBar, TextBlock progressBarText)
         {
             LoadIndex();
-            this.ProgressBar = progressBar;
-            this.ProgressBarText = progressBarText;
+            ProgressBar = progressBar;
+            ProgressBarText = progressBarText;
 
-            foreach (WebAddonGroupBase addon in WebAPI.GetAddonGroups())
+            RemoteIndex = WebAPI.GetIndex();
+            foreach (WebAddonGroup addon in RemoteIndex.AddonGroups)
             {
                 AddonGroup addonGroup = new AddonGroup(addon);
                 AddonGroups.Add(addonGroup);
@@ -119,7 +132,7 @@ namespace kellerkompanie_sync
         public HashSet<string> GetAllFilePaths()
         {
             HashSet<string> allFilePaths = new HashSet<string>();
-            foreach (string addonSearchDirectory in Settings.Instance.AddonSearchDirectories)
+            foreach (string addonSearchDirectory in Settings.Instance.GetAddonSearchDirectories())
             {
                 string[] allfiles = Directory.GetFiles(addonSearchDirectory, "*.*", SearchOption.AllDirectories);
                 foreach (string file in allfiles)
@@ -168,7 +181,22 @@ namespace kellerkompanie_sync
             index = relativeFilePath.IndexOf("\\");
             return relativeFilePath.Substring(0, index);
         }
-        
+
+        public string LookUpAddonName(string addonName)
+        {
+            addonName = addonName.ToLower();
+            foreach (string remoteAddonName in RemoteIndex.FilesIndex.Keys)
+            {
+                if (remoteAddonName.ToLower().Equals(addonName))
+                {
+                    RemoteAddon remoteAddon = RemoteIndex.FilesIndex[remoteAddonName];
+                    return remoteAddon.Uuid;
+                }
+            }
+
+            return null;
+        }
+
         public void UpdateLocalIndex()
         {
             BackgroundWorker worker = new BackgroundWorker();
@@ -320,27 +348,39 @@ namespace kellerkompanie_sync
             double i = 0;
             foreach (AddonGroup addonGroup in AddonGroups)
             {
-                string remoteUuid = addonGroup.WebAddonGroupBase.Uuid;
-                string remoteVersion = addonGroup.WebAddonGroupBase.Version;
+                // link all web addons to existing local addons for later use
+                WebAddonGroup webAddonGroup = addonGroup.WebAddonGroup;
+                List<WebAddon> webAddons = webAddonGroup.Addons;
+                foreach (WebAddon webAddon in webAddons)
+                {
+                    string addonUuid = webAddon.Uuid;
+                    if (addonUuidToLocalAddonMap.ContainsKey(addonUuid))
+                    {
+                        LocalAddon localAddon = addonUuidToLocalAddonMap[addonUuid][0];
+                        Debug.WriteLine(string.Format("linking webAddon={0} to localAddon={1}", webAddon.Name, localAddon.Name));
+                        addonGroup.WebAddonToLocalAddonDict.Add(webAddon, localAddon);
+                    }
+                }
+
+                string remoteUuid = addonGroup.WebAddonGroup.Uuid;
+                string remoteVersion = addonGroup.WebAddonGroup.Version;
                 
                 if (Settings.Instance.SubscribedAddonGroups.ContainsKey(remoteUuid))
                 {
+                    // AddonGroup is subscribed
                     string localVersion = Settings.Instance.SubscribedAddonGroups[remoteUuid];
                     if (localVersion.Equals(remoteVersion))
                     {
                         changes.Add((addonGroup, AddonGroupState.Ready));
-                        //addonGroup.SetState(AddonGroupState.Ready);
                     }
                     else
                     {
                         changes.Add((addonGroup, AddonGroupState.NeedsUpdate));
-                        //addonGroup.SetState(AddonGroupState.NeedsUpdate);
                     }
                 }
                 else
                 {
-                    WebAddonGroup webAddonGroup = WebAPI.GetAddonGroup(addonGroup.WebAddonGroupBase);
-                    List<WebAddon> webAddons = webAddonGroup.Addons;
+                    // AddonGroup is not subscribed
                     int foundAddonsLocally = 0;
                     foreach (WebAddon webAddon in webAddons)
                     {
@@ -370,10 +410,12 @@ namespace kellerkompanie_sync
                 (sender as BackgroundWorker).ReportProgress(percentage);
             }
 
-            foreach((AddonGroup addonGroup, AddonGroupState addonGroupState) in changes)
-            {
-                Application.Current.Dispatcher.Invoke(new Action(() => { addonGroup.State = addonGroupState; }));                
-            }
+            Application.Current.Dispatcher.Invoke(new Action(() => {
+                foreach ((AddonGroup addonGroup, AddonGroupState addonGroupState) in changes)
+                {
+                    addonGroup.State = addonGroupState;                 
+                }
+            }));
         }
 
         void AddonGroupStateWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)

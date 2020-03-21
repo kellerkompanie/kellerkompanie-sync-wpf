@@ -11,7 +11,7 @@ namespace kellerkompanie_sync
         {
             InitializeComponent();
 
-			foreach (string addonSearchDirectory in Settings.Instance.AddonSearchDirectories)
+			foreach (string addonSearchDirectory in Settings.Instance.GetAddonSearchDirectories())
 			{
 				list.Add(addonSearchDirectory);
 			}

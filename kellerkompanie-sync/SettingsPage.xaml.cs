@@ -1,42 +1,11 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace kellerkompanie_sync
 {
-    public class AddonSearchDirectory
-    {
-        public AddonSearchDirectory(string Directory)
-        {
-            this.Directory = Directory;
-        }
-
-        public string Directory { get; set; }
-
-        public override bool Equals(Object obj)
-        {
-            if ((obj == null) || !GetType().Equals(obj.GetType()))
-            {
-                return false;
-            }
-            else
-            {
-                AddonSearchDirectory other = (AddonSearchDirectory)obj;
-                return (Directory.Equals(other.Directory));
-            }
-        }
-
-        public override int GetHashCode()
-        {
-            return Directory.GetHashCode();
-        }
-    }
-
     public partial class SettingsPage : Page
     {
-        public ObservableCollection<AddonSearchDirectory> AddonSearchDirectories { get; } = new ObservableCollection<AddonSearchDirectory>();
-
         public SettingsPage()
         {
             InitializeComponent();
@@ -53,11 +22,7 @@ namespace kellerkompanie_sync
 
             SliderDownloads.Value = settings.SimultaneousDownloads;
 
-            ListViewAddonSearchDirectories.ItemsSource = AddonSearchDirectories;
-            foreach (string addonSearchDirectory in settings.AddonSearchDirectories)
-            {
-                AddonSearchDirectories.Add(new AddonSearchDirectory(addonSearchDirectory));
-            }
+            ListViewAddonSearchDirectories.ItemsSource = Settings.Instance.GetAddonSearchDirectories();
         }
 
         private void ButtonAddAddonSearchDirectory_Click(object sender, RoutedEventArgs e)
@@ -66,13 +31,10 @@ namespace kellerkompanie_sync
 
             if (fileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                var folder = fileDialog.SelectedPath;
-                AddonSearchDirectory addonSearchDirectory = new AddonSearchDirectory(folder);
-                if (!AddonSearchDirectories.Contains(addonSearchDirectory))
+                string folder = fileDialog.SelectedPath;
+                if (!Settings.Instance.GetAddonSearchDirectories().Contains(folder))
                 {
-                    AddonSearchDirectories.Add(addonSearchDirectory);
-
-                    Settings.Instance.AddAddonSearchDirectory(addonSearchDirectory.Directory);
+                    Settings.Instance.AddAddonSearchDirectory(folder);
                     Settings.Instance.SaveSettings();
 
                     FileIndexer.Instance.UpdateLocalIndex();
@@ -82,10 +44,12 @@ namespace kellerkompanie_sync
 
         private void SettingsExecutableLocationPicker_Click(object sender, RoutedEventArgs e)
         {
-            var fileDialog = new System.Windows.Forms.OpenFileDialog();
-            fileDialog.Filter = "Arma3 executable (*arma3_x64.exe)|*arma3_x64.exe";
-            fileDialog.InitialDirectory = "C:\\Program Files(x86)\\Steam\\steamapps\\common\\Arma 3";
-            fileDialog.RestoreDirectory = true;
+            var fileDialog = new System.Windows.Forms.OpenFileDialog
+            {
+                Filter = "Arma3 executable (*arma3_x64.exe)|*arma3_x64.exe",
+                InitialDirectory = "C:\\Program Files(x86)\\Steam\\steamapps\\common\\Arma 3",
+                RestoreDirectory = true
+            };
 
             if (fileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -94,9 +58,7 @@ namespace kellerkompanie_sync
                 Settings.Instance.SaveSettings();
                 TextBoxExecutableLocation.Text = file;
 
-                MainWindow wnd = (MainWindow)Window.GetWindow(this);
-                wnd.PlayUpdateButton.IsEnabled = true;
-                wnd.PlayUpdateButton.ToolTip = null;                
+                MainWindow.Instance.EnablePlayButton();          
             }
         }
 
@@ -150,20 +112,16 @@ namespace kellerkompanie_sync
 
         private void ButtonOpen_Click(object sender, RoutedEventArgs e)
         {
-            var button = (Button)sender;
-            var addonSearchDirectory = ((AddonSearchDirectory)button.DataContext).Directory;
+            Button button = (Button)sender;
+            string addonSearchDirectory = (string)button.DataContext;
             MainWindow.LaunchUri(addonSearchDirectory);
         }
 
         private void ButtonRemove_Click(object sender, RoutedEventArgs e)
         {
-            var button = (Button)sender;
-            var addonSearchDirectory = (AddonSearchDirectory)button.DataContext;
-
-            AddonSearchDirectories.Remove(addonSearchDirectory);
-
-            string directory = addonSearchDirectory.Directory;
-            Settings.Instance.AddonSearchDirectories.Remove(directory);
+            Button button = (Button)sender;
+            string addonSearchDirectory = (string)button.DataContext;
+            Settings.Instance.GetAddonSearchDirectories().Remove(addonSearchDirectory);
             Settings.Instance.SaveSettings();
         }
 

@@ -36,7 +36,12 @@ namespace kellerkompanie_sync
             FileIndexer.Setup(ProgressBar, ProgressBarText);
             FileIndexer.Instance.UpdateLocalIndex();
 
-            if (File.Exists(Settings.Instance.ExecutableLocation))
+            EnablePlayButton();
+        }
+
+        public void EnablePlayButton()
+        {
+            if(File.Exists(Settings.Instance.ExecutableLocation))
             {
                 PlayUpdateButton.IsEnabled = true;
                 PlayUpdateButton.ToolTip = null;
@@ -104,6 +109,11 @@ namespace kellerkompanie_sync
         private void ButtonSettings_Click(object sender, RoutedEventArgs e)
         {
             NavigateToPage(Page.Settings);
+        }
+
+        private void ButtonWebsite_Click(object sender, RoutedEventArgs e)
+        {
+            LaunchUri("https://kellerkompanie.com");            
         }
 
         private readonly Brush orange = (SolidColorBrush)(new BrushConverter().ConvertFrom("#ee4d2e"));
@@ -211,9 +221,8 @@ namespace kellerkompanie_sync
             {
                 if (!addonGroup.CheckBoxIsChecked)
                     continue;
-
-                WebAddonGroup webAddonGroup = WebAPI.GetAddonGroup(addonGroup.WebAddonGroupBase);
-                foreach (WebAddon webAddon in webAddonGroup.Addons)
+                                
+                foreach (WebAddon webAddon in addonGroup.WebAddonGroup.Addons)
                 {
                     string uuid = webAddon.Uuid;
                     LocalAddon localAddon = FileIndexer.Instance.addonUuidToLocalAddonMap[uuid][0];

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 
 namespace kellerkompanie_sync
@@ -11,7 +12,8 @@ namespace kellerkompanie_sync
         private static readonly string SettingsFile = Path.Combine(SettingsDirectory, "settings.json");
         public static readonly string LogFile = Path.Combine(SettingsDirectory, "logs", "kellerkompanie-sync.log");
 
-        public HashSet<string> AddonSearchDirectories { get; set; }
+        [JsonProperty("AddonSearchDirectories")]
+        private readonly ObservableCollection<string> addonSearchDirectories;
         public string ExecutableLocation { get; set; }
         public bool ParamShowScriptErrors { get; set; }
         public bool ParamNoPause { get; set; }
@@ -32,7 +34,7 @@ namespace kellerkompanie_sync
             Directory.CreateDirectory(SettingsDirectory);
             Directory.CreateDirectory(Path.GetDirectoryName(LogFile));
 
-            AddonSearchDirectories = new HashSet<string>();
+            addonSearchDirectories = new ObservableCollection<string>();
             ExecutableLocation = "";
             ParamShowScriptErrors = false;
             ParamNoPause = true;
@@ -54,11 +56,16 @@ namespace kellerkompanie_sync
 
         internal void AddAddonSearchDirectory(string directory)
         {
-            if (!AddonSearchDirectories.Contains(directory))
+            if (!addonSearchDirectories.Contains(directory))
             {
-                AddonSearchDirectories.Add(directory);
+                addonSearchDirectories.Add(directory);
                 SaveSettings();
             }
+        }
+
+        public ObservableCollection<string> GetAddonSearchDirectories()
+        {
+            return addonSearchDirectories;
         }
 
         public void SaveSettings()

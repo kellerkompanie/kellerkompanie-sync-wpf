@@ -1,4 +1,5 @@
 ﻿using Serilog;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -21,7 +22,7 @@ namespace kellerkompanie_sync
         private const string Yellow = "#f7c516";
 
 
-        public WebAddonGroupBase WebAddonGroupBase { get; set; }
+        public WebAddonGroup WebAddonGroup { get; set; }
 
         private string icon;
         public string Icon
@@ -104,7 +105,7 @@ namespace kellerkompanie_sync
             }
             set
             {
-                Log.Information("setting " + WebAddonGroupBase.Name + " to " + value);
+                Log.Information("setting " + WebAddonGroup.Name + " to " + value);
                 state = value;
                 switch (state)
                 {
@@ -188,9 +189,11 @@ namespace kellerkompanie_sync
             }
         }
 
-        public AddonGroup(WebAddonGroupBase WebAddonGroupBase)
+        public Dictionary<WebAddon, LocalAddon> WebAddonToLocalAddonDict = new Dictionary<WebAddon, LocalAddon>();
+
+        public AddonGroup(WebAddonGroup WebAddonGroup)
         {
-            this.WebAddonGroupBase = WebAddonGroupBase;
+            this.WebAddonGroup = WebAddonGroup;
             State = AddonGroupState.Unknown;
         }
     }

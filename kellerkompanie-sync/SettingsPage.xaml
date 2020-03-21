@@ -298,14 +298,14 @@
                                 HorizontalAlignment="Stretch"
                                 FontSize="18"
                                 Foreground="#ee4d2e"
-                                Text="{Binding Directory}" />
+                                Text="{Binding}" />
                         </DockPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
             <Button
                 Name="ButtonAddAddonSearchDirectory"
-                Width="100"
+                Width="120"
                 Height="28"
                 HorizontalAlignment="Left"
                 Background="#ee4d2e"

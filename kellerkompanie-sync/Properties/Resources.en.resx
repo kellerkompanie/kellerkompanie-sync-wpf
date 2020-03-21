@@ -130,7 +130,7 @@
     <value>A list of directories on your computer in which the tool will look for addons (folders starting with @). You can also select folders that already contain addons, in which case the tool will try to discover existing addons before downloading.</value>
   </data>
   <data name="AllModsDownloadedButNotSubscribed" xml:space="preserve">
-    <value>All mods downloaded, but not subscribed</value>
+    <value>All addons present, but group is not subscribed</value>
   </data>
   <data name="AllModsMissing" xml:space="preserve">
     <value>All mods missing</value>
@@ -257,6 +257,9 @@
   </data>
   <data name="Update" xml:space="preserve">
     <value>Update</value>
+  </data>
+  <data name="Website" xml:space="preserve">
+    <value>Open website</value>
   </data>
   <data name="Wiki" xml:space="preserve">
     <value>Wiki</value>

@@ -97,7 +97,7 @@ namespace kellerkompanie_sync.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to All mods downloaded, but not subscribed.
+        ///   Looks up a localized string similar to All addons present, but group is not subscribed.
         /// </summary>
         public static string AllModsDownloadedButNotSubscribed {
             get {
@@ -480,6 +480,15 @@ namespace kellerkompanie_sync.Properties {
         public static string Update {
             get {
                 return ResourceManager.GetString("Update", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open website.
+        /// </summary>
+        public static string Website {
+            get {
+                return ResourceManager.GetString("Website", resourceCulture);
             }
         }
         
