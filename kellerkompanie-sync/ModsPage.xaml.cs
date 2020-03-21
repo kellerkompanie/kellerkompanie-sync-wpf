@@ -198,28 +198,36 @@ namespace kellerkompanie_sync
                     }
                 }
                 else
-                {
-                    // FIXME
+                {                     
+                    Dictionary<string, LocalFileIndex> relativeFilePathToFileIndexMap = new Dictionary<string, LocalFileIndex>();
                     List<LocalAddon> localAddons = FileIndexer.Instance.addonUuidToLocalAddonMap[uuid];
+                    foreach (LocalAddon localAddon in localAddons)
+                    {
+                        foreach (LocalFileIndex fileIndex in localAddon.Files.Values)
+                        {
+                            relativeFilePathToFileIndexMap.Add(fileIndex.Relative_filepath, fileIndex);
+                        }
+                    }
+
+                    // parts of the addon already exist, update existing and download missing                   
                     foreach (RemoteAddonFile remoteAddonFile in remoteAddon.Files.Values)
                     {
                         string remoteFilePath = remoteAddonFile.Path.Replace("/", "\\");
                         string remoteHash = remoteAddonFile.Hash;
 
-                        foreach (LocalAddon localAddon in localAddons)
+                        if (relativeFilePathToFileIndexMap.ContainsKey(remoteFilePath))
                         {
-                            foreach (LocalFileIndex fileIndex in localAddon.Files.Values)
+                            LocalFileIndex localFileIndex = relativeFilePathToFileIndexMap[remoteFilePath];
+                            if (!remoteHash.Equals(localFileIndex.Hash))
                             {
-                                if (remoteFilePath.Equals(fileIndex.Relative_filepath))
-                                {
-                                    if (!fileIndex.Hash.Equals(remoteHash))
-                                    {
-                                        string destinationFilepath = Path.Combine(destinationFolder, remoteFilePath);
-                                        downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath, destinationFilepath, remoteAddonFile.Size));
-                                    }
-                                    break;
-                                }
-                            }
+                                string destinationFilepath = Path.Combine(destinationFolder, remoteFilePath);
+                                downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath, destinationFilepath, remoteAddonFile.Size));
+                            }                            
+                        }
+                        else
+                        {
+                            string destinationFilepath = Path.Combine(destinationFolder, remoteFilePath);
+                            downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath, destinationFilepath, remoteAddonFile.Size));
                         }
                     }
                 }
@@ -275,7 +283,10 @@ namespace kellerkompanie_sync
 
         void DownloadManager_ProgressChanged(object sender, DownloadProgress downloadProgress)
         {
-            Debug.WriteLine("progress: {0}", downloadProgress.Progress);
+            if (downloadProgress.DownloadSpeed == 0)
+            {
+                return;
+            }
 
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {

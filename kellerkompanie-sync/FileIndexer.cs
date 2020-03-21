@@ -81,15 +81,14 @@ namespace kellerkompanie_sync
                 {
                     sb.Append(hashValue[i].ToString("x2"));
                 }
-                Hash = sb.ToString();
+                Hash = sb.ToString().ToUpper();
             }
         }
     }
 
     public class FileIndexer
     {
-        private static FileIndexer instance;
-        private static readonly string IndexFile = Path.Combine(Settings.SettingsDirectory, "file_index.json");
+        private static FileIndexer instance;        
         private Dictionary<string, LocalAddon> Index { get; set; }
         private ProgressBar ProgressBar { get; set; }
         private TextBlock ProgressBarText { get; set; }
@@ -150,7 +149,7 @@ namespace kellerkompanie_sync
         {
             Directory.CreateDirectory(Settings.SettingsDirectory);
 
-            using StreamWriter file = File.CreateText(IndexFile);
+            using StreamWriter file = File.CreateText(Settings.IndexFile);
             JsonSerializer serializer = new JsonSerializer();
             serializer.Formatting = Formatting.Indented;
             serializer.Serialize(file, Index);
@@ -158,13 +157,13 @@ namespace kellerkompanie_sync
 
         public void LoadIndex()
         {
-            if (!File.Exists(IndexFile))
+            if (!File.Exists(Settings.IndexFile))
             {
                 Index = new Dictionary<string, LocalAddon>();
             }
             else
             {
-                using StreamReader file = File.OpenText(IndexFile);
+                using StreamReader file = File.OpenText(Settings.IndexFile);
                 JsonSerializer serializer = new JsonSerializer();
                 Dictionary<string, LocalAddon> index = (Dictionary<string, LocalAddon>)serializer.Deserialize(file, typeof(Dictionary<string, LocalAddon>));
                 Index = index;
@@ -283,9 +282,12 @@ namespace kellerkompanie_sync
                 if (!addonUuidToLocalAddonMap.ContainsKey(localAddon.Uuid))
                 {
                     addonUuidToLocalAddonMap.Add(localAddon.Uuid, new List<LocalAddon>());
+                }                
+                List<LocalAddon> localAddons = addonUuidToLocalAddonMap[localAddon.Uuid];
+                if (!localAddons.Contains(localAddon)) {
+                    localAddons.Add(localAddon);
                 }
-                addonUuidToLocalAddonMap[localAddon.Uuid].Add(localAddon);
-                    
+                                    
                 if(localAddon.Files.ContainsKey(file))
                 {
                     // compare if files differ
@@ -298,9 +300,9 @@ namespace kellerkompanie_sync
                     if (!existingIndex.Created.Equals(created) || existingIndex.Filesize != filesize)
                     {
                         Log.Debug("out of date file: " + file);
-                        // file is not up to date, index it
+                        // file is not up to date, index it                        
                         LocalFileIndex fileIndex = new LocalFileIndex(file);
-                        localAddon.Files.Add(fileIndex.Absolute_filepath, fileIndex);
+                        localAddon.Files[fileIndex.Absolute_filepath] = fileIndex;
                     }
                 }
                 else
@@ -357,7 +359,6 @@ namespace kellerkompanie_sync
                     if (addonUuidToLocalAddonMap.ContainsKey(addonUuid))
                     {
                         LocalAddon localAddon = addonUuidToLocalAddonMap[addonUuid][0];
-                        Debug.WriteLine(string.Format("linking webAddon={0} to localAddon={1}", webAddon.Name, localAddon.Name));
                         addonGroup.WebAddonToLocalAddonDict.Add(webAddon, localAddon);
                     }
                 }

@@ -11,6 +11,7 @@ namespace kellerkompanie_sync
         public static readonly string SettingsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "kellerkompanie-sync");
         private static readonly string SettingsFile = Path.Combine(SettingsDirectory, "settings.json");
         public static readonly string LogFile = Path.Combine(SettingsDirectory, "logs", "kellerkompanie-sync.log");
+        public static readonly string IndexFile = Path.Combine(Settings.SettingsDirectory, "index.json");
 
         [JsonProperty("AddonSearchDirectories")]
         private readonly ObservableCollection<string> addonSearchDirectories;

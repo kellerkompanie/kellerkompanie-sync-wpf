@@ -40,7 +40,15 @@ namespace kellerkompanie_sync
 
         public void StartDownloads()
         {
-            Debug.WriteLine(string.Format("DownloadManager starting with queued={0} running={1} finished={2} total={3}", queuedDownloads.Count, runningDownloads.Count, finishedDownloads.Count, queuedDownloads.Count + runningDownloads.Count + finishedDownloads.Count));
+            if (queuedDownloads.Count == 0)
+            {
+                Log.Debug("DownloadManager StartDownloads(): no downloads in queue, finishing");
+                State = DownloadState.Completed;
+                StateChanged?.Invoke(this, State);
+                return;
+            }
+
+            Log.Debug(string.Format("DownloadManager starting with queued={0} running={1} finished={2} total={3}", queuedDownloads.Count, runningDownloads.Count, finishedDownloads.Count, queuedDownloads.Count + runningDownloads.Count + finishedDownloads.Count));
 
             State = DownloadState.Downloading;
             timer.Elapsed += Timer_Elapsed;           
