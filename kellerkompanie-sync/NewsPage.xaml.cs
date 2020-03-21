@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -16,11 +17,21 @@ namespace kellerkompanie_sync
     public partial class NewsPage : Page
     {
         private readonly List<NewsItem> news = new List<NewsItem>();
-       
+
         public NewsPage()
         {
             InitializeComponent();
 
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.WorkerReportsProgress = true;
+            worker.DoWork += NewsWorker_DoWork;
+            worker.ProgressChanged += NewsWorker_ProgressChanged;
+            worker.RunWorkerCompleted += NewsWorker_RunWorkerCompleted;
+            worker.RunWorkerAsync();
+        }
+
+        void NewsWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
             foreach (WebNews webNews in WebAPI.GetNews()) {
                 NewsItem newsItem = new NewsItem
                 {
@@ -44,13 +55,20 @@ namespace kellerkompanie_sync
                     Icon = "/Images/event.png"
                 };
                 news.Add(newsItem);
-            }
+            }            
+        }
 
+        void NewsWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+
+        }
+
+        void NewsWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
             news.Sort(delegate (NewsItem n1, NewsItem n2) { return n2.Timestamp.CompareTo(n1.Timestamp); });
-
             NewsListView.ItemsSource = news;
         }
-        
+
         private void ListViewItem_Selected(object sender, RoutedEventArgs e)
         {
             var item = sender as ListViewItem;
