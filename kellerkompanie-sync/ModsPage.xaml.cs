@@ -199,7 +199,7 @@ namespace kellerkompanie_sync
 
                 if (!remoteAddon.Uuid.Equals(uuid))
                 {
-                    throw new InvalidOperationException("uuid " + uuid + " of local addon " + name + " does not match remote uuid " + remoteAddon.Uuid + " of addon " + remoteAddon.Name);
+                    throw new InvalidOperationException(string.Format("uuid {0} of local addon {1} does not match remote uuid {2} of addon {3}", uuid, name, remoteAddon.Uuid, remoteAddon.Name));
                 }
 
                 FilePath destinationFolder = args.DownloadDirectoryDict[webAddon];
