@@ -210,7 +210,7 @@ namespace kellerkompanie_sync
                     {
                         FilePath remoteFilePath = remoteAddonFile.Path;
                         FilePath destinationFilePath = new FilePath { Value = Path.Combine(destinationFolder, remoteFilePath.Replace("/", "\\").Value) };
-                        downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath, destinationFilePath, remoteAddonFile.Size));
+                        downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath.OriginalValue, destinationFilePath, remoteAddonFile.Size));
                     }
                 }
                 else
@@ -237,13 +237,13 @@ namespace kellerkompanie_sync
                             if (!remoteHash.Equals(localFileIndex.Hash))
                             {
                                 FilePath destinationFilepath = new FilePath { Value = Path.Combine(destinationFolder, remoteFilePath.Value) };
-                                downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath, destinationFilepath, remoteAddonFile.Size));
+                                downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath.OriginalValue, destinationFilepath, remoteAddonFile.Size));
                             }                            
                         }
                         else
                         {
                             FilePath destinationFilepath = new FilePath { Value = Path.Combine(destinationFolder, remoteFilePath.Value) };
-                            downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath.Value, destinationFilepath, remoteAddonFile.Size));
+                            downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath.OriginalValue, destinationFilepath, remoteAddonFile.Size));
                         }
                     }
                 }

@@ -23,11 +23,19 @@ namespace kellerkompanie_sync
         {
             get
             {
-                return value;
+                return value.ToLower();
             }
             set
             {
-                this.value = value.ToLower();
+                this.value = value;
+            }
+        }
+
+        public string OriginalValue
+        {
+            get
+            {
+                return value;
             }
         }
 
@@ -35,34 +43,34 @@ namespace kellerkompanie_sync
         {
             get
             {
-                return value.Length;
+                return Value.Length;
             }
         }
 
         public bool Contains(string str)
         {
-            return value.Contains(str);
+            return Value.Contains(str);
         }
 
         public override bool Equals(object obj)
         {
             return obj is FilePath path &&
-                   value == path.value;
+                   Value.Equals(path.Value);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(value);
+            return Value.GetHashCode();
         }
 
         public int IndexOf(string str)
         {
-            return value.IndexOf(str);
+            return Value.IndexOf(str);
         }
 
         public int LastIndexOf(string str)
         {
-            return value.LastIndexOf(str);
+            return Value.LastIndexOf(str);
         }
 
 
@@ -70,25 +78,25 @@ namespace kellerkompanie_sync
         {
             var filePath = new FilePath
             {
-                Value = value.Substring(index)
+                Value = Value.Substring(index)
             };
             return filePath;
         }
 
         public FilePath SubPath(int start, int end)
         {
-            var filePath = new FilePath { Value = value.Substring(start, end) };
+            var filePath = new FilePath { Value = Value.Substring(start, end) };
             return filePath;
         }
 
         public override string ToString()
         {
-            return value;
+            return Value;
         }
 
         public FilePath Replace(string oldValue, string newValue)
         {
-            return new FilePath { Value = value.Replace(oldValue, newValue) };
+            return new FilePath { Value = Value.Replace(oldValue, newValue) };
         }
 
         public int CompareTo(object obj)
@@ -96,7 +104,7 @@ namespace kellerkompanie_sync
             if (obj == null) return 1;
 
             FilePath otherFilePath = obj as FilePath;
-            return value.CompareTo(otherFilePath.Value);
+            return Value.CompareTo(otherFilePath.Value);
         }
     }
 
