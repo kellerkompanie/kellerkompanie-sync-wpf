@@ -17,7 +17,7 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>0.1.0-alpha</Version>
+    <Version>0.2.0-beta</Version>
     <Authors>Schwaggot</Authors>
     <Company>Kellerkompanie</Company>
     <Copyright />
