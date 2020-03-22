@@ -60,6 +60,12 @@ namespace kellerkompanie_sync
             return value.IndexOf(str);
         }
 
+        public int LastIndexOf(string str)
+        {
+            return value.LastIndexOf(str);
+        }
+
+
         public FilePath SubPath(int index)
         {
             var filePath = new FilePath
@@ -167,7 +173,7 @@ namespace kellerkompanie_sync
             Filesize = fileInfo.Length;
             Absolute_filepath = filePath;
 
-            int index = filePath.IndexOf("@");
+            int index = filePath.LastIndexOf("@");
             Relative_filepath = filePath.SubPath(index);
 
             using (SHA256 mySHA256 = SHA256.Create())
@@ -323,7 +329,7 @@ namespace kellerkompanie_sync
                 return null;
             }
 
-            int index = filePath.IndexOf("@");
+            int index = filePath.LastIndexOf("@");
             FilePath relativeFilePath = filePath.SubPath(index);
             index = relativeFilePath.IndexOf("\\");
             return relativeFilePath.SubPath(0, index);
@@ -372,7 +378,7 @@ namespace kellerkompanie_sync
         private FilePath ExtractAbsoluteAddonPath(FilePath filePath)
         {
             FilePath addonName = ExtractAddonName(filePath);
-            int index = filePath.IndexOf("@") + addonName.Length;
+            int index = filePath.LastIndexOf("@") + addonName.Length;
             return filePath.SubPath(0, index);
         }
 
