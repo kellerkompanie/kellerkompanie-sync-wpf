@@ -308,27 +308,26 @@ namespace kellerkompanie_sync
                 return;
             }
 
+            string downloadSize = string.Format("{0:n1}/{1:n1} MB", downloadProgress.CurrentDownloadSize / 1024 / 1024, downloadProgress.TotalDownloadSize / 1024 / 1024);
+            string downloadSpeed = string.Format("{0:n1} MB/s", downloadProgress.DownloadSpeed / 1024);
+            TimeSpan t = TimeSpan.FromSeconds(downloadProgress.RemainingTime);
+            string remainingTime;
+            if (t.Hours > 0)
+            {
+                remainingTime = string.Format("{0}h:{1}m:{2}s {3}", t.Hours, t.Minutes, t.Seconds, Properties.Resources.Left);
+            }
+            else if (t.Hours == 0 && t.Minutes > 0)
+            {
+                remainingTime = string.Format("{0}m:{1}s {2}", t.Minutes, t.Seconds, Properties.Resources.Left);
+            }
+            else
+            {
+                remainingTime = string.Format("{0}s {1}", t.Seconds, Properties.Resources.Left);
+            }
+
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
                 MainWindow.Instance.ProgressBar.Value = downloadProgress.Progress;
-
-                string downloadSize = string.Format("{0:n1}/{1:n1} MB", downloadProgress.CurrentDownloadSize / 1024 / 1024, downloadProgress.TotalDownloadSize / 1024 / 1024);
-                string downloadSpeed = string.Format("{0:n1} MB/s", downloadProgress.DownloadSpeed / 1024);
-                TimeSpan t = TimeSpan.FromSeconds(downloadProgress.RemainingTime);
-                string remainingTime;
-                if (t.Hours > 0)
-                {
-                    remainingTime = string.Format("{0}h:{1}m:{2}s {3}", t.Hours, t.Minutes, t.Seconds, Properties.Resources.Left);
-                }
-                else if (t.Hours == 0 && t.Minutes > 0)
-                {
-                    remainingTime = string.Format("{0}m:{1}s {2}", t.Minutes, t.Seconds, Properties.Resources.Left);
-                }
-                else
-                {
-                    remainingTime = string.Format("{0}s {1}", t.Seconds, Properties.Resources.Left);
-                }
-
                 MainWindow.Instance.ProgressBarText.Text = string.Format("{0} ({1} @ {2}, {3})", Properties.Resources.DownloadingModsProgress, downloadSize, downloadSpeed, remainingTime);
             }));
         }
