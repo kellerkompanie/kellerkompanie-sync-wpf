@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
@@ -49,10 +50,10 @@ namespace kellerkompanie_sync
         public string Absolute_filepath { get; set; }
         public DateTime Created { get; set; }
         public long Filesize { get; set; }
-        public string Hash { get; set; }       
+        public string Hash { get; set; }
 
         public LocalFileIndex() { }
-        
+
         public LocalFileIndex(string filePath)
         {
             if (!filePath.Contains("@"))
@@ -71,10 +72,11 @@ namespace kellerkompanie_sync
 
             using (SHA256 mySHA256 = SHA256.Create())
             {
-                FileStream fileStream = fileInfo.Open(FileMode.Open);
+                FileStream fileStream = fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 fileStream.Position = 0;
                 byte[] hashValue = mySHA256.ComputeHash(fileStream);
                 fileStream.Close();
+                fileStream.Dispose();
 
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < hashValue.Length; i++)
@@ -88,14 +90,14 @@ namespace kellerkompanie_sync
 
     public class FileIndexer
     {
-        private static FileIndexer instance;        
+        private static FileIndexer instance;
         private Dictionary<string, LocalAddon> Index { get; set; }
         private ProgressBar ProgressBar { get; set; }
         private TextBlock ProgressBarText { get; set; }
         public ObservableCollection<AddonGroup> AddonGroups { get; set; } = new ObservableCollection<AddonGroup>();
         public Dictionary<string, List<LocalAddon>> addonUuidToLocalAddonMap = new Dictionary<string, List<LocalAddon>>();
         public RemoteIndex RemoteIndex;
-        
+
         private FileIndexer(ProgressBar progressBar, TextBlock progressBarText)
         {
             LoadIndex();
@@ -109,7 +111,7 @@ namespace kellerkompanie_sync
                 AddonGroups.Add(addonGroup);
             }
         }
-        
+
         public static void Setup(ProgressBar progressBar, TextBlock progressBarText)
         {
             instance = new FileIndexer(progressBar, progressBarText);
@@ -136,11 +138,11 @@ namespace kellerkompanie_sync
                 string[] allfiles = Directory.GetFiles(addonSearchDirectory, "*.*", SearchOption.AllDirectories);
                 foreach (string file in allfiles)
                 {
-                    if(file.Contains("@"))
+                    if (file.Contains("@"))
                     {
                         allFilePaths.Add(file);
-                    }                    
-                }                
+                    }
+                }
             }
             return allFilePaths;
         }
@@ -167,7 +169,7 @@ namespace kellerkompanie_sync
                 JsonSerializer serializer = new JsonSerializer();
                 Dictionary<string, LocalAddon> index = (Dictionary<string, LocalAddon>)serializer.Deserialize(file, typeof(Dictionary<string, LocalAddon>));
                 Index = index;
-            }            
+            }
         }
 
         public static string ExtractAddonName(string filePath)
@@ -198,12 +200,27 @@ namespace kellerkompanie_sync
 
         public void UpdateLocalIndex()
         {
+            Debug.WriteLine("FileIndexer UpdateLocalIndex()");
             BackgroundWorker worker = new BackgroundWorker();
             worker.WorkerReportsProgress = true;
             worker.DoWork += LocalIndexingWorker_DoWork;
             worker.ProgressChanged += LocalIndexingWorker_ProgressChanged;
             worker.RunWorkerCompleted += LocalIndexingWorker_RunWorkerCompleted;
             worker.RunWorkerAsync();
+        }
+
+        public void UpdateAddonGroups()
+        {
+            AddonGroups.Clear();
+            RemoteIndex = WebAPI.GetIndex();
+            foreach (WebAddonGroup addon in RemoteIndex.AddonGroups)
+            {
+                AddonGroup addonGroup = new AddonGroup(addon);
+                AddonGroups.Add(addonGroup);
+            }
+            ModsPage.Instance?.ListViewAddonGroups.Items.Refresh();
+
+            UpdateLocalIndex();
         }
 
         private string ExtractAbsoluteAddonPath(string filePath)
@@ -214,7 +231,7 @@ namespace kellerkompanie_sync
         }
 
         void LocalIndexingWorker_DoWork(object sender, DoWorkEventArgs e)
-        {            
+        {
             // get all files from addon search directories
             HashSet<string> files = GetAllFilePaths();
 
@@ -238,11 +255,11 @@ namespace kellerkompanie_sync
             }
             foreach (string indexKey in removals)
             {
-                Index.Remove(indexKey);                
+                Index.Remove(indexKey);
             }
 
             // remove files from index which are not on disk anymore
-            foreach (LocalAddon localAddon in Index.Values) 
+            foreach (LocalAddon localAddon in Index.Values)
             {
                 removals = new List<string>();
                 foreach (string filePath in localAddon.Files.Keys)
@@ -257,7 +274,7 @@ namespace kellerkompanie_sync
                     localAddon.Files.Remove(key);
                 }
             }
-            
+
 
             int i = 0;
             foreach (string file in files)
@@ -282,13 +299,14 @@ namespace kellerkompanie_sync
                 if (!addonUuidToLocalAddonMap.ContainsKey(localAddon.Uuid))
                 {
                     addonUuidToLocalAddonMap.Add(localAddon.Uuid, new List<LocalAddon>());
-                }                
+                }
                 List<LocalAddon> localAddons = addonUuidToLocalAddonMap[localAddon.Uuid];
-                if (!localAddons.Contains(localAddon)) {
+                if (!localAddons.Contains(localAddon))
+                {
                     localAddons.Add(localAddon);
                 }
-                                    
-                if(localAddon.Files.ContainsKey(file))
+
+                if (localAddon.Files.ContainsKey(file))
                 {
                     // compare if files differ
                     LocalFileIndex existingIndex = localAddon.Files[file];
@@ -312,8 +330,8 @@ namespace kellerkompanie_sync
                     LocalFileIndex fileIndex = new LocalFileIndex(file);
                     localAddon.Files.Add(fileIndex.Absolute_filepath, fileIndex);
                 }
-                
-                int percentage = (int)Math.Floor((double) ++i / files.Count * 100);
+
+                int percentage = (int)Math.Floor((double)++i / files.Count * 100);
                 (sender as BackgroundWorker).ReportProgress(percentage);
             }
 
@@ -322,14 +340,21 @@ namespace kellerkompanie_sync
 
         void LocalIndexingWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            ProgressBar.Value = e.ProgressPercentage;
-            ProgressBarText.Text = string.Format("{0} ({1}%)", Properties.Resources.ProgressIndexingFiles, e.ProgressPercentage);
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                ProgressBar.Value = e.ProgressPercentage;
+                ProgressBarText.Text = string.Format("{0} ({1}%)", Properties.Resources.ProgressIndexingFiles, e.ProgressPercentage);
+            }));
         }
 
         void LocalIndexingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            ProgressBar.Value = 0;
-            ProgressBarText.Text = Properties.Resources.ProgressIndexingComplete;
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                ProgressBar.Value = 0;
+                ProgressBarText.Text = Properties.Resources.ProgressIndexingComplete;
+            }));
+
             UpdateAddonGroupStates();
         }
 
@@ -359,20 +384,64 @@ namespace kellerkompanie_sync
                     if (addonUuidToLocalAddonMap.ContainsKey(addonUuid))
                     {
                         LocalAddon localAddon = addonUuidToLocalAddonMap[addonUuid][0];
-                        addonGroup.WebAddonToLocalAddonDict.Add(webAddon, localAddon);
+                        if (!addonGroup.WebAddonToLocalAddonDict.ContainsKey(webAddon))
+                        {
+                            addonGroup.WebAddonToLocalAddonDict.Add(webAddon, localAddon);
+                        }
+                        else
+                        {
+                            addonGroup.WebAddonToLocalAddonDict[webAddon] = localAddon;
+                        }
                     }
                 }
 
                 string remoteUuid = addonGroup.WebAddonGroup.Uuid;
                 string remoteVersion = addonGroup.WebAddonGroup.Version;
-                
+
                 if (Settings.Instance.SubscribedAddonGroups.ContainsKey(remoteUuid))
                 {
-                    // AddonGroup is subscribed
+                    // AddonGroup is subscribed    
                     string localVersion = Settings.Instance.SubscribedAddonGroups[remoteUuid];
                     if (localVersion.Equals(remoteVersion))
                     {
-                        changes.Add((addonGroup, AddonGroupState.Ready));
+                        // even if versions match we have to check for changes in filesystem
+                        bool upToDate = true;
+                        foreach (WebAddon webAddon in addonGroup.WebAddonGroup.Addons)
+                        {
+                            if (!addonUuidToLocalAddonMap.ContainsKey(webAddon.Uuid))
+                            {
+                                // addon is not on disk anymore, needs update
+                                changes.Add((addonGroup, AddonGroupState.NeedsUpdate));
+                                upToDate = false;
+                                break;
+                            }
+                            else
+                            {
+                                // check if files are still there 
+                                List<LocalAddon> localAddons = addonUuidToLocalAddonMap[webAddon.Uuid];
+                                foreach (LocalAddon localAddon in localAddons)
+                                {
+                                    List<string> localAddonFiles = new List<string>(localAddon.Files.Values.Select(fileIndex => fileIndex.Relative_filepath));
+                                    List<string> remoteAddonFiles = GetRemoteFilenamesForAddon(webAddon.Uuid);
+                                    localAddonFiles.Sort();
+                                    remoteAddonFiles.Sort();
+                                    var localNotRemote = localAddonFiles.Except(remoteAddonFiles).ToList();
+                                    var remoteNotLocal = remoteAddonFiles.Except(localAddonFiles).ToList();
+
+                                    if (localNotRemote.Any() || remoteNotLocal.Any())
+                                    {
+                                        changes.Add((addonGroup, AddonGroupState.NeedsUpdate));
+                                        upToDate = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (upToDate)
+                        {
+                            changes.Add((addonGroup, AddonGroupState.Ready));
+                        }
                     }
                     else
                     {
@@ -411,24 +480,50 @@ namespace kellerkompanie_sync
                 (sender as BackgroundWorker).ReportProgress(percentage);
             }
 
-            Application.Current.Dispatcher.Invoke(new Action(() => {
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
                 foreach ((AddonGroup addonGroup, AddonGroupState addonGroupState) in changes)
                 {
-                    addonGroup.State = addonGroupState;                 
+                    addonGroup.State = addonGroupState;
                 }
+                ModsPage.Instance?.ListViewAddonGroups.Items.Refresh();
             }));
+        }
+
+        private List<string> GetRemoteFilenamesForAddon(string uuid)
+        {
+            foreach (RemoteAddon remoteAddon in RemoteIndex.FilesIndex.Values)
+            {
+                if (remoteAddon.Uuid.Equals(uuid))
+                {
+                    List<string> remoteFileNames = new List<string>();
+                    foreach (string remoteFileName in remoteAddon.Files.Keys)
+                    {
+                        remoteFileNames.Add(remoteFileName.Replace("/", "\\"));
+                    }
+                    return remoteFileNames;
+                }
+            }
+
+            return null;
         }
 
         void AddonGroupStateWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            ProgressBar.Value = e.ProgressPercentage;
-            ProgressBarText.Text = string.Format("{0} ({1}%)", Properties.Resources.ProgressComparingOnlineVersion, e.ProgressPercentage);
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                ProgressBar.Value = e.ProgressPercentage;
+                ProgressBarText.Text = string.Format("{0} ({1}%)", Properties.Resources.ProgressComparingOnlineVersion, e.ProgressPercentage);
+            }));
         }
 
         void AddonGroupStateWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            ProgressBar.Value = 0;
-            ProgressBarText.Text = Properties.Resources.EverythingUpToDate;
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                ProgressBar.Value = 0;
+                ProgressBarText.Text = Properties.Resources.EverythingUpToDate;
+            }));
         }
     }
 }

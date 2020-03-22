@@ -12,8 +12,12 @@ namespace kellerkompanie_sync
 {
     public partial class ModsPage : Page
     {
+        public static ModsPage Instance { get; private set; }
+
         public ModsPage()
         {
+            Instance = this;
+
             InitializeComponent();
 
             foreach (AddonGroup addonGroup in FileIndexer.Instance.AddonGroups)
@@ -42,11 +46,13 @@ namespace kellerkompanie_sync
                         addonGrp.ButtonIsEnabled = false;
                     }
                 }
+                ButtonUpdate.IsEnabled = false;
+                ListViewAddonGroups.Items.Refresh();
                 MainWindow.Instance.PlayUpdateButton.IsEnabled = false;
 
                 // in case of missing addons decide where to download them to, if all addons already exist locally skip this step
                 string downloadDirectoryForMissingAddons = null;
-                if (addonGroup.State != AddonGroupState.CompleteButNotSubscribed)
+                if (addonGroup.State != AddonGroupState.CompleteButNotSubscribed && addonGroup.State != AddonGroupState.NeedsUpdate)
                 {
                     // decide where to download missing addons to                    
                     switch (Settings.Instance.GetAddonSearchDirectories().Count)
@@ -75,6 +81,8 @@ namespace kellerkompanie_sync
                                 {
                                     addonGrp.ButtonIsEnabled = true;
                                 }
+                                ButtonUpdate.IsEnabled = true;
+                                ListViewAddonGroups.Items.Refresh();
                                 return;
                             }
                             break;
@@ -103,6 +111,7 @@ namespace kellerkompanie_sync
                 addonGroup.StatusText = Properties.Resources.ProgressDownloading;
                 addonGroup.StatusVisibility = Visibility.Visible;
                 addonGroup.ButtonText = Properties.Resources.Pause;
+                ListViewAddonGroups.Items.Refresh();
 
                 BackgroundWorker worker = new BackgroundWorker();
                 worker.WorkerReportsProgress = true;
@@ -128,6 +137,11 @@ namespace kellerkompanie_sync
             }
         }
 
+        private void ButtonUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            FileIndexer.Instance.UpdateAddonGroups();
+        }
+
         class DownloadArguments
         {
             public AddonGroup AddonGroup { get; set; }
@@ -146,7 +160,9 @@ namespace kellerkompanie_sync
             {
                 string webAddonUuid = webAddon.Uuid;
                 if (!FileIndexer.Instance.addonUuidToLocalAddonMap.ContainsKey(webAddonUuid))
+                {
                     continue;
+                }
 
                 RemoteAddon remAddon = remoteIndex.FilesIndex[webAddon.Foldername];
 
@@ -252,6 +268,7 @@ namespace kellerkompanie_sync
             switch (state)
             {
                 case DownloadState.Completed:
+                    // update existing information, i.e., versions, hashes etc.
                     ValidateAddonGroup(downloadManager.AddonGroup);
 
                     Application.Current.Dispatcher.Invoke(new Action(() =>
@@ -260,6 +277,7 @@ namespace kellerkompanie_sync
                         mainWindow.ProgressBar.Value = 0;
                         mainWindow.ProgressBarText.Text = Properties.Resources.EverythingUpToDate;
                         downloadManager.AddonGroup.StatusText = "";
+                        ListViewAddonGroups.Items.Refresh();
                     }));
                     break;
 
@@ -268,6 +286,7 @@ namespace kellerkompanie_sync
                     {
                         downloadManager.AddonGroup.ButtonText = Properties.Resources.Continue;
                         downloadManager.AddonGroup.StatusText = Properties.Resources.ProgressDownloadPaused;
+                        ListViewAddonGroups.Items.Refresh();
                     }));
                     break;
 
@@ -276,9 +295,10 @@ namespace kellerkompanie_sync
                     {
                         downloadManager.AddonGroup.ButtonText = Properties.Resources.Pause;
                         downloadManager.AddonGroup.StatusText = Properties.Resources.ProgressDownloading;
+                        ListViewAddonGroups.Items.Refresh();
                     }));
                     break;
-            }
+            }            
         }
 
         void DownloadManager_ProgressChanged(object sender, DownloadProgress downloadProgress)
@@ -290,8 +310,7 @@ namespace kellerkompanie_sync
 
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
-                MainWindow mainWindow = (MainWindow)Window.GetWindow(this);
-                mainWindow.ProgressBar.Value = downloadProgress.Progress;
+                MainWindow.Instance.ProgressBar.Value = downloadProgress.Progress;
 
                 string downloadSize = string.Format("{0:n1}/{1:n1} MB", downloadProgress.CurrentDownloadSize / 1024 / 1024, downloadProgress.TotalDownloadSize / 1024 / 1024);
                 string downloadSpeed = string.Format("{0:n1} MB/s", downloadProgress.DownloadSpeed / 1024);
@@ -310,7 +329,7 @@ namespace kellerkompanie_sync
                     remainingTime = string.Format("{0}s {1}", t.Seconds, Properties.Resources.Left);
                 }
 
-                mainWindow.ProgressBarText.Text = string.Format("{0} ({1} @ {2}, {3})", Properties.Resources.DownloadingModsProgress, downloadSize, downloadSpeed, remainingTime);
+                MainWindow.Instance.ProgressBarText.Text = string.Format("{0} ({1} @ {2}, {3})", Properties.Resources.DownloadingModsProgress, downloadSize, downloadSpeed, remainingTime);
             }));
         }
 
@@ -321,13 +340,23 @@ namespace kellerkompanie_sync
 
         void DownloadWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-
+            
         }
 
         private void ValidateAddonGroup(AddonGroup addonGroup)
         {
-            // TODO update existing information, i.e., versions, hashes etc.
-
+            // add group to subscribed addons
+            string uuid = addonGroup.WebAddonGroup.Uuid;
+            string version = addonGroup.WebAddonGroup.Version;
+            if (Settings.Instance.SubscribedAddonGroups.ContainsKey(uuid))
+            {
+                Settings.Instance.SubscribedAddonGroups[uuid] = version;
+            } else
+            {
+                Settings.Instance.SubscribedAddonGroups.Add(uuid, version);
+            }
+            
+            // update UI
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
                 downloadManager = null;
@@ -339,7 +368,11 @@ namespace kellerkompanie_sync
                 {
                     addonGrp.ButtonIsEnabled = true;
                 }
+                ButtonUpdate.IsEnabled = true;
+                ListViewAddonGroups.Items.Refresh();
             }));
+
+            FileIndexer.Instance.UpdateLocalIndex();
         }
     }
 }

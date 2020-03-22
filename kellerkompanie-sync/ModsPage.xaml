@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:p="clr-namespace:kellerkompanie_sync.Properties"
     Title="ModsPage"
     d:DesignHeight="450"
     d:DesignWidth="800"
@@ -120,7 +121,7 @@
         </ControlTemplate>
     </Page.Resources>
 
-    <Grid>
+    <StackPanel>
         <ListView
             Name="ListViewAddonGroups"
             Margin="0,6,0,0"
@@ -192,6 +193,17 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-
-    </Grid>
+        <Button
+            Name="ButtonUpdate"
+            Width="32"
+            Height="32"
+            Margin="0,2,0,0"
+            HorizontalAlignment="Right"
+            Click="ButtonUpdate_Click"
+            Style="{StaticResource OrangeButton}"
+            Template="{StaticResource OrangeButtonTemplate}"
+            ToolTip="{x:Static p:Resources.Update}">
+            <Image Source="/Images/refresh.png" />
+        </Button>
+    </StackPanel>
 </Page>

@@ -89,7 +89,8 @@ namespace kellerkompanie_sync
                     });
                 }
             }
-            
+
+            fileStream.Close();
             fileStream.Dispose();
                         
             if (DownloadedSize == FileSize)

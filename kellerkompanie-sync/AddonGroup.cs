@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -182,10 +183,8 @@ namespace kellerkompanie_sync
                         break;
                 }
 
-                //Application.Current.Dispatcher.Invoke(new Action(() =>
-                //{
+                Debug.WriteLine(string.Format("setting state of {0} to {1}", WebAddonGroup.Name, State));
                 Parent?.Items.Refresh();
-                //}));
             }
         }
 
@@ -195,6 +194,11 @@ namespace kellerkompanie_sync
         {
             this.WebAddonGroup = WebAddonGroup;
             State = AddonGroupState.Unknown;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{{{0}, {1}}}", WebAddonGroup.Name, WebAddonGroup.Uuid);
         }
     }
 }
