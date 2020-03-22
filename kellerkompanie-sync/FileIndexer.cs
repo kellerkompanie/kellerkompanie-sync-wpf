@@ -54,13 +54,12 @@ namespace kellerkompanie_sync
 
         public override bool Equals(object obj)
         {
-            return obj is FilePath path &&
-                   Value.Equals(path.Value);
+            return obj is FilePath path && Value.Equals(path.Value);
         }
 
         public override int GetHashCode()
         {
-            return Value.GetHashCode();
+            return HashCode.Combine(Value);
         }
 
         public int IndexOf(string str)
@@ -78,14 +77,14 @@ namespace kellerkompanie_sync
         {
             var filePath = new FilePath
             {
-                Value = Value.Substring(index)
+                Value = value.Substring(index)
             };
             return filePath;
         }
 
         public FilePath SubPath(int start, int end)
         {
-            var filePath = new FilePath { Value = Value.Substring(start, end) };
+            var filePath = new FilePath { Value = value.Substring(start, end) };
             return filePath;
         }
 
@@ -96,7 +95,7 @@ namespace kellerkompanie_sync
 
         public FilePath Replace(string oldValue, string newValue)
         {
-            return new FilePath { Value = Value.Replace(oldValue, newValue) };
+            return new FilePath { Value = value.Replace(oldValue, newValue) };
         }
 
         public int CompareTo(object obj)
