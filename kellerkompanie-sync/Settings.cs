@@ -14,48 +14,34 @@ namespace kellerkompanie_sync
         public static readonly string IndexFile = Path.Combine(SettingsDirectory, "index.json");
 
         [JsonProperty("AddonSearchDirectories")]
-        private readonly ObservableCollection<string> addonSearchDirectories;
-        public string ExecutableLocation { get; set; }
-        public bool ParamShowScriptErrors { get; set; }
-        public bool ParamNoPause { get; set; }
-        public bool ParamWindowMode { get; set; }
-        public bool ParamNoSplashScreen { get; set; }
-        public bool ParamDefaultWorldEmpty { get; set; }
-        public bool ParamNoLogs { get; set; }
-        public string ParamAdditional { get; set; }
-        public Dictionary<string, string> SubscribedAddonGroups { get; set; }
+        private readonly ObservableCollection<FilePath> addonSearchDirectories = new ObservableCollection<FilePath>();
+        public string ExecutableLocation { get; set; } = "";
+        public bool ParamShowScriptErrors { get; set; } = false;
+        public bool ParamNoPause { get; set; } = true;
+        public bool ParamWindowMode { get; set; } = false;
+        public bool ParamNoSplashScreen { get; set; } = true;
+        public bool ParamDefaultWorldEmpty { get; set; } = false;
+        public bool ParamNoLogs { get; set; } = false;
+        public string ParamAdditional { get; set; } = "";
+        public Dictionary<string, string> SubscribedAddonGroups { get; set; } = new Dictionary<string, string>();
         public double WindowX { get; set; }
         public double WindowY { get; set; }
-        public double WindowWidth { get; set; }
-        public double WindowHeight { get; set; }
-        public int SimultaneousDownloads { get; set; }
+        public double WindowWidth { get; set; } = 800;
+        public double WindowHeight { get; set; } = 600;
+        public int SimultaneousDownloads { get; set; } = 10;
 
         private Settings()
         {
             Directory.CreateDirectory(SettingsDirectory);
             Directory.CreateDirectory(Path.GetDirectoryName(LogFile));
 
-            addonSearchDirectories = new ObservableCollection<string>();
-            ExecutableLocation = "";
-            ParamShowScriptErrors = false;
-            ParamNoPause = true;
-            ParamWindowMode = false;
-            ParamNoSplashScreen = true;
-            ParamDefaultWorldEmpty = false;
-            ParamNoLogs = false;
-            ParamAdditional = "";
-            SubscribedAddonGroups = new Dictionary<string, string>();
-            SimultaneousDownloads = 10;
-
-            WindowWidth = 800;
-            WindowHeight = 600;
             WindowX = System.Windows.SystemParameters.PrimaryScreenWidth / 2 - WindowWidth / 2;
             WindowY = System.Windows.SystemParameters.PrimaryScreenHeight / 2 - WindowHeight / 2;
         }
 
         public static Settings Instance { get; private set; } = new Settings();
 
-        internal void AddAddonSearchDirectory(string directory)
+        internal void AddAddonSearchDirectory(FilePath directory)
         {
             if (!addonSearchDirectories.Contains(directory))
             {
@@ -64,7 +50,7 @@ namespace kellerkompanie_sync
             }
         }
 
-        public ObservableCollection<string> GetAddonSearchDirectories()
+        public ObservableCollection<FilePath> GetAddonSearchDirectories()
         {
             return addonSearchDirectories;
         }

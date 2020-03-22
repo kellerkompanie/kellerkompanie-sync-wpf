@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.IO;
 
 namespace kellerkompanie_sync
 {
@@ -11,10 +12,6 @@ namespace kellerkompanie_sync
             get
             {
                 return OriginalValue.ToLower();
-            }
-            set
-            {
-                OriginalValue = value;
             }
         }
 
@@ -53,30 +50,32 @@ namespace kellerkompanie_sync
             return Value.LastIndexOf(str);
         }
 
+        public static FilePath Combine(FilePath filePath, FilePath filePathOther)
+        {
+            string combinedPath = Path.Combine(filePath.OriginalValue, filePathOther.OriginalValue);
+            return new FilePath(combinedPath);
+        }
 
         public FilePath SubPath(int index)
         {
-            var filePath = new FilePath
-            {
-                Value = OriginalValue.Substring(index)
-            };
+            var filePath = new FilePath(OriginalValue.Substring(index));
             return filePath;
         }
 
         public FilePath SubPath(int start, int end)
         {
-            var filePath = new FilePath { Value = OriginalValue.Substring(start, end) };
+            var filePath = new FilePath(OriginalValue.Substring(start, end));
             return filePath;
         }
 
         public override string ToString()
         {
-            return Value;
+            return OriginalValue;
         }
 
         public FilePath Replace(string oldValue, string newValue)
         {
-            return new FilePath { Value = OriginalValue.Replace(oldValue, newValue) };
+            return new FilePath(OriginalValue.Replace(oldValue, newValue));
         }
 
         public int CompareTo(object obj)
@@ -86,6 +85,11 @@ namespace kellerkompanie_sync
             FilePath otherFilePath = obj as FilePath;
             return Value.CompareTo(otherFilePath.Value);
         }
+
+        public FilePath(string filePath)
+        {
+            OriginalValue = filePath;
+        }
     }
 
     public class FilePathConverter : JsonConverter
@@ -93,7 +97,7 @@ namespace kellerkompanie_sync
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             string value = (string)reader.Value;
-            return new FilePath { Value = value };
+            return new FilePath(value);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

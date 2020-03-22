@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using Path = System.IO.Path;
 
 namespace kellerkompanie_sync
 {
@@ -51,7 +50,7 @@ namespace kellerkompanie_sync
                 MainWindow.Instance.PlayUpdateButton.IsEnabled = false;
 
                 // in case of missing addons decide where to download them to, if all addons already exist locally skip this step
-                string downloadDirectoryForMissingAddons = null;
+                FilePath downloadDirectoryForMissingAddons = null;
                 if (addonGroup.State != AddonGroupState.CompleteButNotSubscribed && addonGroup.State != AddonGroupState.NeedsUpdate)
                 {
                     // decide where to download missing addons to                    
@@ -89,7 +88,7 @@ namespace kellerkompanie_sync
                     }
                 }
 
-                Dictionary<WebAddon, string> webAddonToDownloadDirectoryDict = new Dictionary<WebAddon, string>();
+                Dictionary<WebAddon, FilePath> webAddonToDownloadDirectoryDict = new Dictionary<WebAddon, FilePath>();
                 WebAddonGroup webAddonGroup = addonGroup.WebAddonGroup;
                 foreach (WebAddon webAddon in webAddonGroup.Addons)
                 {
@@ -97,8 +96,9 @@ namespace kellerkompanie_sync
                     {
                         // some addons might already exist, for these download to existing folder
                         LocalAddon existingLocalAddon = addonGroup.WebAddonToLocalAddonDict[webAddon];
-                        string parentFolder = Directory.GetParent(existingLocalAddon.AbsoluteFilepath.Value).FullName;
-                        webAddonToDownloadDirectoryDict.Add(webAddon, parentFolder);
+                        string parentFolder = Directory.GetParent(existingLocalAddon.AbsoluteFilepath.OriginalValue).FullName;
+                        FilePath addonParentFolder = new FilePath(parentFolder);
+                        webAddonToDownloadDirectoryDict.Add(webAddon, addonParentFolder);
                     }
                     else
                     {
@@ -116,8 +116,6 @@ namespace kellerkompanie_sync
                 BackgroundWorker worker = new BackgroundWorker();
                 worker.WorkerReportsProgress = true;
                 worker.DoWork += DownloadWorker_DoWork;
-                worker.ProgressChanged += DownloadWorker_ProgressChanged;
-                worker.RunWorkerCompleted += DownloadWorker_RunWorkerCompleted;
                 DownloadArguments args = new DownloadArguments
                 {
                     AddonGroup = addonGroup,
@@ -145,7 +143,7 @@ namespace kellerkompanie_sync
         class DownloadArguments
         {
             public AddonGroup AddonGroup { get; set; }
-            public Dictionary<WebAddon, string> DownloadDirectoryDict { get; set; }
+            public Dictionary<WebAddon, FilePath> DownloadDirectoryDict { get; set; }
         }
 
         void DownloadWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -189,7 +187,10 @@ namespace kellerkompanie_sync
             }
 
             // determine files to download
-            List<(string, FilePath, long)> downloads = new List<(string, FilePath, long)>();
+            downloadManager = new DownloadManager(args.AddonGroup);
+            downloadManager.StateChanged += DownloadManager_StateChanged;
+            downloadManager.ProgressChanged += DownloadManager_ProgressChanged;
+
             foreach (WebAddon webAddon in webAddonGroup.Addons)
             {
                 RemoteAddon remoteAddon = FileIndexer.Instance.RemoteIndex.FilesIndex[webAddon.Foldername];
@@ -201,7 +202,7 @@ namespace kellerkompanie_sync
                     throw new InvalidOperationException("uuid " + uuid + " of local addon " + name + " does not match remote uuid " + remoteAddon.Uuid + " of addon " + remoteAddon.Name);
                 }
 
-                string destinationFolder = args.DownloadDirectoryDict[webAddon];
+                FilePath destinationFolder = args.DownloadDirectoryDict[webAddon];
 
                 if (!FileIndexer.Instance.addonUuidToLocalAddonMap.ContainsKey(uuid))
                 {
@@ -209,8 +210,8 @@ namespace kellerkompanie_sync
                     foreach (RemoteAddonFile remoteAddonFile in remoteAddon.Files.Values)
                     {
                         FilePath remoteFilePath = remoteAddonFile.Path;
-                        FilePath destinationFilePath = new FilePath { Value = Path.Combine(destinationFolder, remoteFilePath.Replace("/", "\\").Value) };
-                        downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath.OriginalValue, destinationFilePath, remoteAddonFile.Size));
+                        FilePath destinationFilePath = FilePath.Combine(destinationFolder, remoteFilePath.Replace("/", "\\"));
+                        downloadManager.AddDownload(WebAPI.RepoUrl + "/" + remoteFilePath.OriginalValue, destinationFilePath, remoteAddonFile.Size);
                     }
                 }
                 else
@@ -236,26 +237,17 @@ namespace kellerkompanie_sync
                             LocalFileIndex localFileIndex = relativeFilePathToFileIndexMap[remoteFilePath];
                             if (!remoteHash.Equals(localFileIndex.Hash))
                             {
-                                FilePath destinationFilepath = new FilePath { Value = Path.Combine(destinationFolder, remoteFilePath.Value) };
-                                downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath.OriginalValue, destinationFilepath, remoteAddonFile.Size));
+                                FilePath destinationFilepath = FilePath.Combine(destinationFolder, remoteFilePath);
+                                downloadManager.AddDownload(WebAPI.RepoUrl + "/" + remoteFilePath.OriginalValue, destinationFilepath, remoteAddonFile.Size);
                             }                            
                         }
                         else
                         {
-                            FilePath destinationFilepath = new FilePath { Value = Path.Combine(destinationFolder, remoteFilePath.Value) };
-                            downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath.OriginalValue, destinationFilepath, remoteAddonFile.Size));
+                            FilePath destinationFilepath = FilePath.Combine(destinationFolder, remoteFilePath);
+                            downloadManager.AddDownload(WebAPI.RepoUrl + "/" + remoteFilePath.OriginalValue, destinationFilepath, remoteAddonFile.Size);
                         }
                     }
                 }
-            }
-
-            downloadManager = new DownloadManager(args.AddonGroup);
-            downloadManager.StateChanged += DownloadManager_StateChanged;
-            downloadManager.ProgressChanged += DownloadManager_ProgressChanged;
-
-            foreach ((string url, FilePath destinationFile, long filesize) in downloads)
-            {
-                downloadManager.AddDownload(url, destinationFile, filesize);
             }
 
             downloadManager.StartDownloads();
@@ -330,16 +322,6 @@ namespace kellerkompanie_sync
                 MainWindow.Instance.ProgressBar.Value = downloadProgress.Progress;
                 MainWindow.Instance.ProgressBarText.Text = string.Format("{0} ({1} @ {2}, {3})", Properties.Resources.DownloadingModsProgress, downloadSize, downloadSpeed, remainingTime);
             }));
-        }
-
-        void DownloadWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-
-        }
-
-        void DownloadWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            
         }
 
         private void ValidateAddonGroup(AddonGroup addonGroup)

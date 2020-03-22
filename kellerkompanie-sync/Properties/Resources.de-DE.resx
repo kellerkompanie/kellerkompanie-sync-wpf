@@ -138,6 +138,12 @@
   <data name="ArmaExecutableLocation" xml:space="preserve">
     <value>Arma 3 Pfad zur ausführbaren Datei:</value>
   </data>
+  <data name="ChooseDirectoryDialogMessage" xml:space="preserve">
+    <value>In welchen Addon Such-Ordner sollen fehlende Addons heruntergeladen werden?</value>
+  </data>
+  <data name="ChooseDirectoryDialogTitle" xml:space="preserve">
+    <value>Download Ordner auswählen</value>
+  </data>
   <data name="Continue" xml:space="preserve">
     <value>Download fortsetzen</value>
   </data>

@@ -165,7 +165,7 @@ namespace kellerkompanie_sync
                     {
                         JToken jAddonFileValue = ((JProperty)jAddonFile).Value;
                         string addonFileHash = (string)jAddonFileValue["file_hash"];
-                        FilePath addonFilePath = new FilePath { Value = (string)jAddonFileValue["file_path"] };
+                        FilePath addonFilePath = new FilePath((string)jAddonFileValue["file_path"]);
                         long addonFileSize = (long)jAddonFileValue["file_size"];
 
                         RemoteAddonFile remoteAddonFile = new RemoteAddonFile

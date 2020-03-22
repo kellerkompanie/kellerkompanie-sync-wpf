@@ -137,14 +137,14 @@ namespace kellerkompanie_sync
         public HashSet<FilePath> GetAllFilePaths()
         {
             HashSet<FilePath> allFilePaths = new HashSet<FilePath>();
-            foreach (string addonSearchDirectory in Settings.Instance.GetAddonSearchDirectories())
+            foreach (FilePath addonSearchDirectory in Settings.Instance.GetAddonSearchDirectories())
             {
-                string[] allfiles = Directory.GetFiles(addonSearchDirectory, "*.*", SearchOption.AllDirectories);
+                string[] allfiles = Directory.GetFiles(addonSearchDirectory.OriginalValue, "*.*", SearchOption.AllDirectories);
                 foreach (string file in allfiles)
                 {
                     if (file.Contains("@"))
                     {
-                        allFilePaths.Add(new FilePath { Value = file });
+                        allFilePaths.Add(new FilePath(file));
                     }
                 }
             }
@@ -181,14 +181,14 @@ namespace kellerkompanie_sync
                     string localAddonName = (string)jLocalAddon["Name"];
                     string localAddonUuid = (string)jLocalAddon["Uuid"];
                     string localAddonVersion = (string)jLocalAddon["Version"];
-                    FilePath localAddonAbsoluteFilePath = new FilePath { Value = (string)jLocalAddon["AbsoluteFilepath"] };
+                    FilePath localAddonAbsoluteFilePath = new FilePath((string)jLocalAddon["AbsoluteFilepath"]);
 
                     Dictionary<FilePath, LocalFileIndex> files = new Dictionary<FilePath, LocalFileIndex>();
                     foreach (JToken jFile in jLocalAddon["Files"])
                     {
                         var jFileContent = ((JProperty)jFile).Value;
-                        FilePath fileRelativeFilePath = new FilePath { Value = (string)jFileContent["Relative_filepath"] };
-                        FilePath fileAbsoluteFilePath = new FilePath { Value = (string)jFileContent["Absolute_filepath"] };
+                        FilePath fileRelativeFilePath = new FilePath((string)jFileContent["Relative_filepath"]);
+                        FilePath fileAbsoluteFilePath = new FilePath((string)jFileContent["Absolute_filepath"]);
                         DateTime fileCreated = (DateTime)jFileContent["Created"];
                         long fileSize = (long)jFileContent["Filesize"];
                         string fileHash = (string)jFileContent["Hash"];

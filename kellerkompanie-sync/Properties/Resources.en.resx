@@ -138,6 +138,12 @@
   <data name="ArmaExecutableLocation" xml:space="preserve">
     <value>Arma 3 executable location:</value>
   </data>
+  <data name="ChooseDirectoryDialogMessage" xml:space="preserve">
+    <value>To which addon search directory do you want to download missing addons?</value>
+  </data>
+  <data name="ChooseDirectoryDialogTitle" xml:space="preserve">
+    <value>Choose download directory</value>
+  </data>
   <data name="Continue" xml:space="preserve">
     <value>Continue download</value>
   </data>

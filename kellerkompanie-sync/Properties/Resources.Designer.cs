@@ -124,6 +124,24 @@ namespace kellerkompanie_sync.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to To which addon search directory do you want to download missing addons?.
+        /// </summary>
+        public static string ChooseDirectoryDialogMessage {
+            get {
+                return ResourceManager.GetString("ChooseDirectoryDialogMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose download directory.
+        /// </summary>
+        public static string ChooseDirectoryDialogTitle {
+            get {
+                return ResourceManager.GetString("ChooseDirectoryDialogTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Continue download.
         /// </summary>
         public static string Continue {

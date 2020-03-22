@@ -31,7 +31,7 @@ namespace kellerkompanie_sync
 
             if (fileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                string folder = fileDialog.SelectedPath;
+                FilePath folder = new FilePath(fileDialog.SelectedPath);
                 if (!Settings.Instance.GetAddonSearchDirectories().Contains(folder))
                 {
                     Settings.Instance.AddAddonSearchDirectory(folder);
@@ -120,7 +120,7 @@ namespace kellerkompanie_sync
         private void ButtonRemove_Click(object sender, RoutedEventArgs e)
         {
             Button button = (Button)sender;
-            string addonSearchDirectory = (string)button.DataContext;
+            FilePath addonSearchDirectory = (FilePath)button.DataContext;
             Settings.Instance.GetAddonSearchDirectories().Remove(addonSearchDirectory);
             Settings.Instance.SaveSettings();
         }

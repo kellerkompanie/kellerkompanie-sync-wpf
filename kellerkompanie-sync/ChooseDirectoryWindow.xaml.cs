@@ -1,21 +1,14 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows;
+﻿using System.Windows;
 
 namespace kellerkompanie_sync
 {
     public partial class ChooseDirectoryWindow : Window
     {
-		private ObservableCollection<string> list = new ObservableCollection<string>();
-
 		public ChooseDirectoryWindow()
         {
             InitializeComponent();
 
-			foreach (string addonSearchDirectory in Settings.Instance.GetAddonSearchDirectories())
-			{
-				list.Add(addonSearchDirectory);
-			}
-			ComboBox.ItemsSource = list;
+			ComboBox.ItemsSource = Settings.Instance.GetAddonSearchDirectories();
 			ComboBox.SelectedIndex = 0;
         }
 
@@ -24,9 +17,9 @@ namespace kellerkompanie_sync
 			DialogResult = true;
 		}
 
-		public string ChosenDirectory
+		public FilePath ChosenDirectory
 		{
-			get { return ComboBox.Text; }
+			get { return (FilePath)ComboBox.DataContext; }
 		}
 	}
 }
