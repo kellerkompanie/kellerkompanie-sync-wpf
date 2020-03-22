@@ -97,7 +97,7 @@ namespace kellerkompanie_sync
                     {
                         // some addons might already exist, for these download to existing folder
                         LocalAddon existingLocalAddon = addonGroup.WebAddonToLocalAddonDict[webAddon];
-                        string parentFolder = Directory.GetParent(existingLocalAddon.AbsoluteFilepath).FullName;
+                        string parentFolder = Directory.GetParent(existingLocalAddon.AbsoluteFilepath.Value).FullName;
                         webAddonToDownloadDirectoryDict.Add(webAddon, parentFolder);
                     }
                     else
@@ -169,19 +169,19 @@ namespace kellerkompanie_sync
                 List<LocalAddon> localAddons = FileIndexer.Instance.addonUuidToLocalAddonMap[webAddonUuid];
                 foreach (LocalAddon localAddon in localAddons)
                 {
-                    List<string> removals = new List<string>();
+                    List<FilePath> removals = new List<FilePath>();
                     foreach (LocalFileIndex fileIndex in localAddon.Files.Values)
                     {
-                        string relativeFilepath = fileIndex.Relative_filepath;
+                        FilePath relativeFilepath = fileIndex.Relative_filepath;
                         if (!remAddon.Files.ContainsKey(relativeFilepath.Replace("\\", "/")))
                         {
-                            string filePath = fileIndex.Absolute_filepath;
+                            FilePath filePath = fileIndex.Absolute_filepath;
                             Log.Debug("deleting " + filePath);
                             removals.Add(filePath);
-                            File.Delete(@filePath);
+                            File.Delete(@filePath.Value);
                         }
                     }
-                    foreach (string removal in removals)
+                    foreach (FilePath removal in removals)
                     {
                         localAddon.Files.Remove(removal);
                     }
@@ -189,7 +189,7 @@ namespace kellerkompanie_sync
             }
 
             // determine files to download
-            List<(string, string, long)> downloads = new List<(string, string, long)>();
+            List<(string, FilePath, long)> downloads = new List<(string, FilePath, long)>();
             foreach (WebAddon webAddon in webAddonGroup.Addons)
             {
                 RemoteAddon remoteAddon = FileIndexer.Instance.RemoteIndex.FilesIndex[webAddon.Foldername];
@@ -208,14 +208,14 @@ namespace kellerkompanie_sync
                     // download all
                     foreach (RemoteAddonFile remoteAddonFile in remoteAddon.Files.Values)
                     {
-                        string remoteFilePath = remoteAddonFile.Path;
-                        string destinationFilePath = Path.Combine(destinationFolder, remoteFilePath.Replace("/", "\\"));
+                        FilePath remoteFilePath = remoteAddonFile.Path;
+                        FilePath destinationFilePath = new FilePath { Value = Path.Combine(destinationFolder, remoteFilePath.Replace("/", "\\").Value) };
                         downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath, destinationFilePath, remoteAddonFile.Size));
                     }
                 }
                 else
                 {                     
-                    Dictionary<string, LocalFileIndex> relativeFilePathToFileIndexMap = new Dictionary<string, LocalFileIndex>();
+                    Dictionary<FilePath, LocalFileIndex> relativeFilePathToFileIndexMap = new Dictionary<FilePath, LocalFileIndex>();
                     List<LocalAddon> localAddons = FileIndexer.Instance.addonUuidToLocalAddonMap[uuid];
                     foreach (LocalAddon localAddon in localAddons)
                     {
@@ -228,7 +228,7 @@ namespace kellerkompanie_sync
                     // parts of the addon already exist, update existing and download missing                   
                     foreach (RemoteAddonFile remoteAddonFile in remoteAddon.Files.Values)
                     {
-                        string remoteFilePath = remoteAddonFile.Path.Replace("/", "\\");
+                        FilePath remoteFilePath = remoteAddonFile.Path.Replace("/", "\\");
                         string remoteHash = remoteAddonFile.Hash;
 
                         if (relativeFilePathToFileIndexMap.ContainsKey(remoteFilePath))
@@ -236,14 +236,14 @@ namespace kellerkompanie_sync
                             LocalFileIndex localFileIndex = relativeFilePathToFileIndexMap[remoteFilePath];
                             if (!remoteHash.Equals(localFileIndex.Hash))
                             {
-                                string destinationFilepath = Path.Combine(destinationFolder, remoteFilePath);
+                                FilePath destinationFilepath = new FilePath { Value = Path.Combine(destinationFolder, remoteFilePath.Value) };
                                 downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath, destinationFilepath, remoteAddonFile.Size));
                             }                            
                         }
                         else
                         {
-                            string destinationFilepath = Path.Combine(destinationFolder, remoteFilePath);
-                            downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath, destinationFilepath, remoteAddonFile.Size));
+                            FilePath destinationFilepath = new FilePath { Value = Path.Combine(destinationFolder, remoteFilePath.Value) };
+                            downloads.Add((WebAPI.RepoUrl + "/" + remoteFilePath.Value, destinationFilepath, remoteAddonFile.Size));
                         }
                     }
                 }
@@ -253,7 +253,7 @@ namespace kellerkompanie_sync
             downloadManager.StateChanged += DownloadManager_StateChanged;
             downloadManager.ProgressChanged += DownloadManager_ProgressChanged;
 
-            foreach ((string url, string destinationFile, long filesize) in downloads)
+            foreach ((string url, FilePath destinationFile, long filesize) in downloads)
             {
                 downloadManager.AddDownload(url, destinationFile, filesize);
             }

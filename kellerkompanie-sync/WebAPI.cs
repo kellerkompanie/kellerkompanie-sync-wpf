@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -38,9 +39,6 @@ namespace kellerkompanie_sync
     {
         [JsonProperty("addon_group_author")]
         public string Author { get; set; }
-
-        [JsonProperty("addon_group_id")]
-        public int Id { get; set; }
 
         [JsonProperty("addon_group_name")]
         public string Name { get; set; }
@@ -111,8 +109,90 @@ namespace kellerkompanie_sync
             using (WebClient wc = new WebClient())
             {
                 var json = wc.DownloadString(IndexUrl);
-                RemoteIndex index = JsonConvert.DeserializeObject<RemoteIndex>(json);
-                return index;
+                var jRoot = JObject.Parse(json);
+
+                List<WebAddonGroup> addonGroups = new List<WebAddonGroup>();
+                JToken jAddonGroups = jRoot["addon_groups"];
+                foreach (JToken jAddonGroup in jAddonGroups)
+                {
+                    string addonGroupAuthor = (string)jAddonGroup["addon_group_author"];
+                    string addonGroupName = (string)jAddonGroup["addon_group_name"];
+                    string addonGroupUuid = (string)jAddonGroup["addon_group_uuid"];
+                    string addonGroupVersion = (string)jAddonGroup["addon_group_version"];
+
+                    List<WebAddon> addons = new List<WebAddon>();
+                    var jAddons = jAddonGroup["addons"];
+                    foreach (JToken jAddon in jAddons)
+                    {
+                        string addonFoldername = (string)jAddon["addon_foldername"];
+                        string addonName = (string)jAddon["addon_name"];
+                        string addonUuid = (string)jAddon["addon_uuid"];
+                        string addonVersion = (string)jAddon["addon_version"];
+
+                        WebAddon webAddon = new WebAddon()
+                        {
+                            Foldername = addonFoldername,
+                            Name = addonName,
+                            Uuid = addonUuid,
+                            Version = addonVersion,
+                        };
+                        addons.Add(webAddon);
+                    }
+
+                    WebAddonGroup webAddonGroup = new WebAddonGroup
+                    {
+                        Author = addonGroupAuthor,
+                        Name = addonGroupName,
+                        Uuid = addonGroupUuid,
+                        Version = addonGroupVersion,
+                        Addons = addons,
+                    };
+                    addonGroups.Add(webAddonGroup);
+                }
+
+                Dictionary<string, RemoteAddon> filesIndex = new Dictionary<string, RemoteAddon>();
+                JToken jFilesIndex = jRoot["files_index"];
+                foreach (JToken jFileIndexTuple in jFilesIndex)
+                {
+                    JToken value = ((JProperty)jFileIndexTuple).Value;
+                    string addonName = (string)value["addon_name"];
+                    string addonUuid = (string)value["addon_uuid"];
+                    string addonVersion = (string)value["addon_version"];
+
+                    Dictionary<FilePath, RemoteAddonFile> files = new Dictionary<FilePath, RemoteAddonFile>();
+                    var jAddonFiles = value["addon_files"];
+                    foreach (JToken jAddonFile in jAddonFiles)
+                    {
+                        JToken jAddonFileValue = ((JProperty)jAddonFile).Value;
+                        string addonFileHash = (string)jAddonFileValue["file_hash"];
+                        FilePath addonFilePath = new FilePath { Value = (string)jAddonFileValue["file_path"] };
+                        long addonFileSize = (long)jAddonFileValue["file_size"];
+
+                        RemoteAddonFile remoteAddonFile = new RemoteAddonFile
+                        {
+                            Hash = addonFileHash,
+                            Path = addonFilePath,
+                            Size = addonFileSize,
+                        };
+                        files.Add(addonFilePath, remoteAddonFile);
+                    }
+
+                    RemoteAddon remoteAddon = new RemoteAddon
+                    {
+                        Uuid = addonUuid,
+                        Name = addonName,
+                        Version = addonVersion,
+                        Files = files,
+                    };
+                    filesIndex.Add(addonName, remoteAddon);
+                }
+
+                // RemoteIndex index = JsonConvert.DeserializeObject<RemoteIndex>(json);
+                return new RemoteIndex()
+                {
+                    AddonGroups = addonGroups,
+                    FilesIndex = filesIndex
+                };
             }
         }
 

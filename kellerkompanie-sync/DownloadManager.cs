@@ -102,7 +102,7 @@ namespace kellerkompanie_sync
             StateChanged?.Invoke(this, State);
         }
 
-        public void AddDownload(string sourceUrl, string filepath, long expectedFileSize)
+        public void AddDownload(string sourceUrl, FilePath filepath, long expectedFileSize)
         {
             if (State != DownloadState.Created)
             {

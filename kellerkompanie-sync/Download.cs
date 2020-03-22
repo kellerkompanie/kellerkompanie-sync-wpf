@@ -39,13 +39,13 @@ namespace kellerkompanie_sync
 
         public double DownloadSpeed { get; private set; } = 0;  
 
-        private readonly string filePath;
+        private readonly FilePath filePath;
 
         public DownloadState DownloadState { get; private set; } = DownloadState.Created;
 
         public EventHandler<DownloadState> StateChanged;
 
-        public Download(string url, string filePath)
+        public Download(string url, FilePath filePath)
         {
             // convert string to uri using Uri.TryCreate
             if (!Uri.TryCreate(url, UriKind.Absolute, out uri))
@@ -60,9 +60,9 @@ namespace kellerkompanie_sync
         {
             Log.Debug("starting download: " + this);
 
-            string directory = Path.GetDirectoryName(filePath);
+            string directory = Path.GetDirectoryName(filePath.Value);
             Directory.CreateDirectory(directory);                        
-            fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);                       
+            fileStream = new FileStream(filePath.Value, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);                       
                         
             request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(uri);                        
             using (response = (System.Net.HttpWebResponse)await request.GetResponseAsync())
