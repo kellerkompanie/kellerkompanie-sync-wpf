@@ -6,26 +6,19 @@ namespace kellerkompanie_sync
     [JsonConverter(typeof(FilePathConverter))]
     public class FilePath : IComparable
     {
-        private string value;
         public string Value
         {
             get
             {
-                return value.ToLower();
+                return OriginalValue.ToLower();
             }
             set
             {
-                this.value = value;
+                OriginalValue = value;
             }
         }
 
-        public string OriginalValue
-        {
-            get
-            {
-                return value;
-            }
-        }
+        public string OriginalValue { get; private set; }
 
         public int Length
         {
@@ -65,14 +58,14 @@ namespace kellerkompanie_sync
         {
             var filePath = new FilePath
             {
-                Value = value.Substring(index)
+                Value = OriginalValue.Substring(index)
             };
             return filePath;
         }
 
         public FilePath SubPath(int start, int end)
         {
-            var filePath = new FilePath { Value = value.Substring(start, end) };
+            var filePath = new FilePath { Value = OriginalValue.Substring(start, end) };
             return filePath;
         }
 
@@ -83,7 +76,7 @@ namespace kellerkompanie_sync
 
         public FilePath Replace(string oldValue, string newValue)
         {
-            return new FilePath { Value = value.Replace(oldValue, newValue) };
+            return new FilePath { Value = OriginalValue.Replace(oldValue, newValue) };
         }
 
         public int CompareTo(object obj)
