@@ -36,7 +36,11 @@ namespace kellerkompanie_sync
 
         public override bool Equals(object obj)
         {
-            return obj is LocalAddon addon && Uuid == addon.Uuid;
+            if (obj == null)
+            {
+                return false;
+            }
+            return obj is LocalAddon addon && Uuid.Equals(addon.Uuid);
         }
 
         public override int GetHashCode()
