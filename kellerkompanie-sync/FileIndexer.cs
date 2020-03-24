@@ -18,7 +18,7 @@ namespace kellerkompanie_sync
     public class LocalAddon
     {
         public string Name { get; set; }
-        public string Uuid { get; set; }
+        public Uuid Uuid { get; set; }
         public string Version { get; set; }
         public FilePath AbsoluteFilepath { get; set; }
         public Dictionary<FilePath, LocalFileIndex> Files { get; set; }
@@ -98,8 +98,7 @@ namespace kellerkompanie_sync
         private TextBlock ProgressBarText { get; set; }
         public ObservableCollection<AddonGroup> AddonGroups { get; set; } = new ObservableCollection<AddonGroup>();
 
-        // uuid --> LocalAddon
-        public Dictionary<string, List<LocalAddon>> addonUuidToLocalAddonMap = new Dictionary<string, List<LocalAddon>>();
+        public Dictionary<Uuid, List<LocalAddon>> addonUuidToLocalAddonMap = new Dictionary<Uuid, List<LocalAddon>>();
         public RemoteIndex RemoteIndex;
 
         private FileIndexer(ProgressBar progressBar, TextBlock progressBarText)
@@ -109,9 +108,8 @@ namespace kellerkompanie_sync
             ProgressBarText = progressBarText;
 
             RemoteIndex = WebAPI.GetIndex();
-            foreach (WebAddonGroup addon in RemoteIndex.AddonGroups)
+            foreach (AddonGroup addonGroup in RemoteIndex.AddonGroups)
             {
-                AddonGroup addonGroup = new AddonGroup(addon);
                 AddonGroups.Add(addonGroup);
             }
         }
@@ -179,7 +177,7 @@ namespace kellerkompanie_sync
                 {
                     JToken jLocalAddon = jIndexEntry.Value;
                     string localAddonName = (string)jLocalAddon["Name"];
-                    string localAddonUuid = (string)jLocalAddon["Uuid"];
+                    Uuid localAddonUuid = new Uuid((string)jLocalAddon["Uuid"]);
                     string localAddonVersion = (string)jLocalAddon["Version"];
                     FilePath localAddonAbsoluteFilePath = new FilePath((string)jLocalAddon["AbsoluteFilepath"]);
 
@@ -230,14 +228,13 @@ namespace kellerkompanie_sync
             return relativeFilePath.SubPath(0, index);
         }
 
-        public string LookUpAddonName(string addonName)
+        public Uuid LookUpAddonName(string addonName)
         {
             addonName = addonName.ToLower();
-            foreach (string remoteAddonName in RemoteIndex.FilesIndex.Keys)
+            foreach (RemoteAddon remoteAddon in RemoteIndex.FilesIndex.Values)
             {
-                if (remoteAddonName.ToLower().Equals(addonName))
+                if (remoteAddon.Name.ToLower().Equals(addonName))
                 {
-                    RemoteAddon remoteAddon = RemoteIndex.FilesIndex[remoteAddonName];
                     return remoteAddon.Uuid;
                 }
             }
@@ -260,9 +257,8 @@ namespace kellerkompanie_sync
         {
             AddonGroups.Clear();
             RemoteIndex = WebAPI.GetIndex();
-            foreach (WebAddonGroup addon in RemoteIndex.AddonGroups)
+            foreach (AddonGroup addonGroup in RemoteIndex.AddonGroups)
             {
-                AddonGroup addonGroup = new AddonGroup(addon);
                 AddonGroups.Add(addonGroup);
             }
             ModsPage.Instance?.ListViewAddonGroups.Items.Refresh();
@@ -425,11 +421,10 @@ namespace kellerkompanie_sync
             foreach (AddonGroup addonGroup in AddonGroups)
             {
                 // link all web addons to existing local addons for later use
-                WebAddonGroup webAddonGroup = addonGroup.WebAddonGroup;
-                List<WebAddon> webAddons = webAddonGroup.Addons;
-                foreach (WebAddon webAddon in webAddons)
+                List<RemoteAddon> webAddons = addonGroup.RemoteAddons;
+                foreach (RemoteAddon webAddon in webAddons)
                 {
-                    string addonUuid = webAddon.Uuid;
+                    Uuid addonUuid = webAddon.Uuid;
                     if (addonUuidToLocalAddonMap.ContainsKey(addonUuid))
                     {
                         LocalAddon localAddon = addonUuidToLocalAddonMap[addonUuid][0];
@@ -444,8 +439,8 @@ namespace kellerkompanie_sync
                     }
                 }
 
-                string remoteUuid = addonGroup.WebAddonGroup.Uuid;
-                string remoteVersion = addonGroup.WebAddonGroup.Version;
+                string remoteUuid = addonGroup.Uuid;
+                string remoteVersion = addonGroup.RemoteVersion;
 
                 if (Settings.Instance.SubscribedAddonGroups.ContainsKey(remoteUuid))
                 {
@@ -455,7 +450,7 @@ namespace kellerkompanie_sync
                     {
                         // even if versions match we have to check for changes in filesystem
                         bool upToDate = true;
-                        foreach (WebAddon webAddon in addonGroup.WebAddonGroup.Addons)
+                        foreach (RemoteAddon webAddon in addonGroup.RemoteAddons)
                         {
                             if (!addonUuidToLocalAddonMap.ContainsKey(webAddon.Uuid))
                             {
@@ -501,9 +496,9 @@ namespace kellerkompanie_sync
                 {
                     // AddonGroup is not subscribed
                     int foundAddonsLocally = 0;
-                    foreach (WebAddon webAddon in webAddons)
+                    foreach (RemoteAddon webAddon in webAddons)
                     {
-                        string addonUuid = webAddon.Uuid;
+                        Uuid addonUuid = webAddon.Uuid;
                         if (addonUuidToLocalAddonMap.ContainsKey(addonUuid))
                         {
                             foundAddonsLocally++;
@@ -539,22 +534,20 @@ namespace kellerkompanie_sync
             }));
         }
 
-        private List<FilePath> GetRemoteFilenamesForAddon(string uuid)
+        private List<FilePath> GetRemoteFilenamesForAddon(Uuid uuid)
         {
-            foreach (RemoteAddon remoteAddon in RemoteIndex.FilesIndex.Values)
+            if (!RemoteIndex.FilesIndex.ContainsKey(uuid))
             {
-                if (remoteAddon.Uuid.Equals(uuid))
-                {
-                    List<FilePath> remoteFileNames = new List<FilePath>();
-                    foreach (FilePath remoteFileName in remoteAddon.Files.Keys)
-                    {
-                        remoteFileNames.Add(remoteFileName.Replace("/", "\\"));
-                    }
-                    return remoteFileNames;
-                }
+                return null;
             }
 
-            return null;
+            RemoteAddon remoteAddon = RemoteIndex.FilesIndex[uuid];            
+            List<FilePath> remoteFileNames = new List<FilePath>();
+            foreach (FilePath remoteFileName in remoteAddon.Files.Keys)
+            {
+                remoteFileNames.Add(remoteFileName.Replace("/", "\\"));
+            }
+            return remoteFileNames;            
         }
 
         void AddonGroupStateWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)

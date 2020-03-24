@@ -88,9 +88,8 @@ namespace kellerkompanie_sync
                     }
                 }
 
-                Dictionary<WebAddon, FilePath> webAddonToDownloadDirectoryDict = new Dictionary<WebAddon, FilePath>();
-                WebAddonGroup webAddonGroup = addonGroup.WebAddonGroup;
-                foreach (WebAddon webAddon in webAddonGroup.Addons)
+                Dictionary<RemoteAddon, FilePath> webAddonToDownloadDirectoryDict = new Dictionary<RemoteAddon, FilePath>();
+                foreach (RemoteAddon webAddon in addonGroup.RemoteAddons)
                 {
                     if (addonGroup.WebAddonToLocalAddonDict.ContainsKey(webAddon))
                     {
@@ -143,7 +142,7 @@ namespace kellerkompanie_sync
         class DownloadArguments
         {
             public AddonGroup AddonGroup { get; set; }
-            public Dictionary<WebAddon, FilePath> DownloadDirectoryDict { get; set; }
+            public Dictionary<RemoteAddon, FilePath> DownloadDirectoryDict { get; set; }
         }
 
         void DownloadWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -153,16 +152,16 @@ namespace kellerkompanie_sync
             RemoteIndex remoteIndex = WebAPI.GetIndex();
 
             // determine files to delete            
-            WebAddonGroup webAddonGroup = args.AddonGroup.WebAddonGroup;
-            foreach (WebAddon webAddon in webAddonGroup.Addons)
+            AddonGroup addonGroup = args.AddonGroup;
+            foreach (RemoteAddon webAddon in addonGroup.RemoteAddons)
             {
-                string webAddonUuid = webAddon.Uuid;
+                Uuid webAddonUuid = webAddon.Uuid;
                 if (!FileIndexer.Instance.addonUuidToLocalAddonMap.ContainsKey(webAddonUuid))
                 {
                     continue;
                 }
 
-                RemoteAddon remAddon = remoteIndex.FilesIndex[webAddon.Foldername];
+                RemoteAddon remAddon = remoteIndex.FilesIndex[webAddon.Uuid];
 
                 List<LocalAddon> localAddons = FileIndexer.Instance.addonUuidToLocalAddonMap[webAddonUuid];
                 foreach (LocalAddon localAddon in localAddons)
@@ -191,10 +190,10 @@ namespace kellerkompanie_sync
             downloadManager.StateChanged += DownloadManager_StateChanged;
             downloadManager.ProgressChanged += DownloadManager_ProgressChanged;
 
-            foreach (WebAddon webAddon in webAddonGroup.Addons)
+            foreach (RemoteAddon webAddon in addonGroup.RemoteAddons)
             {
-                RemoteAddon remoteAddon = FileIndexer.Instance.RemoteIndex.FilesIndex[webAddon.Foldername];
-                string uuid = webAddon.Uuid;
+                RemoteAddon remoteAddon = FileIndexer.Instance.RemoteIndex.FilesIndex[webAddon.Uuid];
+                Uuid uuid = webAddon.Uuid;
                 string name = webAddon.Name;
 
                 if (!remoteAddon.Uuid.Equals(uuid))
@@ -327,14 +326,14 @@ namespace kellerkompanie_sync
         private void ValidateAddonGroup(AddonGroup addonGroup)
         {
             // add group to subscribed addons
-            string uuid = addonGroup.WebAddonGroup.Uuid;
-            string version = addonGroup.WebAddonGroup.Version;
+            string uuid = addonGroup.Uuid;
+            string remoteVersion = addonGroup.RemoteVersion;
             if (Settings.Instance.SubscribedAddonGroups.ContainsKey(uuid))
             {
-                Settings.Instance.SubscribedAddonGroups[uuid] = version;
+                Settings.Instance.SubscribedAddonGroups[uuid] = remoteVersion;
             } else
             {
-                Settings.Instance.SubscribedAddonGroups.Add(uuid, version);
+                Settings.Instance.SubscribedAddonGroups.Add(uuid, remoteVersion);
             }
             
             // update UI

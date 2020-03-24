@@ -1,40 +1,40 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace kellerkompanie_sync
 {
     public class RemoteIndex
-    {
-        [JsonProperty("files_index")]        
-        public Dictionary<string, RemoteAddon> FilesIndex { get; set; }
-        [JsonProperty("addon_groups")]
-        public List<WebAddonGroup> AddonGroups { get; set; }
+    { 
+        public Dictionary<Uuid, RemoteAddon> FilesIndex { get; set; }
+        public List<AddonGroup> AddonGroups { get; set; }
     }
 
     public class RemoteAddon
     {
-        [JsonProperty("addon_name")]
         public string Name { get; set; }
 
-        [JsonProperty("addon_uuid")]
-        public string Uuid { get; set; }
+        public Uuid Uuid { get; set; }
 
-        [JsonProperty("addon_version")]
         public string Version { get; set; }
 
-        [JsonProperty("addon_files")]
         public Dictionary<FilePath, RemoteAddonFile> Files { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("{{{0}, {1}}}", Name, Uuid);
+        }
     }
 
     public class RemoteAddonFile
     {
-        [JsonProperty("file_path")]
         public FilePath Path { get; set; }
 
-        [JsonProperty("file_size")]
         public long Size { get; set; }
 
-        [JsonProperty("file_hash")]
         public string Hash { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("{{{0}}}", Path);
+        }
     }
 }

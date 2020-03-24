@@ -22,8 +22,11 @@ namespace kellerkompanie_sync
         private const string Red = "#d9534f";
         private const string Yellow = "#f7c516";
 
-
-        public WebAddonGroup WebAddonGroup { get; set; }
+        public string Author { get; set; }
+        public string Name { get; set; }
+        public string Uuid { get; set; }
+        public string RemoteVersion { get; set; }
+        public List<RemoteAddon> RemoteAddons { get; set; }
 
         private string icon;
         public string Icon
@@ -106,7 +109,7 @@ namespace kellerkompanie_sync
             }
             set
             {
-                Log.Information("setting " + WebAddonGroup.Name + " to " + value);
+                Log.Information(string.Format("setting {0} to {1}", Name, value));
                 state = value;
                 switch (state)
                 {
@@ -183,22 +186,26 @@ namespace kellerkompanie_sync
                         break;
                 }
 
-                Debug.WriteLine(string.Format("setting state of {0} to {1}", WebAddonGroup.Name, State));
+                Debug.WriteLine(string.Format("setting state of {0} to {1}", Name, State));
                 Parent?.Items.Refresh();
             }
         }
 
-        public Dictionary<WebAddon, LocalAddon> WebAddonToLocalAddonDict = new Dictionary<WebAddon, LocalAddon>();
+        public Dictionary<RemoteAddon, LocalAddon> WebAddonToLocalAddonDict = new Dictionary<RemoteAddon, LocalAddon>();
 
-        public AddonGroup(WebAddonGroup WebAddonGroup)
+        public AddonGroup(string name, string author, string uuid, string version, List<RemoteAddon> remoteAddons)
         {
-            this.WebAddonGroup = WebAddonGroup;
+            Name = name;
+            Uuid = uuid;
+            RemoteVersion = version;
+            Author = author;
+            RemoteAddons = remoteAddons;
             State = AddonGroupState.Unknown;
         }
 
         public override string ToString()
         {
-            return string.Format("{{{0}, {1}}}", WebAddonGroup.Name, WebAddonGroup.Uuid);
+            return string.Format("{{{0}, {1}}}", Name, Uuid);
         }
     }
 }

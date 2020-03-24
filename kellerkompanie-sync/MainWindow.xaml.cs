@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
@@ -25,7 +26,7 @@ namespace kellerkompanie_sync
 
             InitializeComponent();
 
-            ProgressBar.Value = 0;            
+            ProgressBar.Value = 0;
             ProgressBarText.Text = Properties.Resources.EverythingUpToDate;
 
             NavigateToPage(Page.News);
@@ -41,7 +42,7 @@ namespace kellerkompanie_sync
 
         public void EnablePlayButton()
         {
-            if(File.Exists(Settings.Instance.ExecutableLocation))
+            if (File.Exists(Settings.Instance.ExecutableLocation))
             {
                 PlayUpdateButton.IsEnabled = true;
                 PlayUpdateButton.ToolTip = null;
@@ -79,7 +80,7 @@ namespace kellerkompanie_sync
         {
             LaunchUri("https://wiki.kellerkompanie.com");
         }
-               
+
         private void buttonTFAR_Click(object sender, RoutedEventArgs e)
         {
             if (IsTeamspeakRunning())
@@ -113,7 +114,7 @@ namespace kellerkompanie_sync
 
         private void ButtonWebsite_Click(object sender, RoutedEventArgs e)
         {
-            LaunchUri("https://kellerkompanie.com");            
+            LaunchUri("https://kellerkompanie.com");
         }
 
         private readonly Brush orange = (SolidColorBrush)(new BrushConverter().ConvertFrom("#ee4d2e"));
@@ -154,9 +155,13 @@ namespace kellerkompanie_sync
         {
             Process[] pname = Process.GetProcessesByName(processName);
             if (pname.Length == 0)
+            {
                 return false;
+            }
             else
+            {
                 return true;
+            }
         }
 
         private bool IsSteamRunning()
@@ -220,11 +225,13 @@ namespace kellerkompanie_sync
             foreach (AddonGroup addonGroup in FileIndexer.Instance.AddonGroups)
             {
                 if (!addonGroup.CheckBoxIsChecked)
-                    continue;
-                                
-                foreach (WebAddon webAddon in addonGroup.WebAddonGroup.Addons)
                 {
-                    string uuid = webAddon.Uuid;
+                    continue;
+                }
+
+                foreach (RemoteAddon webAddon in addonGroup.RemoteAddons)
+                {
+                    Uuid uuid = webAddon.Uuid;
                     LocalAddon localAddon = FileIndexer.Instance.addonUuidToLocalAddonMap[uuid][0];
                     sb.Append(" -mod=");
                     sb.Append(localAddon.AbsoluteFilepath);
@@ -232,7 +239,7 @@ namespace kellerkompanie_sync
                 }
             }
 
-            if (!String.IsNullOrEmpty(Settings.Instance.ParamAdditional))
+            if (!string.IsNullOrEmpty(Settings.Instance.ParamAdditional))
             {
                 sb.Append(" ");
                 sb.Append(Settings.Instance.ParamAdditional);

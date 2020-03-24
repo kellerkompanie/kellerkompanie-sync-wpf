@@ -181,7 +181,7 @@
                             HorizontalAlignment="Stretch"
                             FontSize="18"
                             Foreground="#ee4d2e"
-                            Text="{Binding WebAddonGroup.Name}" />
+                            Text="{Binding Name}" />
                         <TextBlock
                             Name="TextBlockDownloading"
                             Margin="8,0,0,0"

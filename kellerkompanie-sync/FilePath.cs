@@ -88,7 +88,7 @@ namespace kellerkompanie_sync
 
         public FilePath(string filePath)
         {
-            OriginalValue = filePath;
+            OriginalValue = filePath ?? throw new ArgumentException("filePath cannot be null");
         }
     }
 
@@ -103,7 +103,7 @@ namespace kellerkompanie_sync
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             FilePath filePath = (FilePath)value;
-            writer.WriteValue(filePath.Value);
+            writer.WriteValue(filePath.OriginalValue);
         }
 
         public override bool CanConvert(Type objectType)
