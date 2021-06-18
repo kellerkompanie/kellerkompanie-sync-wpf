@@ -23,19 +23,34 @@ namespace kellerkompanie_sync
         public string Weblink { get; set; }
 
         [JsonProperty("news_timestamp")]
-        public long Timestamp { get; set; }
+        public DateTime Date { get; set; }
+    }
+
+    public class WebCalendar
+    {
+        [JsonProperty("all")]
+        public List<WebEvent> All { get; set; }
+
+        [JsonProperty("upcoming")]
+        public List<WebEvent> Upcoming { get; set; }
     }
 
     public class WebEvent
     {
-        [JsonProperty("event_title")]
+        [JsonProperty("title")]
         public string Title { get; set; }
 
-        [JsonProperty("event_description")]
+        [JsonProperty("content")]
         public string Description { get; set; }
 
-        [JsonProperty("event_timestamp")]
-        public long Timestamp { get; set; }
+        [JsonProperty("event_date")]
+        public DateTime Date { get; set; }
+
+        [JsonProperty("contact")]
+        public string Contact { get; set; }
+
+        [JsonProperty("link")]
+        public string Link { get; set; }
 
         public string ExtractContent()
         {
@@ -153,8 +168,8 @@ namespace kellerkompanie_sync
             using (WebClient wc = new WebClient())
             {
                 var json = wc.DownloadString(CalendarUrl);
-                List<WebEvent> events = JsonConvert.DeserializeObject<List<WebEvent>>(json);
-                return events;
+                WebCalendar webCalendar = JsonConvert.DeserializeObject<WebCalendar>(json);
+                return webCalendar.Upcoming;
             }
         }
     }

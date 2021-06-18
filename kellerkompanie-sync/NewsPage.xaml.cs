@@ -37,7 +37,7 @@ namespace kellerkompanie_sync
                 {
                     Title = webNews.Title,
                     Content = webNews.Content,
-                    Timestamp = webNews.Timestamp,
+                    Timestamp = ((System.DateTimeOffset)webNews.Date).ToUnixTimeMilliseconds(),
                     Weblink = webNews.Weblink,
                     Icon = "/Images/news.png"
                 };
@@ -50,7 +50,7 @@ namespace kellerkompanie_sync
                 {
                     Title = webEvent.Title,
                     Content = webEvent.ExtractContent(),
-                    Timestamp = webEvent.Timestamp,
+                    Timestamp = ((System.DateTimeOffset)webEvent.Date).ToUnixTimeMilliseconds(),
                     Weblink = webEvent.ExtractWeblink(),
                     Icon = "/Images/event.png"
                 };
