@@ -139,17 +139,24 @@ namespace kellerkompanie_sync
         public HashSet<FilePath> GetAllFilePaths()
         {
             HashSet<FilePath> allFilePaths = new HashSet<FilePath>();
-            foreach (FilePath addonSearchDirectory in Settings.Instance.GetAddonSearchDirectories())
-            {
-                string[] allfiles = Directory.GetFiles(addonSearchDirectory.OriginalValue, "*.*", SearchOption.AllDirectories);
-                foreach (string file in allfiles)
-                {
-                    if (file.Contains("@"))
-                    {
-                        allFilePaths.Add(new FilePath(file));
+                try {
+                    foreach (FilePath addonSearchDirectory in Settings.Instance.GetAddonSearchDirectories())
+                    {   
+                        string[] allfiles = Directory.GetFiles(addonSearchDirectory.OriginalValue, "*.*", SearchOption.AllDirectories);
+
+                        foreach (string file in allfiles)
+                        {
+                            if (file.Contains("@"))
+                            {
+                                allFilePaths.Add(new FilePath(file));
+                            }
+                        }
                     }
+                    
                 }
-            }
+                catch(System.IO.DirectoryNotFoundException ex){
+                    //TODO: Reset File Path & Show error to User
+                }
             return allFilePaths;
         }
 

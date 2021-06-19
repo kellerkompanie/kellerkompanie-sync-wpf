@@ -113,7 +113,7 @@ namespace kellerkompanie_sync
         private void ButtonOpen_Click(object sender, RoutedEventArgs e)
         {
             Button button = (Button)sender;
-            string addonSearchDirectory = (string)button.DataContext;
+            string addonSearchDirectory = button.DataContext.ToString();
             MainWindow.LaunchUri(addonSearchDirectory);
         }
 
