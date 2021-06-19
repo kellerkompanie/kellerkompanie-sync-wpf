@@ -12,7 +12,9 @@
     <ListView
         Name="NewsListView"
         Background="#161618"
-        BorderThickness="0">
+        BorderThickness="0"
+        ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+        ScrollViewer.VerticalScrollBarVisibility="Disabled">
         <ListView.ItemContainerStyle>
             <Style TargetType="ListViewItem">
                 <Setter Property="Padding" Value="0" />
