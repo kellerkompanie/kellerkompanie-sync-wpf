@@ -94,7 +94,14 @@ namespace kellerkompanie_sync
 
         public static void LaunchUri(string uri)
         {
-            Process.Start(new ProcessStartInfo(uri) { CreateNoWindow = true, UseShellExecute = true });
+            try {
+                Process.Start(new ProcessStartInfo(uri) { CreateNoWindow = true, UseShellExecute = true });
+            }
+            catch(System.ComponentModel.Win32Exception ex){
+                    MessageBox.Show(Properties.Resources.AddonSearchDirectoryNotFoundInfoMessage, "kellerkompanie-sync");
+                    Debug.WriteLine("Addon Seach Directory not Found: " + ex.Message);
+                }
+            
         }
 
         private void ButtonNews_Click(object sender, RoutedEventArgs e)

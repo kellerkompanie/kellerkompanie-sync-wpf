@@ -155,7 +155,8 @@ namespace kellerkompanie_sync
                     
                 }
                 catch(System.IO.DirectoryNotFoundException ex){
-                    //TODO: Reset File Path & Show error to User
+                    MessageBox.Show(Properties.Resources.AddonSearchDirectoryNotFoundInfoMessage, "kellerkompanie-sync");
+                    Debug.WriteLine("Addon Seach Directory not Found: " + ex.Message);
                 }
             return allFilePaths;
         }

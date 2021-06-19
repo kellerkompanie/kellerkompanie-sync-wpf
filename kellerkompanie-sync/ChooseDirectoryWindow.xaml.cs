@@ -17,6 +17,6 @@ namespace kellerkompanie_sync
             DialogResult = true;
         }
 
-        public FilePath ChosenDirectory => (FilePath)ComboBox.DataContext;
+        public FilePath ChosenDirectory => (FilePath)ComboBox.SelectedValue;
     }
 }

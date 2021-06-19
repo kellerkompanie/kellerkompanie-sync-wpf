@@ -14,7 +14,7 @@
         Background="#161618"
         BorderThickness="0"
         ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-        ScrollViewer.VerticalScrollBarVisibility="Disabled">
+        ScrollViewer.VerticalScrollBarVisibility="Hidden">
         <ListView.ItemContainerStyle>
             <Style TargetType="ListViewItem">
                 <Setter Property="Padding" Value="0" />

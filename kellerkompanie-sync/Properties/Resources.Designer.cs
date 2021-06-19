@@ -239,6 +239,12 @@ namespace kellerkompanie_sync.Properties {
                 return ResourceManager.GetString("MissingAddonSearchDirectoryInfoMessage", resourceCulture);
             }
         }
+
+         public static string AddonSearchDirectoryNotFoundInfoMessage {
+            get {
+                return ResourceManager.GetString("AddonSearchDirectoryNotFoundInfoMessage", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Mods.

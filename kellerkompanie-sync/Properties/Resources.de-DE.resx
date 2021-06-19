@@ -163,7 +163,7 @@
     <value>Alle Dateien aktuell</value>
   </data>
   <data name="ExecutableNotFoundTooltip" xml:space="preserve">
-    <value>Ausführbare Datei nicht gefunden, überprüfe die Einstellungen</value>
+    <value>Ausführbare Datei nicht gefunden, überprüfe die Einstellungen.</value>
   </data>
   <data name="Forum" xml:space="preserve">
     <value>Forum</value>
@@ -176,6 +176,9 @@
   </data>
   <data name="MissingAddonSearchDirectoryInfoMessage" xml:space="preserve">
     <value>Füge bitte zuerst einen Order zu Addon Such-Ordnern hinzu.</value>
+  </data>
+  <data name="AddonSearchDirectoryNotFoundInfoMessage" xml:space="preserve">
+  <value>Pfad zum Addon Search Directory nicht gefunden, überprüfe die Einstellungen.</value>
   </data>
   <data name="Mods" xml:space="preserve">
     <value>Mods</value>
