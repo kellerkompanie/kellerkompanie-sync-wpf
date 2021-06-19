@@ -72,7 +72,7 @@ namespace kellerkompanie_sync
             Filesize = fileInfo.Length;
             Absolute_filepath = filePath;
 
-            int index = filePath.LastIndexOf("@");
+            int index = filePath.IndexOf("@");
             Relative_filepath = filePath.SubPath(index);
 
             using (SHA256 sha256 = SHA256.Create())
@@ -233,7 +233,7 @@ namespace kellerkompanie_sync
                 return null;
             }
 
-            int index = filePath.LastIndexOf("@");
+            int index = filePath.IndexOf("@");
             FilePath relativeFilePath = filePath.SubPath(index);
             index = relativeFilePath.IndexOf("\\");
             return relativeFilePath.SubPath(0, index);
@@ -280,7 +280,7 @@ namespace kellerkompanie_sync
         private FilePath ExtractAbsoluteAddonPath(FilePath filePath)
         {
             FilePath addonName = ExtractAddonName(filePath);
-            int index = filePath.LastIndexOf("@") + addonName.Length;
+            int index = filePath.IndexOf("@") + addonName.Length;
             return filePath.SubPath(0, index);
         }
 
