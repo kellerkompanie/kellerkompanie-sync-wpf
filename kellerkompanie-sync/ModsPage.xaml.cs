@@ -87,6 +87,19 @@ namespace kellerkompanie_sync
                             break;
                     }
                 }
+                else if (addonGroup.State == AddonGroupState.NeedsUpdate)
+                {
+                    // TODO: implement, set downloadDirectoryForMissingAddons correctly
+                }
+                else if (addonGroup.State == AddonGroupState.CompleteButNotSubscribed)
+                {
+                    // TODO: implement, set downloadDirectoryForMissingAddons correctly
+                }
+
+                if (downloadDirectoryForMissingAddons == null)
+                {
+                    throw new InvalidOperationException("the download folder for missing addons is null");
+                }
 
                 Dictionary<RemoteAddon, FilePath> webAddonToDownloadDirectoryDict = new Dictionary<RemoteAddon, FilePath>();
                 foreach (RemoteAddon webAddon in addonGroup.RemoteAddons)
