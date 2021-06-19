@@ -17,14 +17,6 @@ namespace kellerkompanie_sync
             DialogResult = true;
         }
 
-<<<<<<< HEAD
-		public FilePath ChosenDirectory
-		{
-			get { return (FilePath)ComboBox.SelectedItem; }
-		}
-	}
-=======
         public FilePath ChosenDirectory => (FilePath)ComboBox.DataContext;
     }
->>>>>>> 99367182fb9322683b0659f541210d9730e4f7ef
 }
