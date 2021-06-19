@@ -85,7 +85,6 @@ namespace kellerkompanie_sync
                         }
                         break;
                 }
-                
 
                 if (downloadDirectoryForMissingAddons == null)
                 {
