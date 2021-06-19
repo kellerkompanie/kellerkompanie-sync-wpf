@@ -4,22 +4,19 @@ namespace kellerkompanie_sync
 {
     public partial class ChooseDirectoryWindow : Window
     {
-		public ChooseDirectoryWindow()
+        public ChooseDirectoryWindow()
         {
             InitializeComponent();
 
-			ComboBox.ItemsSource = Settings.Instance.GetAddonSearchDirectories();
-			ComboBox.SelectedIndex = 0;
+            ComboBox.ItemsSource = Settings.Instance.GetAddonSearchDirectories();
+            ComboBox.SelectedIndex = 0;
         }
 
-		private void ButtonOk_Click(object sender, RoutedEventArgs e)
-		{
-			DialogResult = true;
-		}
+        private void ButtonOk_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
+        }
 
-		public FilePath ChosenDirectory
-		{
-			get { return (FilePath)ComboBox.DataContext; }
-		}
-	}
+        public FilePath ChosenDirectory => (FilePath)ComboBox.DataContext;
+    }
 }
