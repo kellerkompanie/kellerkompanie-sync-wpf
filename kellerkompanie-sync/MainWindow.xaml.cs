@@ -233,9 +233,9 @@ namespace kellerkompanie_sync
                 {
                     Uuid uuid = webAddon.Uuid;
                     LocalAddon localAddon = FileIndexer.Instance.addonUuidToLocalAddonMap[uuid][0];
-                    sb.Append(" -mod=");
+                    sb.Append(" \"-mod=");
                     sb.Append(localAddon.AbsoluteFilepath);
-                    sb.Append(";");
+                    sb.Append(";\"");
                 }
             }
 
