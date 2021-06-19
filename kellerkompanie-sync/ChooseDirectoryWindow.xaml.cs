@@ -19,7 +19,7 @@ namespace kellerkompanie_sync
 
 		public FilePath ChosenDirectory
 		{
-			get { return (FilePath)ComboBox.DataContext; }
+			get { return (FilePath)ComboBox.SelectedItem; }
 		}
 	}
 }
