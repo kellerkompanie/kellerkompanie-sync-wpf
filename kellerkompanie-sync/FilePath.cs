@@ -52,6 +52,10 @@ namespace kellerkompanie_sync
 
         public static FilePath Combine(FilePath filePath, FilePath filePathOther)
         {
+            //in case of an Update, the original filePath can be null
+            if (filePath == null){
+                return filePathOther;
+            }
             string combinedPath = Path.Combine(filePath.OriginalValue, filePathOther.OriginalValue);
             return new FilePath(combinedPath);
         }
