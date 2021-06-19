@@ -51,50 +51,41 @@ namespace kellerkompanie_sync
 
                 // in case of missing addons decide where to download them to, if all addons already exist locally skip this step
                 FilePath downloadDirectoryForMissingAddons = null;
-                if (addonGroup.State != AddonGroupState.CompleteButNotSubscribed && addonGroup.State != AddonGroupState.NeedsUpdate)
+                
+                // decide where to download missing addons to                    
+                switch (Settings.Instance.GetAddonSearchDirectories().Count)
                 {
-                    // decide where to download missing addons to                    
-                    switch (Settings.Instance.GetAddonSearchDirectories().Count)
-                    {
-                        case 0:
-                            // there is no addon search directory set, tell user to choose at least one
-                            MessageBox.Show(Properties.Resources.MissingAddonSearchDirectoryInfoMessage, "kellerkompanie-sync");
+                    case 0:
+                        // there is no addon search directory set, tell user to choose at least one
+                        MessageBox.Show(Properties.Resources.MissingAddonSearchDirectoryInfoMessage, "kellerkompanie-sync");
+                        return;
+
+                    case 1:
+                        // there is exactly one folder set as search directory, so this one will be download destination for all
+                        downloadDirectoryForMissingAddons = Settings.Instance.GetAddonSearchDirectories()[0];
+                        break;
+
+                    default:
+                        // there is more than one addon search directory, make user choose to which one he wants to download missing files
+                        ChooseDirectoryWindow inputDialog = new ChooseDirectoryWindow();
+                        if (inputDialog.ShowDialog() == true)
+                        {
+                            downloadDirectoryForMissingAddons = inputDialog.ChosenDirectory;
+                        }
+                        else
+                        {
+                            MainWindow.Instance.EnablePlayButton();
+                            foreach (AddonGroup addonGrp in FileIndexer.Instance.AddonGroups)
+                            {
+                                addonGrp.ButtonIsEnabled = true;
+                            }
+                            ButtonUpdate.IsEnabled = true;
+                            ListViewAddonGroups.Items.Refresh();
                             return;
-
-                        case 1:
-                            // there is exactly one folder set as search directory, so this one will be download destination for all
-                            downloadDirectoryForMissingAddons = Settings.Instance.GetAddonSearchDirectories()[0];
-                            break;
-
-                        default:
-                            // there is more than one addon search directory, make user choose to which one he wants to download missing files
-                            ChooseDirectoryWindow inputDialog = new ChooseDirectoryWindow();
-                            if (inputDialog.ShowDialog() == true)
-                            {
-                                downloadDirectoryForMissingAddons = inputDialog.ChosenDirectory;
-                            }
-                            else
-                            {
-                                MainWindow.Instance.EnablePlayButton();
-                                foreach (AddonGroup addonGrp in FileIndexer.Instance.AddonGroups)
-                                {
-                                    addonGrp.ButtonIsEnabled = true;
-                                }
-                                ButtonUpdate.IsEnabled = true;
-                                ListViewAddonGroups.Items.Refresh();
-                                return;
-                            }
-                            break;
-                    }
+                        }
+                        break;
                 }
-                else if (addonGroup.State == AddonGroupState.NeedsUpdate)
-                {
-                    // TODO: implement, set downloadDirectoryForMissingAddons correctly
-                }
-                else if (addonGroup.State == AddonGroupState.CompleteButNotSubscribed)
-                {
-                    // TODO: implement, set downloadDirectoryForMissingAddons correctly
-                }
+                
 
                 if (downloadDirectoryForMissingAddons == null)
                 {
