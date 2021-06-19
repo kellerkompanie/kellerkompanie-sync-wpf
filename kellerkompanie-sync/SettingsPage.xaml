@@ -121,6 +121,7 @@
         </ControlTemplate>
     </Page.Resources>
 
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
     <StackPanel>
         <DockPanel
             Name="SettingsExecutableLocationContainer"
@@ -318,4 +319,5 @@
         </StackPanel>
 
     </StackPanel>
+    </ScrollViewer>  
 </Page>
