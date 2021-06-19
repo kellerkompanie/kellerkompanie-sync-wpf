@@ -333,7 +333,6 @@ namespace kellerkompanie_sync
 
 
             int i = 0;
-            int testCounter = 0;
             foreach (FilePath file in files)
             {
                 FilePath absoluteAddonPath = ExtractAbsoluteAddonPath(file);
@@ -349,13 +348,10 @@ namespace kellerkompanie_sync
                     // create new addon
                     Log.Debug("creating new addon: " + absoluteAddonPath);
                     FilePath addonName = ExtractAddonName(file);
-                    Log.Debug("addonName=" + addonName);
                     localAddon = new LocalAddon(addonName, absoluteAddonPath);
                     Index.Add(absoluteAddonPath, localAddon);
                 }
-                testCounter++;
-                Log.Debug("Addon Uuid: " + localAddon.Uuid + " TestCounter: " + testCounter);
-                
+
                 if (!addonUuidToLocalAddonMap.ContainsKey(localAddon.Uuid))
                 {
                     addonUuidToLocalAddonMap.Add(localAddon.Uuid, new List<LocalAddon>());
