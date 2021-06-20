@@ -26,7 +26,7 @@
         <ListView.ItemTemplate>
             <DataTemplate>
                 <StackPanel
-                    Width="{Binding ActualWidth, ElementName=NewsListView}"
+                    Width="575"
                     Margin="0,0,-24,0"
                     Background="#212121"
                     Orientation="Horizontal">
@@ -54,6 +54,8 @@
                             Foreground="DarkGray"
                             Text="{Binding Content}"
                             TextTrimming="CharacterEllipsis"
+                            Width="500"
+                            Height="20"
                             TextWrapping="Wrap" />
                     </StackPanel>
                 </StackPanel>
