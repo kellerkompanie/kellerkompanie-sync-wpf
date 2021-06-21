@@ -61,9 +61,10 @@ namespace kellerkompanie_sync
 
         public string ExtractWeblink()
         {
-            Regex regex = new Regex(@".*<a.*>(.*)<\/a>");
-            Match match = regex.Match(Description);
-            return match.Groups[1].ToString();
+            //Regex regex = new Regex(@".*<a.*>(.*)<\/a>");
+            //Match match = regex.Match(Link);
+            //return match.Groups[1].ToString();
+            return Link;
         }
     }
 
