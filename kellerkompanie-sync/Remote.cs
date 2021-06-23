@@ -3,7 +3,7 @@
 namespace kellerkompanie_sync
 {
     public class RemoteIndex
-    { 
+    {
         public Dictionary<Uuid, RemoteAddon> FilesIndex { get; set; }
         public List<AddonGroup> AddonGroups { get; set; }
     }
