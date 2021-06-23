@@ -2,7 +2,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
@@ -94,14 +93,16 @@ namespace kellerkompanie_sync
 
         public static void LaunchUri(string uri)
         {
-            try {
+            try
+            {
                 Process.Start(new ProcessStartInfo(uri) { CreateNoWindow = true, UseShellExecute = true });
             }
-            catch(System.ComponentModel.Win32Exception ex){
-                    MessageBox.Show(Properties.Resources.AddonSearchDirectoryNotFoundInfoMessage, "kellerkompanie-sync");
-                    Debug.WriteLine("Addon Seach Directory not Found: " + ex.Message);
-                }
-            
+            catch (System.ComponentModel.Win32Exception ex)
+            {
+                MessageBox.Show(Properties.Resources.AddonSearchDirectoryNotFoundInfoMessage, "kellerkompanie-sync");
+                Debug.WriteLine("Addon Seach Directory not Found: " + ex.Message);
+            }
+
         }
 
         private void ButtonNews_Click(object sender, RoutedEventArgs e)
@@ -158,7 +159,7 @@ namespace kellerkompanie_sync
             MainFrame.Navigate(new Uri(destination, UriKind.Relative));
         }
 
-        private bool IsProcessRunning(string processName)
+        private static bool IsProcessRunning(string processName)
         {
             Process[] pname = Process.GetProcessesByName(processName);
             if (pname.Length == 0)
@@ -171,17 +172,17 @@ namespace kellerkompanie_sync
             }
         }
 
-        private bool IsSteamRunning()
+        private static bool IsSteamRunning()
         {
             return IsProcessRunning("Steam");
         }
 
-        private bool IsArmaRunning()
+        private static bool IsArmaRunning()
         {
             return IsProcessRunning(Path.GetFileNameWithoutExtension(Settings.Instance.ExecutableLocation));
         }
 
-        private bool IsTeamspeakRunning()
+        private static bool IsTeamspeakRunning()
         {
             return IsProcessRunning("ts3client_win64");
         }
@@ -248,7 +249,7 @@ namespace kellerkompanie_sync
 
             if (!string.IsNullOrEmpty(Settings.Instance.ParamAdditional))
             {
-                sb.Append(" ");
+                sb.Append(' ');
                 sb.Append(Settings.Instance.ParamAdditional);
             }
 
