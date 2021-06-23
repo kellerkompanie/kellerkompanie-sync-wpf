@@ -31,7 +31,7 @@ namespace kellerkompanie_sync
 
             if (fileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                FilePath folder = new FilePath(fileDialog.SelectedPath);
+                FilePath folder = new(fileDialog.SelectedPath);
                 if (!Settings.Instance.GetAddonSearchDirectories().Contains(folder))
                 {
                     Settings.Instance.AddAddonSearchDirectory(folder);
@@ -58,7 +58,7 @@ namespace kellerkompanie_sync
                 Settings.SaveSettings();
                 TextBoxExecutableLocation.Text = file;
 
-                MainWindow.Instance.EnablePlayButton();          
+                MainWindow.Instance.EnablePlayButton();
             }
         }
 
