@@ -16,14 +16,16 @@ namespace kellerkompanie_sync
 
     public partial class NewsPage : Page
     {
-        private readonly List<NewsItem> news = new List<NewsItem>();
+        private readonly List<NewsItem> news = new();
 
         public NewsPage()
         {
             InitializeComponent();
 
-            BackgroundWorker worker = new BackgroundWorker();
-            worker.WorkerReportsProgress = true;
+            BackgroundWorker worker = new()
+            {
+                WorkerReportsProgress = true
+            };
             worker.DoWork += NewsWorker_DoWork;
             worker.ProgressChanged += NewsWorker_ProgressChanged;
             worker.RunWorkerCompleted += NewsWorker_RunWorkerCompleted;
@@ -32,8 +34,9 @@ namespace kellerkompanie_sync
 
         void NewsWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            foreach (WebNews webNews in WebAPI.GetNews()) {
-                NewsItem newsItem = new NewsItem
+            foreach (WebNews webNews in WebAPI.GetNews())
+            {
+                NewsItem newsItem = new()
                 {
                     Title = webNews.Title,
                     Content = webNews.Content,
@@ -46,7 +49,7 @@ namespace kellerkompanie_sync
 
             foreach (WebEvent webEvent in WebAPI.GetEvents())
             {
-                NewsItem newsItem = new NewsItem
+                NewsItem newsItem = new()
                 {
                     Title = webEvent.Title,
                     Content = webEvent.ExtractContent(),
@@ -55,7 +58,7 @@ namespace kellerkompanie_sync
                     Icon = "/Images/event.png"
                 };
                 news.Add(newsItem);
-            }            
+            }
         }
 
         void NewsWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -71,8 +74,7 @@ namespace kellerkompanie_sync
 
         private void ListViewItem_Selected(object sender, RoutedEventArgs e)
         {
-            var item = sender as ListViewItem;
-            if (item != null && item.IsSelected)
+            if (sender is ListViewItem item && item.IsSelected)
             {
                 NewsItem newsItem = (NewsItem)item.DataContext;
                 MainWindow.LaunchUri(newsItem.Weblink);
