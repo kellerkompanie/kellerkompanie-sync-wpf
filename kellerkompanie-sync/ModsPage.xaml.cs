@@ -51,7 +51,7 @@ namespace kellerkompanie_sync
 
                 // in case of missing addons decide where to download them to, if all addons already exist locally skip this step
                 FilePath downloadDirectoryForMissingAddons = null;
-                
+
                 // decide where to download missing addons to                    
                 switch (Settings.Instance.GetAddonSearchDirectories().Count)
                 {
@@ -67,7 +67,7 @@ namespace kellerkompanie_sync
 
                     default:
                         // there is more than one addon search directory, make user choose to which one he wants to download missing files
-                        ChooseDirectoryWindow inputDialog = new ChooseDirectoryWindow();
+                        ChooseDirectoryWindow inputDialog = new();
                         if (inputDialog.ShowDialog() == true)
                         {
                             downloadDirectoryForMissingAddons = inputDialog.ChosenDirectory;
@@ -91,7 +91,7 @@ namespace kellerkompanie_sync
                     throw new InvalidOperationException("the download folder for missing addons is null");
                 }
 
-                Dictionary<RemoteAddon, FilePath> webAddonToDownloadDirectoryDict = new Dictionary<RemoteAddon, FilePath>();
+                Dictionary<RemoteAddon, FilePath> webAddonToDownloadDirectoryDict = new();
                 foreach (RemoteAddon webAddon in addonGroup.RemoteAddons)
                 {
                     if (addonGroup.WebAddonToLocalAddonDict.ContainsKey(webAddon))
@@ -99,7 +99,7 @@ namespace kellerkompanie_sync
                         // some addons might already exist, for these download to existing folder
                         LocalAddon existingLocalAddon = addonGroup.WebAddonToLocalAddonDict[webAddon];
                         string parentFolder = Directory.GetParent(existingLocalAddon.AbsoluteFilepath.OriginalValue).FullName;
-                        FilePath addonParentFolder = new FilePath(parentFolder);
+                        FilePath addonParentFolder = new(parentFolder);
                         webAddonToDownloadDirectoryDict.Add(webAddon, addonParentFolder);
                     }
                     else
@@ -115,15 +115,15 @@ namespace kellerkompanie_sync
                 addonGroup.ButtonText = Properties.Resources.Pause;
                 ListViewAddonGroups.Items.Refresh();
 
-                BackgroundWorker worker = new BackgroundWorker();
+                BackgroundWorker worker = new();
                 worker.WorkerReportsProgress = true;
                 worker.DoWork += DownloadWorker_DoWork;
-                DownloadArguments args = new DownloadArguments
+                DownloadArguments args = new()
                 {
                     AddonGroup = addonGroup,
                     DownloadDirectoryDict = webAddonToDownloadDirectoryDict
                 };
-                worker.RunWorkerAsync(args);                
+                worker.RunWorkerAsync(args);
             }
             else if (downloadManager?.State == DownloadState.Paused)
             {
@@ -169,7 +169,7 @@ namespace kellerkompanie_sync
                 List<LocalAddon> localAddons = FileIndexer.Instance.addonUuidToLocalAddonMap[webAddonUuid];
                 foreach (LocalAddon localAddon in localAddons)
                 {
-                    List<FilePath> removals = new List<FilePath>();
+                    List<FilePath> removals = new();
                     foreach (LocalFileIndex fileIndex in localAddon.Files.Values)
                     {
                         FilePath relativeFilepath = fileIndex.Relative_filepath;
@@ -217,8 +217,8 @@ namespace kellerkompanie_sync
                     }
                 }
                 else
-                {                     
-                    Dictionary<FilePath, LocalFileIndex> relativeFilePathToFileIndexMap = new Dictionary<FilePath, LocalFileIndex>();
+                {
+                    Dictionary<FilePath, LocalFileIndex> relativeFilePathToFileIndexMap = new();
                     List<LocalAddon> localAddons = FileIndexer.Instance.addonUuidToLocalAddonMap[uuid];
                     foreach (LocalAddon localAddon in localAddons)
                     {
@@ -241,7 +241,7 @@ namespace kellerkompanie_sync
                             {
                                 FilePath destinationFilepath = FilePath.Combine(destinationFolder, remoteFilePath);
                                 downloadManager.AddDownload(WebAPI.RepoUrl + "/" + remoteFilePath.OriginalValue, destinationFilepath, remoteAddonFile.Size);
-                            }                            
+                            }
                         }
                         else
                         {
@@ -292,7 +292,7 @@ namespace kellerkompanie_sync
                         ListViewAddonGroups.Items.Refresh();
                     }));
                     break;
-            }            
+            }
         }
 
         void DownloadManager_ProgressChanged(object sender, DownloadProgress downloadProgress)
@@ -334,11 +334,12 @@ namespace kellerkompanie_sync
             if (Settings.Instance.SubscribedAddonGroups.ContainsKey(uuid))
             {
                 Settings.Instance.SubscribedAddonGroups[uuid] = remoteVersion;
-            } else
+            }
+            else
             {
                 Settings.Instance.SubscribedAddonGroups.Add(uuid, remoteVersion);
             }
-            
+
             // update UI
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
