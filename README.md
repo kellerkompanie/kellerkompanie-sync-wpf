@@ -3,6 +3,8 @@ Native Windows implementation of KekoSync using the Windows Presentation Foundat
 
 Server side implementation (written in Rust): https://github.com/kellerkompanie/kellerkompanie-sync-rust
 
+Webinterface (serving of files, addon groups, etc.): https://github.com/kellerkompanie/kellerkompanie-arma3server-interface
+
 ## Features
 * Synchronization of Arma3 addons and groups from server to client with multiple simultaneous and stoppable/resumable downloads.
 * Detection of already present addons to avoid superflous downloads.
