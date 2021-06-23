@@ -16,9 +16,9 @@ namespace kellerkompanie_sync
 
         public override bool Equals(object obj)
         {
-            if (obj == null) 
-            { 
-                return false; 
+            if (obj == null)
+            {
+                return false;
             }
             return obj is Uuid uuid && Value.Equals(uuid.Value);
         }
