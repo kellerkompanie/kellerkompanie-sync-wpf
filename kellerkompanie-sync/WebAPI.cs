@@ -61,9 +61,6 @@ namespace kellerkompanie_sync
 
         public string ExtractWeblink()
         {
-            //Regex regex = new Regex(@".*<a.*>(.*)<\/a>");
-            //Match match = regex.Match(Link);
-            //return match.Groups[1].ToString();
             return Link;
         }
     }
@@ -77,101 +74,94 @@ namespace kellerkompanie_sync
 
         public static RemoteIndex GetIndex()
         {
-            using (WebClient wc = new WebClient())
+            using WebClient wc = new();
+            var json = wc.DownloadString(IndexUrl);
+            var jRoot = JObject.Parse(json);
+
+            Dictionary<Uuid, RemoteAddon> filesIndex = new Dictionary<Uuid, RemoteAddon>();
+            JToken jFilesIndex = jRoot["files_index"];
+            foreach (JToken jFileIndexTuple in jFilesIndex)
             {
-                var json = wc.DownloadString(IndexUrl);
-                var jRoot = JObject.Parse(json);
-                
-                Dictionary<Uuid, RemoteAddon> filesIndex = new Dictionary<Uuid, RemoteAddon>();
-                JToken jFilesIndex = jRoot["files_index"];
-                foreach (JToken jFileIndexTuple in jFilesIndex)
+                JToken value = ((JProperty)jFileIndexTuple).Value;
+                string addonName = (string)value["name"];
+                Uuid addonUuid = new Uuid((string)value["uuid"]);
+                string addonVersion = (string)value["version"];
+
+                Dictionary<FilePath, RemoteAddonFile> files = new Dictionary<FilePath, RemoteAddonFile>();
+                var jAddonFiles = value["files"];
+                foreach (JToken jAddonFile in jAddonFiles)
                 {
-                    JToken value = ((JProperty)jFileIndexTuple).Value;
-                    string addonName = (string)value["name"];
-                    Uuid addonUuid = new Uuid((string)value["uuid"]);
-                    string addonVersion = (string)value["version"];
+                    JToken jAddonFileValue = ((JProperty)jAddonFile).Value;
+                    string addonFileHash = (string)jAddonFileValue["hash"];
+                    FilePath addonFilePath = new FilePath((string)jAddonFileValue["path"]);
+                    long addonFileSize = (long)jAddonFileValue["size"];
 
-                    Dictionary<FilePath, RemoteAddonFile> files = new Dictionary<FilePath, RemoteAddonFile>();
-                    var jAddonFiles = value["files"];
-                    foreach (JToken jAddonFile in jAddonFiles)
+                    RemoteAddonFile remoteAddonFile = new RemoteAddonFile
                     {
-                        JToken jAddonFileValue = ((JProperty)jAddonFile).Value;
-                        string addonFileHash = (string)jAddonFileValue["hash"];
-                        FilePath addonFilePath = new FilePath((string)jAddonFileValue["path"]);
-                        long addonFileSize = (long)jAddonFileValue["size"];
-
-                        RemoteAddonFile remoteAddonFile = new RemoteAddonFile
-                        {
-                            Hash = addonFileHash,
-                            Path = addonFilePath,
-                            Size = addonFileSize,
-                        };
-                        files.Add(addonFilePath, remoteAddonFile);
-                    }
-
-                    RemoteAddon remoteAddon = new RemoteAddon
-                    {
-                        Uuid = addonUuid,
-                        Name = addonName,
-                        Version = addonVersion,
-                        Files = files,
+                        Hash = addonFileHash,
+                        Path = addonFilePath,
+                        Size = addonFileSize,
                     };
-                    filesIndex.Add(addonUuid, remoteAddon);
+                    files.Add(addonFilePath, remoteAddonFile);
                 }
 
-                List<AddonGroup> addonGroups = new List<AddonGroup>();
-                JToken jAddonGroups = jRoot["addon_groups"];
-                foreach (JToken jAddonGroup in jAddonGroups)
+                RemoteAddon remoteAddon = new RemoteAddon
                 {
-                    string addonGroupAuthor = (string)jAddonGroup["author"];
-                    string addonGroupName = (string)jAddonGroup["name"];
-                    string addonGroupUuid = (string)jAddonGroup["uuid"];
-                    string addonGroupVersion = (string)jAddonGroup["version"];
-
-                    List<RemoteAddon> addons = new List<RemoteAddon>();
-                    var jAddonUuids = jAddonGroup["addons"];
-                    foreach (JToken jAddonUuid in jAddonUuids)
-                    {
-                        Uuid addonUuid = new Uuid((string)jAddonUuid);
-
-                        Debug.Assert(filesIndex.ContainsKey(addonUuid));
-                        RemoteAddon remoteAddon = filesIndex[addonUuid];                        
-                        Debug.Assert(remoteAddon.Uuid.Equals(addonUuid));
-
-                        addons.Add(remoteAddon);
-                    }
-
-                    AddonGroup addonGroup = new AddonGroup(addonGroupName, addonGroupAuthor, addonGroupUuid, addonGroupVersion, addons);
-                    addonGroups.Add(addonGroup);
-                }
-
-                // RemoteIndex index = JsonConvert.DeserializeObject<RemoteIndex>(json);
-                return new RemoteIndex()
-                {
-                    AddonGroups = addonGroups,
-                    FilesIndex = filesIndex
+                    Uuid = addonUuid,
+                    Name = addonName,
+                    Version = addonVersion,
+                    Files = files,
                 };
+                filesIndex.Add(addonUuid, remoteAddon);
             }
+
+            List<AddonGroup> addonGroups = new List<AddonGroup>();
+            JToken jAddonGroups = jRoot["addon_groups"];
+            foreach (JToken jAddonGroup in jAddonGroups)
+            {
+                string addonGroupAuthor = (string)jAddonGroup["author"];
+                string addonGroupName = (string)jAddonGroup["name"];
+                string addonGroupUuid = (string)jAddonGroup["uuid"];
+                string addonGroupVersion = (string)jAddonGroup["version"];
+
+                List<RemoteAddon> addons = new List<RemoteAddon>();
+                var jAddonUuids = jAddonGroup["addons"];
+                foreach (JToken jAddonUuid in jAddonUuids)
+                {
+                    Uuid addonUuid = new Uuid((string)jAddonUuid);
+
+                    Debug.Assert(filesIndex.ContainsKey(addonUuid));
+                    RemoteAddon remoteAddon = filesIndex[addonUuid];
+                    Debug.Assert(remoteAddon.Uuid.Equals(addonUuid));
+
+                    addons.Add(remoteAddon);
+                }
+
+                AddonGroup addonGroup = new AddonGroup(addonGroupName, addonGroupAuthor, addonGroupUuid, addonGroupVersion, addons);
+                addonGroups.Add(addonGroup);
+            }
+
+            return new RemoteIndex()
+            {
+                AddonGroups = addonGroups,
+                FilesIndex = filesIndex
+            };
         }
 
         public static List<WebNews> GetNews()
         {
-            using (WebClient wc = new WebClient())
-            {
-                var json = wc.DownloadString(NewsUrl);
-                List<WebNews> news = JsonConvert.DeserializeObject<List<WebNews>>(json);
-                return news;
-            }
+            using WebClient wc = new();
+            var json = wc.DownloadString(NewsUrl);
+            List<WebNews> news = JsonConvert.DeserializeObject<List<WebNews>>(json);
+            return news;
         }
 
         public static List<WebEvent> GetEvents()
         {
-            using (WebClient wc = new WebClient())
-            {
-                var json = wc.DownloadString(CalendarUrl);
-                WebCalendar webCalendar = JsonConvert.DeserializeObject<WebCalendar>(json);
-                return webCalendar.Upcoming;
-            }
+            using WebClient wc = new();
+            var json = wc.DownloadString(CalendarUrl);
+            WebCalendar webCalendar = JsonConvert.DeserializeObject<WebCalendar>(json);
+            return webCalendar.Upcoming;
         }
     }
 }
