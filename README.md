@@ -1,6 +1,8 @@
 # kellerkompanie-sync-wpf
 Native Windows implementation of KekoSync using the Windows Presentation Foundation (WPF) frontend in C#. The idea is to have an executable .exe that runs on Windows without requiring the user to install additional dependencies (e.g., Java JVM). KekoSync is used to synchronize addons and groups of addons from the Arma3 gameserver to force all players joining with the same set of addons. The overall intention is to provide our community members with a tool that is intuitive and simpler to use than the vanilla launcher, ArmA3Sync etc.
 
+Server side implementation (written in Rust): https://github.com/kellerkompanie/kellerkompanie-sync-rust
+
 ## Features
 * Synchronization of Arma3 addons and groups from server to client with multiple simultaneous and stoppable/resumable downloads.
 * Detection of already present addons to avoid superflous downloads.
