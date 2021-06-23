@@ -191,7 +191,7 @@ namespace kellerkompanie_sync
             }
         }
 
-        public Dictionary<RemoteAddon, LocalAddon> WebAddonToLocalAddonDict = new Dictionary<RemoteAddon, LocalAddon>();
+        public Dictionary<RemoteAddon, LocalAddon> WebAddonToLocalAddonDict = new();
 
         public AddonGroup(string name, string author, string uuid, string version, List<RemoteAddon> remoteAddons)
         {
