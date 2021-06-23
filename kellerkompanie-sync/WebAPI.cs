@@ -137,7 +137,7 @@ namespace kellerkompanie_sync
                     addons.Add(remoteAddon);
                 }
 
-                AddonGroup addonGroup = new(addonGroupName, addonGroupAuthor, addonGroupUuid, addonGroupVersion, addons);                
+                AddonGroup addonGroup = new(addonGroupName, addonGroupAuthor, addonGroupUuid, addonGroupVersion, addons);
                 addonGroups.Add(addonGroup);
             }
 
