@@ -16,7 +16,7 @@ namespace kellerkompanie_sync
     public class Download
     {
         /// Represent url of the file on the internet
-        private Uri uri;
+        private readonly Uri uri;
         private System.Net.HttpWebRequest request;
         private System.Net.HttpWebResponse response;
         private Stream stream;
@@ -84,7 +84,7 @@ namespace kellerkompanie_sync
                             fileStream.Write(buffer, 0, bufferBytesRead);
                             DownloadedSize += bufferBytesRead; 
                             CurrentSize += bufferBytesRead; 
-                            DownloadSpeed = (CurrentSize / 1024) / ((DateTime.Now - downloadStart).TotalSeconds);
+                            DownloadSpeed = CurrentSize / 1024 / (DateTime.Now - downloadStart).TotalSeconds;
                         }
                     });
                 }
@@ -110,11 +110,12 @@ namespace kellerkompanie_sync
 
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder("{");
+            StringBuilder sb = new('{');
             sb.Append(DownloadState);
-            sb.Append(", ");
+            sb.Append(',');
+            sb.Append(' ');
             sb.Append(uri);
-            sb.Append("}");
+            sb.Append('}');
             return sb.ToString();
         }     
     }    
