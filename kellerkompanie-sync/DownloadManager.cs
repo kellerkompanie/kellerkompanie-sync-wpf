@@ -18,13 +18,13 @@ namespace kellerkompanie_sync
 
     public class DownloadManager
     {
-        private readonly List<Download> queuedDownloads = new List<Download>();
-        private readonly List<Download> runningDownloads = new List<Download>();
-        private readonly List<Download> finishedDownloads = new List<Download>();
+        private readonly List<Download> queuedDownloads = new();
+        private readonly List<Download> runningDownloads = new();
+        private readonly List<Download> finishedDownloads = new();
 
-        private static readonly ReaderWriterLock ReaderWriterLock = new ReaderWriterLock();
+        private static readonly ReaderWriterLock ReaderWriterLock = new();
         private const int TIMEOUT = 100;
-        private readonly System.Timers.Timer timer = new System.Timers.Timer(500);
+        private readonly System.Timers.Timer timer = new(500);
         private long totalDownloadSize = 0;
 
         public DownloadState State { get; private set; } = DownloadState.Created;
@@ -109,7 +109,7 @@ namespace kellerkompanie_sync
                 throw new InvalidOperationException("can only add new downloads before downloader started");
             }
 
-            Download download = new Download(sourceUrl, filepath);
+            Download download = new(sourceUrl, filepath);
             totalDownloadSize += expectedFileSize;
             queuedDownloads.Add(download);
         }
@@ -141,13 +141,15 @@ namespace kellerkompanie_sync
                 ReaderWriterLock.ReleaseReaderLock();
             }
 
-            DownloadProgress progress = new DownloadProgress();
-            progress.DownloadSpeed = downloadSpeed;
-            progress.ActiveDownloads = numActiveDownloads;
-            progress.CurrentDownloadSize = currentDownloadSize;
-            progress.TotalDownloadSize = totalDownloadSize;
-            progress.RemainingTime = (totalDownloadSize - currentDownloadSize) / 1024 / downloadSpeed;
-            progress.Progress = Math.Floor(((double)currentDownloadSize / (double)totalDownloadSize) * 100.0);
+            DownloadProgress progress = new()
+            {
+                DownloadSpeed = downloadSpeed,
+                ActiveDownloads = numActiveDownloads,
+                CurrentDownloadSize = currentDownloadSize,
+                TotalDownloadSize = totalDownloadSize,
+                RemainingTime = (totalDownloadSize - currentDownloadSize) / 1024 / downloadSpeed,
+                Progress = Math.Floor(((double)currentDownloadSize / (double)totalDownloadSize) * 100.0)
+            };
             ProgressChanged.Invoke(this, progress);
         }
 
