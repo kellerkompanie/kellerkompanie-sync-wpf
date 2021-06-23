@@ -67,7 +67,7 @@ namespace kellerkompanie_sync
                 throw new ArgumentException("Parameter must contain @ in path");
             }
 
-            FileInfo fileInfo = new FileInfo(filePath.Value);
+            FileInfo fileInfo = new(filePath.Value);
             Created = fileInfo.CreationTime;
             Filesize = fileInfo.Length;
             Absolute_filepath = filePath;
@@ -83,7 +83,7 @@ namespace kellerkompanie_sync
                 fileStream.Close();
                 fileStream.Dispose();
 
-                StringBuilder sb = new StringBuilder();
+                StringBuilder sb = new();
                 for (int i = 0; i < hashValue.Length; i++)
                 {
                     sb.Append(hashValue[i].ToString("x2"));
@@ -100,9 +100,9 @@ namespace kellerkompanie_sync
         private Dictionary<FilePath, LocalAddon> Index { get; set; }
         private ProgressBar ProgressBar { get; set; }
         private TextBlock ProgressBarText { get; set; }
-        public ObservableCollection<AddonGroup> AddonGroups { get; set; } = new ObservableCollection<AddonGroup>();
+        public ObservableCollection<AddonGroup> AddonGroups { get; set; } = new();
 
-        public Dictionary<Uuid, List<LocalAddon>> addonUuidToLocalAddonMap = new Dictionary<Uuid, List<LocalAddon>>();
+        public Dictionary<Uuid, List<LocalAddon>> addonUuidToLocalAddonMap = new();
         public RemoteIndex RemoteIndex;
 
         private FileIndexer(ProgressBar progressBar, TextBlock progressBarText)
@@ -138,7 +138,7 @@ namespace kellerkompanie_sync
 
         public HashSet<FilePath> GetAllFilePaths()
         {
-            HashSet<FilePath> allFilePaths = new HashSet<FilePath>();
+            HashSet<FilePath> allFilePaths = new();
                 try {
                     foreach (FilePath addonSearchDirectory in Settings.Instance.GetAddonSearchDirectories())
                     {   
@@ -154,7 +154,7 @@ namespace kellerkompanie_sync
                     }
                     
                 }
-                catch(System.IO.DirectoryNotFoundException ex){
+                catch(DirectoryNotFoundException ex){
                     MessageBox.Show(Properties.Resources.AddonSearchDirectoryNotFoundInfoMessage, "kellerkompanie-sync");
                     Debug.WriteLine("Addon Seach Directory not Found: " + ex.Message);
                 }
@@ -166,7 +166,7 @@ namespace kellerkompanie_sync
             Directory.CreateDirectory(Settings.SettingsDirectory);
 
             using StreamWriter file = File.CreateText(Settings.IndexFile);
-            JsonSerializerSettings settings = new JsonSerializerSettings();
+            JsonSerializerSettings settings = new();
             settings.Formatting = Formatting.Indented;
             JsonSerializer serializer = JsonSerializer.Create(settings);
             serializer.Serialize(file, Index);
@@ -189,21 +189,21 @@ namespace kellerkompanie_sync
                 {
                     JToken jLocalAddon = jIndexEntry.Value;
                     string localAddonName = (string)jLocalAddon["Name"];
-                    Uuid localAddonUuid = new Uuid((string)jLocalAddon["Uuid"]);
+                    Uuid localAddonUuid = new((string)jLocalAddon["Uuid"]);
                     string localAddonVersion = (string)jLocalAddon["Version"];
-                    FilePath localAddonAbsoluteFilePath = new FilePath((string)jLocalAddon["AbsoluteFilepath"]);
+                    FilePath localAddonAbsoluteFilePath = new((string)jLocalAddon["AbsoluteFilepath"]);
 
-                    Dictionary<FilePath, LocalFileIndex> files = new Dictionary<FilePath, LocalFileIndex>();
+                    Dictionary<FilePath, LocalFileIndex> files = new();
                     foreach (JToken jFile in jLocalAddon["Files"])
                     {
                         var jFileContent = ((JProperty)jFile).Value;
-                        FilePath fileRelativeFilePath = new FilePath((string)jFileContent["Relative_filepath"]);
-                        FilePath fileAbsoluteFilePath = new FilePath((string)jFileContent["Absolute_filepath"]);
+                        FilePath fileRelativeFilePath = new((string)jFileContent["Relative_filepath"]);
+                        FilePath fileAbsoluteFilePath = new((string)jFileContent["Absolute_filepath"]);
                         DateTime fileCreated = (DateTime)jFileContent["Created"];
                         long fileSize = (long)jFileContent["Filesize"];
                         string fileHash = (string)jFileContent["Hash"];
 
-                        LocalFileIndex localFileIndex = new LocalFileIndex
+                        LocalFileIndex localFileIndex = new()
                         {
                             Relative_filepath = fileRelativeFilePath,
                             Absolute_filepath = fileAbsoluteFilePath,
@@ -214,7 +214,7 @@ namespace kellerkompanie_sync
                         files.Add(fileAbsoluteFilePath, localFileIndex);
                     }
 
-                    LocalAddon localAddon = new LocalAddon()
+                    LocalAddon localAddon = new()
                     {
                         Name = localAddonName,
                         Uuid = localAddonUuid,
@@ -257,7 +257,7 @@ namespace kellerkompanie_sync
         public void UpdateLocalIndex()
         {
             Debug.WriteLine("FileIndexer UpdateLocalIndex()");
-            BackgroundWorker worker = new BackgroundWorker();
+            BackgroundWorker worker = new();
             worker.WorkerReportsProgress = true;
             worker.DoWork += LocalIndexingWorker_DoWork;
             worker.ProgressChanged += LocalIndexingWorker_ProgressChanged;
@@ -291,7 +291,7 @@ namespace kellerkompanie_sync
             HashSet<FilePath> files = GetAllFilePaths();
 
             // remove addons from index that are not on disk anymore            
-            List<FilePath> removals = new List<FilePath>();
+            List<FilePath> removals = new();
             foreach (FilePath indexKey in Index.Keys)
             {
                 bool remove = true;
@@ -368,7 +368,7 @@ namespace kellerkompanie_sync
                     // compare if files differ
                     LocalFileIndex existingIndex = localAddon.Files[file];
 
-                    FileInfo fileInfo = new FileInfo(file.Value);
+                    FileInfo fileInfo = new(file.Value);
                     DateTime created = fileInfo.CreationTime;
                     long filesize = fileInfo.Length;
 
@@ -376,7 +376,7 @@ namespace kellerkompanie_sync
                     {
                         Log.Debug("out of date file: " + file);
                         // file is not up to date, index it                        
-                        LocalFileIndex fileIndex = new LocalFileIndex(file);
+                        LocalFileIndex fileIndex = new(file);
                         localAddon.Files[fileIndex.Absolute_filepath] = fileIndex;
                     }
                 }
@@ -384,7 +384,7 @@ namespace kellerkompanie_sync
                 {
                     // file is not indexed yet, index it
                     Log.Debug("file not indexed yet: " + file);
-                    LocalFileIndex fileIndex = new LocalFileIndex(file);
+                    LocalFileIndex fileIndex = new(file);
                     localAddon.Files.Add(fileIndex.Absolute_filepath, fileIndex);
                 }
 
@@ -417,7 +417,7 @@ namespace kellerkompanie_sync
 
         public void UpdateAddonGroupStates()
         {
-            BackgroundWorker worker = new BackgroundWorker();
+            BackgroundWorker worker = new();
             worker.WorkerReportsProgress = true;
             worker.DoWork += AddonGroupStateWorker_DoWork;
             worker.ProgressChanged += AddonGroupStateWorker_ProgressChanged;
@@ -427,7 +427,7 @@ namespace kellerkompanie_sync
 
         void AddonGroupStateWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            List<(AddonGroup, AddonGroupState)> changes = new List<(AddonGroup, AddonGroupState)>();
+            List<(AddonGroup, AddonGroupState)> changes = new();
 
             double i = 0;
             foreach (AddonGroup addonGroup in AddonGroups)
@@ -477,7 +477,7 @@ namespace kellerkompanie_sync
                                 List<LocalAddon> localAddons = addonUuidToLocalAddonMap[webAddon.Uuid];
                                 foreach (LocalAddon localAddon in localAddons)
                                 {
-                                    List<FilePath> localAddonFiles = new List<FilePath>(localAddon.Files.Values.Select(fileIndex => fileIndex.Relative_filepath));
+                                    List<FilePath> localAddonFiles = new(localAddon.Files.Values.Select(fileIndex => fileIndex.Relative_filepath));
                                     List<FilePath> remoteAddonFiles = GetRemoteFilenamesForAddon(webAddon.Uuid);
                                     localAddonFiles.Sort();
                                     remoteAddonFiles.Sort();
@@ -554,7 +554,7 @@ namespace kellerkompanie_sync
             }
 
             RemoteAddon remoteAddon = RemoteIndex.FilesIndex[uuid];            
-            List<FilePath> remoteFileNames = new List<FilePath>();
+            List<FilePath> remoteFileNames = new();
             foreach (FilePath remoteFileName in remoteAddon.Files.Keys)
             {
                 remoteFileNames.Add(remoteFileName.Replace("/", "\\"));
