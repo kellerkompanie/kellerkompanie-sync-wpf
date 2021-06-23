@@ -30,7 +30,7 @@ namespace kellerkompanie_sync
 
             NavigateToPage(Page.News);
 
-            Settings.Instance.LoadSettings();
+            Settings.LoadSettings();
             RestoreWindowPositionAndSize();
 
             FileIndexer.Setup(ProgressBar, ProgressBarText);
@@ -295,7 +295,7 @@ namespace kellerkompanie_sync
 
         private void MainWindow_Closed(object sender, EventArgs e)
         {
-            Settings.Instance.SaveSettings();
+            Settings.SaveSettings();
         }
     }
 }

@@ -14,7 +14,7 @@ namespace kellerkompanie_sync
         public static readonly string IndexFile = Path.Combine(SettingsDirectory, "index.json");
 
         [JsonProperty("AddonSearchDirectories")]
-        private readonly ObservableCollection<FilePath> addonSearchDirectories = new ObservableCollection<FilePath>();
+        private readonly ObservableCollection<FilePath> addonSearchDirectories = new();
         public string ExecutableLocation { get; set; } = "";
         public bool ParamShowScriptErrors { get; set; } = false;
         public bool ParamNoPause { get; set; } = true;
@@ -23,7 +23,7 @@ namespace kellerkompanie_sync
         public bool ParamDefaultWorldEmpty { get; set; } = false;
         public bool ParamNoLogs { get; set; } = false;
         public string ParamAdditional { get; set; } = "";
-        public Dictionary<string, string> SubscribedAddonGroups { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> SubscribedAddonGroups { get; set; } = new();
         public double WindowX { get; set; }
         public double WindowY { get; set; }
         public double WindowWidth { get; set; } = 800;
@@ -39,7 +39,7 @@ namespace kellerkompanie_sync
             WindowY = System.Windows.SystemParameters.PrimaryScreenHeight / 2 - WindowHeight / 2;
         }
 
-        public static Settings Instance { get; private set; } = new Settings();
+        public static Settings Instance { get; private set; } = new();
 
         internal void AddAddonSearchDirectory(FilePath directory)
         {
@@ -55,31 +55,27 @@ namespace kellerkompanie_sync
             return addonSearchDirectories;
         }
 
-        public void SaveSettings()
+        public static void SaveSettings()
         {
             Directory.CreateDirectory(SettingsDirectory);
 
-            using (StreamWriter file = File.CreateText(@SettingsFile))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Formatting = Formatting.Indented;
-                serializer.Serialize(file, Instance);
-            }
+            using StreamWriter file = File.CreateText(@SettingsFile);
+            JsonSerializer serializer = new();
+            serializer.Formatting = Formatting.Indented;
+            serializer.Serialize(file, Instance);
         }
 
-        public void LoadSettings()
+        public static void LoadSettings()
         {
             if (!File.Exists(SettingsFile))
             {
                 return;
             }
 
-            using (StreamReader file = File.OpenText(@SettingsFile))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                Settings settings = (Settings)serializer.Deserialize(file, typeof(Settings));
-                Instance = settings;
-            }
+            using StreamReader file = File.OpenText(@SettingsFile);
+            JsonSerializer serializer = new();
+            Settings settings = (Settings)serializer.Deserialize(file, typeof(Settings));
+            Instance = settings;
         }
     }
 }

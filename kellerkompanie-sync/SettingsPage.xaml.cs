@@ -35,7 +35,7 @@ namespace kellerkompanie_sync
                 if (!Settings.Instance.GetAddonSearchDirectories().Contains(folder))
                 {
                     Settings.Instance.AddAddonSearchDirectory(folder);
-                    Settings.Instance.SaveSettings();
+                    Settings.SaveSettings();
 
                     FileIndexer.Instance.UpdateLocalIndex();
                 }
@@ -55,7 +55,7 @@ namespace kellerkompanie_sync
             {
                 var file = fileDialog.FileName;
                 Settings.Instance.ExecutableLocation = file;
-                Settings.Instance.SaveSettings();
+                Settings.SaveSettings();
                 TextBoxExecutableLocation.Text = file;
 
                 MainWindow.Instance.EnablePlayButton();          
@@ -66,48 +66,48 @@ namespace kellerkompanie_sync
         {
             bool isChecked = CheckBoxShowScriptErrors.IsChecked == true;
             Settings.Instance.ParamShowScriptErrors = isChecked;
-            Settings.Instance.SaveSettings();
+            Settings.SaveSettings();
         }
 
         private void CheckBoxNoPause_Click(object sender, RoutedEventArgs e)
         {
             bool isChecked = CheckBoxNoPause.IsChecked == true;
             Settings.Instance.ParamNoPause = isChecked;
-            Settings.Instance.SaveSettings();
+            Settings.SaveSettings();
         }
 
         private void CheckBoxWindowMode_Click(object sender, RoutedEventArgs e)
         {
             bool isChecked = CheckBoxWindowMode.IsChecked == true;
             Settings.Instance.ParamWindowMode = isChecked;
-            Settings.Instance.SaveSettings();
+            Settings.SaveSettings();
         }
 
         private void CheckBoxNoSplashScreen_Click(object sender, RoutedEventArgs e)
         {
             bool isChecked = CheckBoxNoSplashScreen.IsChecked == true;
             Settings.Instance.ParamNoSplashScreen = isChecked;
-            Settings.Instance.SaveSettings();
+            Settings.SaveSettings();
         }
 
         private void CheckBoxDefaultWorldEmpty_Click(object sender, RoutedEventArgs e)
         {
             bool isChecked = CheckBoxDefaultWorldEmpty.IsChecked == true;
             Settings.Instance.ParamDefaultWorldEmpty = isChecked;
-            Settings.Instance.SaveSettings();
+            Settings.SaveSettings();
         }
 
         private void CheckBoxNoLogs_Click(object sender, RoutedEventArgs e)
         {
             bool isChecked = CheckBoxNoLogs.IsChecked == true;
             Settings.Instance.ParamNoLogs = isChecked;
-            Settings.Instance.SaveSettings();
+            Settings.SaveSettings();
         }
 
         private void TextBoxAdditionalParameters_TextChanged(object sender, TextChangedEventArgs e)
         {
             Settings.Instance.ParamAdditional = TextBoxAdditionalParameters.Text;
-            Settings.Instance.SaveSettings();
+            Settings.SaveSettings();
         }
 
         private void ButtonOpen_Click(object sender, RoutedEventArgs e)
@@ -122,13 +122,13 @@ namespace kellerkompanie_sync
             Button button = (Button)sender;
             FilePath addonSearchDirectory = (FilePath)button.DataContext;
             Settings.Instance.GetAddonSearchDirectories().Remove(addonSearchDirectory);
-            Settings.Instance.SaveSettings();
+            Settings.SaveSettings();
         }
 
         private void SliderDownloads_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Settings.Instance.SimultaneousDownloads = (int)Math.Floor(e.NewValue);
-            Settings.Instance.SaveSettings();
+            Settings.SaveSettings();
         }
     }
 }
