@@ -54,7 +54,7 @@ namespace kellerkompanie_sync
 
         public string ExtractContent()
         {
-            Regex regex = new Regex(@"(.*) - <a.*>(.*)<\/a>");
+            Regex regex = new(@"(.*) - <a.*>(.*)<\/a>");
             Match match = regex.Match(Description);
             return match.Groups[1].ToString();
         }
@@ -78,25 +78,25 @@ namespace kellerkompanie_sync
             var json = wc.DownloadString(IndexUrl);
             var jRoot = JObject.Parse(json);
 
-            Dictionary<Uuid, RemoteAddon> filesIndex = new Dictionary<Uuid, RemoteAddon>();
+            Dictionary<Uuid, RemoteAddon> filesIndex = new();
             JToken jFilesIndex = jRoot["files_index"];
             foreach (JToken jFileIndexTuple in jFilesIndex)
             {
                 JToken value = ((JProperty)jFileIndexTuple).Value;
                 string addonName = (string)value["name"];
-                Uuid addonUuid = new Uuid((string)value["uuid"]);
+                Uuid addonUuid = new((string)value["uuid"]);
                 string addonVersion = (string)value["version"];
 
-                Dictionary<FilePath, RemoteAddonFile> files = new Dictionary<FilePath, RemoteAddonFile>();
+                Dictionary<FilePath, RemoteAddonFile> files = new();
                 var jAddonFiles = value["files"];
                 foreach (JToken jAddonFile in jAddonFiles)
                 {
                     JToken jAddonFileValue = ((JProperty)jAddonFile).Value;
                     string addonFileHash = (string)jAddonFileValue["hash"];
-                    FilePath addonFilePath = new FilePath((string)jAddonFileValue["path"]);
+                    FilePath addonFilePath = new((string)jAddonFileValue["path"]);
                     long addonFileSize = (long)jAddonFileValue["size"];
 
-                    RemoteAddonFile remoteAddonFile = new RemoteAddonFile
+                    RemoteAddonFile remoteAddonFile = new()
                     {
                         Hash = addonFileHash,
                         Path = addonFilePath,
@@ -105,7 +105,7 @@ namespace kellerkompanie_sync
                     files.Add(addonFilePath, remoteAddonFile);
                 }
 
-                RemoteAddon remoteAddon = new RemoteAddon
+                RemoteAddon remoteAddon = new()
                 {
                     Uuid = addonUuid,
                     Name = addonName,
@@ -115,7 +115,7 @@ namespace kellerkompanie_sync
                 filesIndex.Add(addonUuid, remoteAddon);
             }
 
-            List<AddonGroup> addonGroups = new List<AddonGroup>();
+            List<AddonGroup> addonGroups = new();
             JToken jAddonGroups = jRoot["addon_groups"];
             foreach (JToken jAddonGroup in jAddonGroups)
             {
@@ -124,11 +124,11 @@ namespace kellerkompanie_sync
                 string addonGroupUuid = (string)jAddonGroup["uuid"];
                 string addonGroupVersion = (string)jAddonGroup["version"];
 
-                List<RemoteAddon> addons = new List<RemoteAddon>();
+                List<RemoteAddon> addons = new();
                 var jAddonUuids = jAddonGroup["addons"];
                 foreach (JToken jAddonUuid in jAddonUuids)
                 {
-                    Uuid addonUuid = new Uuid((string)jAddonUuid);
+                    Uuid addonUuid = new((string)jAddonUuid);
 
                     Debug.Assert(filesIndex.ContainsKey(addonUuid));
                     RemoteAddon remoteAddon = filesIndex[addonUuid];
@@ -137,7 +137,7 @@ namespace kellerkompanie_sync
                     addons.Add(remoteAddon);
                 }
 
-                AddonGroup addonGroup = new AddonGroup(addonGroupName, addonGroupAuthor, addonGroupUuid, addonGroupVersion, addons);
+                AddonGroup addonGroup = new(addonGroupName, addonGroupAuthor, addonGroupUuid, addonGroupVersion, addons);                
                 addonGroups.Add(addonGroup);
             }
 
