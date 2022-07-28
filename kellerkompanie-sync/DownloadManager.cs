@@ -30,7 +30,7 @@ namespace kellerkompanie_sync
         public DownloadState State { get; private set; } = DownloadState.Created;
         public AddonGroup AddonGroup { get; }
         public EventHandler<DownloadState> StateChanged;
-        public EventHandler<DownloadProgress> ProgressChanged;                
+        public EventHandler<DownloadProgress> ProgressChanged;
 
         public DownloadManager(AddonGroup addonGroup)
         {
@@ -51,7 +51,7 @@ namespace kellerkompanie_sync
             Log.Debug(string.Format("DownloadManager starting with queued={0} running={1} finished={2} total={3}", queuedDownloads.Count, runningDownloads.Count, finishedDownloads.Count, queuedDownloads.Count + runningDownloads.Count + finishedDownloads.Count));
 
             State = DownloadState.Downloading;
-            timer.Elapsed += Timer_Elapsed;           
+            timer.Elapsed += Timer_Elapsed;
             timer.Start();
 
             int n = Math.Min(Settings.Instance.SimultaneousDownloads, queuedDownloads.Count);
@@ -77,14 +77,14 @@ namespace kellerkompanie_sync
             finally
             {
                 ReaderWriterLock.ReleaseWriterLock();
-            }            
+            }
         }
 
         public void PauseDownloads()
         {
             State = DownloadState.Paused;
             timer.Elapsed -= Timer_Elapsed;
-            timer.Stop();            
+            timer.Stop();
 
             ReaderWriterLock.AcquireWriterLock(TIMEOUT);
             try
@@ -129,7 +129,7 @@ namespace kellerkompanie_sync
                 {
                     downloadSpeed += download.DownloadSpeed;
                     currentDownloadSize += download.DownloadedSize;
-                }                    
+                }
 
                 foreach (Download download in finishedDownloads)
                 {
@@ -166,7 +166,7 @@ namespace kellerkompanie_sync
                     {
                         runningDownloads.Remove(download);
                         finishedDownloads.Add(download);
-                        
+
                         if (queuedDownloads.Count > 0 && State != DownloadState.Paused && runningDownloads.Count < Settings.Instance.SimultaneousDownloads)
                         {
                             DownloadNext();
@@ -175,7 +175,7 @@ namespace kellerkompanie_sync
                         {
                             State = DownloadState.Completed;
                             timer.Elapsed -= Timer_Elapsed;
-                            timer.Stop();                            
+                            timer.Stop();
                             Log.Debug("DownloadManager: all downloads finished");
                             StateChanged?.Invoke(this, State);
                         }

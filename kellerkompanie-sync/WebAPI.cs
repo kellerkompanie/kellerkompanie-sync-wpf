@@ -67,7 +67,7 @@ namespace kellerkompanie_sync
 
     class WebAPI
     {
-        private static readonly string IndexUrl = "http://server.kellerkompanie.com/repository/index.json";
+        private static readonly string IndexUrl = "http://server.kellerkompanie.com/kekosync.index.json";
         public static readonly string RepoUrl = "http://server.kellerkompanie.com/repository/mods";
         private static readonly string NewsUrl = "https://kellerkompanie.com/news_json.php";
         private static readonly string CalendarUrl = "https://kellerkompanie.com/calendar_json.php";
@@ -79,7 +79,7 @@ namespace kellerkompanie_sync
             var jRoot = JObject.Parse(json);
 
             Dictionary<Uuid, RemoteAddon> filesIndex = new();
-            JToken jFilesIndex = jRoot["files_index"];
+            JToken jFilesIndex = jRoot["filesIndex"];
             foreach (JToken jFileIndexTuple in jFilesIndex)
             {
                 JToken value = ((JProperty)jFileIndexTuple).Value;
@@ -116,7 +116,7 @@ namespace kellerkompanie_sync
             }
 
             List<AddonGroup> addonGroups = new();
-            JToken jAddonGroups = jRoot["addon_groups"];
+            JToken jAddonGroups = jRoot["addonGroups"];
             foreach (JToken jAddonGroup in jAddonGroups)
             {
                 string addonGroupAuthor = (string)jAddonGroup["author"];

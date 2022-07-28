@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AddDirectory" xml:space="preserve">
     <value>Add Directory</value>
@@ -128,6 +128,9 @@
   </data>
   <data name="AddonSearchDirectoriesExplanation" xml:space="preserve">
     <value>A list of directories on your computer in which the tool will look for addons (folders starting with @). You can also select folders that already contain addons, in which case the tool will try to discover existing addons before downloading.</value>
+  </data>
+  <data name="AddonSearchDirectoryNotFoundInfoMessage" xml:space="preserve">
+    <value>Addon search directory not found!</value>
   </data>
   <data name="AllModsDownloadedButNotSubscribed" xml:space="preserve">
     <value>All addons present, but group is not subscribed</value>

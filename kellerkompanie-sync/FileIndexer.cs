@@ -8,10 +8,9 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+
 
 namespace kellerkompanie_sync
 {
@@ -55,7 +54,7 @@ namespace kellerkompanie_sync
         public FilePath Absolute_filepath { get; set; }
         public DateTime Created { get; set; }
         public long Filesize { get; set; }
-        public string Hash { get; set; }
+        public ulong Hash { get; set; }
 
         public LocalFileIndex() { }
 
@@ -75,21 +74,8 @@ namespace kellerkompanie_sync
             int index = filePath.IndexOf("@");
             Relative_filepath = filePath.SubPath(index);
 
-            using (SHA256 sha256 = SHA256.Create())
-            {
-                FileStream fileStream = fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                fileStream.Position = 0;
-                byte[] hashValue = sha256.ComputeHash(fileStream);
-                fileStream.Close();
-                fileStream.Dispose();
-
-                StringBuilder sb = new();
-                for (int i = 0; i < hashValue.Length; i++)
-                {
-                    sb.Append(hashValue[i].ToString("x2"));
-                }
-                Hash = sb.ToString().ToUpper();
-            }
+            byte[] data = File.ReadAllBytes(filePath.Value);
+            Hash = Standart.Hash.xxHash.xxHash64.ComputeHash(data, (int)fileInfo.Length, 42);
         }
     }
 
@@ -139,25 +125,27 @@ namespace kellerkompanie_sync
         public HashSet<FilePath> GetAllFilePaths()
         {
             HashSet<FilePath> allFilePaths = new();
-                try {
-                    foreach (FilePath addonSearchDirectory in Settings.Instance.GetAddonSearchDirectories())
-                    {   
-                        string[] allfiles = Directory.GetFiles(addonSearchDirectory.OriginalValue, "*.*", SearchOption.AllDirectories);
+            try
+            {
+                foreach (FilePath addonSearchDirectory in Settings.Instance.GetAddonSearchDirectories())
+                {
+                    string[] allfiles = Directory.GetFiles(addonSearchDirectory.OriginalValue, "*.*", SearchOption.AllDirectories);
 
-                        foreach (string file in allfiles)
+                    foreach (string file in allfiles)
+                    {
+                        if (file.Contains("@"))
                         {
-                            if (file.Contains("@"))
-                            {
-                                allFilePaths.Add(new FilePath(file));
-                            }
+                            allFilePaths.Add(new FilePath(file));
                         }
                     }
-                    
                 }
-                catch(DirectoryNotFoundException ex){
-                    MessageBox.Show(Properties.Resources.AddonSearchDirectoryNotFoundInfoMessage, "kellerkompanie-sync");
-                    Debug.WriteLine("Addon Seach Directory not Found: " + ex.Message);
-                }
+
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                MessageBox.Show(Properties.Resources.AddonSearchDirectoryNotFoundInfoMessage, "kellerkompanie-sync");
+                Debug.WriteLine("Addon Seach Directory not Found: " + ex.Message);
+            }
             return allFilePaths;
         }
 
@@ -201,7 +189,7 @@ namespace kellerkompanie_sync
                         FilePath fileAbsoluteFilePath = new((string)jFileContent["Absolute_filepath"]);
                         DateTime fileCreated = (DateTime)jFileContent["Created"];
                         long fileSize = (long)jFileContent["Filesize"];
-                        string fileHash = (string)jFileContent["Hash"];
+                        ulong fileHash = (ulong)jFileContent["Hash"];
 
                         LocalFileIndex localFileIndex = new()
                         {
@@ -223,7 +211,7 @@ namespace kellerkompanie_sync
                         Files = files,
                     };
                     Index.Add(localAddonAbsoluteFilePath, localAddon);
-                }               
+                }
             }
         }
 
@@ -553,13 +541,13 @@ namespace kellerkompanie_sync
                 return null;
             }
 
-            RemoteAddon remoteAddon = RemoteIndex.FilesIndex[uuid];            
+            RemoteAddon remoteAddon = RemoteIndex.FilesIndex[uuid];
             List<FilePath> remoteFileNames = new();
             foreach (FilePath remoteFileName in remoteAddon.Files.Keys)
             {
                 remoteFileNames.Add(remoteFileName.Replace("/", "\\"));
             }
-            return remoteFileNames;            
+            return remoteFileNames;
         }
 
         void AddonGroupStateWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)

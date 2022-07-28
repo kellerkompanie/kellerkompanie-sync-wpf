@@ -33,6 +33,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="xxHash.NET\src\Standart.Hash.xxHash.Perf\**" />
+    <Compile Remove="xxHash.NET\src\Standart.Hash.xxHash.Test\**" />
+    <Compile Remove="xxHash3.NET\xxHash3.Benchmarks\**" />
+    <EmbeddedResource Remove="xxHash.NET\src\Standart.Hash.xxHash.Perf\**" />
+    <EmbeddedResource Remove="xxHash.NET\src\Standart.Hash.xxHash.Test\**" />
+    <EmbeddedResource Remove="xxHash3.NET\xxHash3.Benchmarks\**" />
+    <None Remove="xxHash.NET\src\Standart.Hash.xxHash.Perf\**" />
+    <None Remove="xxHash.NET\src\Standart.Hash.xxHash.Test\**" />
+    <None Remove="xxHash3.NET\xxHash3.Benchmarks\**" />
+    <Page Remove="xxHash.NET\src\Standart.Hash.xxHash.Perf\**" />
+    <Page Remove="xxHash.NET\src\Standart.Hash.xxHash.Test\**" />
+    <Page Remove="xxHash3.NET\xxHash3.Benchmarks\**" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
     <None Remove="Images\announcement.png" />
     <None Remove="Images\appicon.png" />
     <None Remove="Images\calendar.png" />
@@ -58,10 +77,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Serilog" Version="2.9.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
-    <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Serilog" Version="2.11.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Standart.Hash.xxHash" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>

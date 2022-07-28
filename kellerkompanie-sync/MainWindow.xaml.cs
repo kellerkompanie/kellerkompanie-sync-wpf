@@ -36,7 +36,7 @@ namespace kellerkompanie_sync
             FileIndexer.Setup(ProgressBar, ProgressBarText);
             FileIndexer.Instance.UpdateLocalIndex();
 
-            EnablePlayButton();
+            EnablePlayButton();            
         }
 
         public void EnablePlayButton()
